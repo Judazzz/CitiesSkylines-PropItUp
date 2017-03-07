@@ -1,0 +1,48 @@
+[h1]About this mod[/h1]
+[quote]Prop it Up! is a mod with a number of features that allow you to access and replace props and trees that are embedded within buildings, in real-time. These features can be divided in global and asset-based tools.[/quote]
+
+[h1]So, how do I use this mod[/h1]
+[quote]All features of this mod can be accessed through its panel. To toggle the panel, you can use one of the three available key combinations: by default this is Alt-P, but in the mod options panel you can change this to Ctrl-P or Shift-P. Your prefered key combination will be stored in the mod's config file.
+The second way to toggle the panel is by clicking on the button with the tree icon: by default this button is located in the lower right corner, near the Free Camera button, but you can place it anywhere you want by dragging it while keeping the right mouse button clicked. Its position will be stored in the mod's config file.
+
+When you open the mod panel, you will find three tabs: [b]Global[/b], [b]Asset props[/b], and [b]Asset trees[/b].
+
+[b]Global[/b]: in this panel you can replace embedded vanilla trees with different ones on a [i]global, city-wide level[/i]. This feature is useful when you quickly want to replace all trees that do not fit the theme of your city: for example to replace all palm trees with pine or oak trees when you are playing on a temperate or boreal map. It can also be useful as a work-around for the - as-of-yet still unresolved - problem of flickering trees caused by the Random Tree Rotation mod.
+To use this feature, select a tree from the top list, select a replacement from the bottom list (use the search box above the replacement list to quickly find the tree you are looking for), and click the [b]Replace tree[/b] button to apply the change. Vanilla trees that have a global replacement applied to them are indicated in the list with a *, and to see what replacement tree you have used, hover the cursor over the vanilla tree item in the list. To undo a replacement, select the tree you want to reset in the top list and click the [b]Reset tree[/b] button (it will only be available when you have selected a replaced tree in the list).
+Note: if you switch from the [b]Building props[/b] or [b]Building trees[/b] panel, the currently selected building be unselected.
+Note: the replacements you make apply to every building on your map, as well as any newly added ones for as long as your global replacements remain active.
+
+[b]Asset props[/b]: in this panel you can replace props on a [i]per-building basis[/i]. This feature is useful when you want to replace building props that you don't like or that just don't fit. For example: I have always been bugged by the unrealistic amounts of table sets on roof tops that certain buildings have, and this mod allows me to replace them with more fitting props like antennas or chimneys.
+To use this feature, first select the building that you want to edit: the building selection tool will open as soon as you open this panel. Once a building is selected, all props used will be shown in the top list. To replace a prop, select it in the top list, then select a replacement from the bottom list (use the search feature above the replacement list to quickly find the prop you are looking for), and click the [b]Replace prop[/b] button to apply the change. After a replacement the name of the replaced prop will be replaced with the name of the replacement prop, so you will always see what props are currently being used by that building. To undo a replacement, select the prop you want to reset in the top list and click the [b]Reset prop[/b] button (it will only be available when you have selected a replacement prop in the list).
+Note: if you switch from the [b]Building trees[/b] panel, the currently selected building will remain selected.
+Note: the replacement(s) you make will apply to every instance of that building present in your city, as well as every instance that you add later.
+
+[b]Asset trees[/b]: in this panel you can do the same as in the Asset Props panel, but obviously instead of props it will let you replace trees on a per-building level.[/quote]
+
+[h1]Limitations and peculiarities[/h1]
+[quote]I have tried to make this mod as flexible and robust as possible, but there are a few things you'll need to keep in mind when using this mod:
+- this mod can only replace props and trees that are present in-game: this means that dependencies that you have not subscribed to are out of reach of this mod;
+- certain props have special properties, such as seating area's (benches) or are decal props: these props can only be replaced by props with those same properties. This is the reason why sometimes you will find just a few replacement options;
+- because of the way the game works, it is not recommended to replace different props or trees with one replacement. For example, when you replace two different vanilla trees with one Workshop tree, you can no longer change or undo those two different trees separately afterwards;
+- because this mod searches for every instance of a prop or tree present at the moment you apply a replacement, global and per-building replacements can override each other. That means that global replacements can override earlier made per-building replacements, and per-building replacements can override earlier made global replacements. Because of this, for the best results it is highly recommended to make all desired global tree replacements first, and only add per-building replacements afterwards;
+- when loading a city, per building replacements get prevalence over global replacements: this means that per-building replacements are applied first, and global replacements afterwards. Because of this, it is recommended to only globally replace vanilla trees;
+- this mod only affects props and trees embedded within buildings. If you want to customize roadside trees, use Boformer's awesome [url=http://steamcommunity.com/sharedfiles/filedetails/?id=543722850]Network Skins[/url] mod;
+- because of the way the game works, replaced trees still display the original tree's LOD model when zoomming out. I will investigate further, and hopefully this undesired behavior can be changed in the future, but I cannot give any guarantees that it can be done;
+- as of version 1.6, Cities: Skylines' Asset Editor supports prop randomization: I have not specifically tested this mod with that feature, but I don't expect any unusual behavior;
+- the above list of limits and peculiarities are the result of either the way the game itself works, or design choices made by me. By subscribing to this mod, you acknowledge you have read and are familiar with the above list, and accept that mod support is not applicable to these issues.[/quote]
+
+[h1]Compatibility[/h1]
+[quote]This mod should be compatible with all other mods.
+I have not done compatibility tests for every mod available in the Workshop for obvious reasons, but I have not found any incompatibilities between this mod and the ones I am subscribed to.[/quote]
+
+[h1]What's next?[/h1]
+[quote]In the first weeks after the publication of this mod, I will not add new, or change existing features, but limit strictly myself to bugfixes, compatibility issues and optimizations. The reason for this feature-freeze is to allow some time to iron out any bugs and incompatibilities I may have overlooked during development.
+Once the mod is stable, new features may be added. Things on the wish list (not to be confused with a todo list) are:
+- config files per save game or city;
+- replacing a prop or tree with nothing ('soft removal');
+- per-building replacements on instance level instead of asset level: this would allow players to customize each and every building in their cities individually.[/quote]
+
+
+[b]Short demo video:[/b] [url=https://u.nya.is/fpicba.mp4]click here[/url]
+
+[b]Source:[/b] [url=https://github.com/Judazzz/CitiesSkylines-PropItUp]Github[/url]
