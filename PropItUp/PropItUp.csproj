@@ -78,10 +78,8 @@
     <Compile Include="PropItUpTool.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Assets\ToolbarAtlas.png" />
-    <Content Include="Assets\WorkshopDescription.txt" />
+    <Folder Include="Assets\" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>mkdir "%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(ProjectName)"
