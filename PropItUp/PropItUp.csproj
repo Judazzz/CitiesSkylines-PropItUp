@@ -70,8 +70,9 @@
     <Compile Include="ThreadingExtension.cs" />
     <Compile Include="PropItUpTool.cs" />
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="Assets\" />
+    <EmbeddedResource Include="Assets\ToolbarAtlas.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
