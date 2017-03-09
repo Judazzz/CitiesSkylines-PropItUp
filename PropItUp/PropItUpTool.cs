@@ -295,12 +295,27 @@ namespace PropItUp
                         {
                             tree.m_finalTree = newTree;
                             tree.m_tree = newTree;
-                            //  TODO: LOD model:
                         }
                     }
                 }
+                UpdateBuildingsRenderers(); //that should update LODs
                 ReplaceFreeStandingTree(oldTree, newTree);
             });
+        }
+
+
+        private static void UpdateBuildingsRenderers() //TODO(earalov): limit updated buildings only to those that have replaced trees
+        {
+            var buildings = BuildingManager.instance.m_buildings.m_buffer;
+            for (ushort index = 0; index < buildings.Length; index++)
+            {
+                var building = buildings[index];
+                if (building.m_flags == Building.Flags.None)
+                {
+                    continue;
+                }
+                BuildingManager.instance.UpdateBuildingRenderer(index, true); //that should update LODs
+            }
         }
 
         private static void ReplaceFreeStandingTree(TreeInfo oldTree, TreeInfo newTree)
@@ -324,7 +339,7 @@ namespace PropItUp
                 }
                 tree.Info = newTree;
                 trees[index] = tree;
-                TreeManager.instance.UpdateTree(index);
+                TreeManager.instance.UpdateTreeRenderer(index, true); //that updates LODs
             }
         }
 
@@ -485,51 +500,53 @@ namespace PropItUp
         //  Replace selected tree/prop with replacement for building (runtime):
         public static void ReplacePrefabBuilding(PrefabReplacement selectedPrefabReplacement)
         {
-            //  Replacement = prop:
-            if (selectedPrefabReplacement.type == "prop")
+            SimulationManager.instance.AddAction(() =>
             {
-                //  TODO: fix issues with buildings with accented characters in name (causes error);
-                PropInfo newProp = PrefabCollection<PropInfo>.FindLoaded(selectedPrefabReplacement.replacement_name);
-                foreach (var prop in BuildingSelectionTool.instance.m_selectedBuilding.m_props)
+                //  Replacement = prop:
+                if (selectedPrefabReplacement.type == "prop")
                 {
-                    if (prop.m_prop != null)
+                    //  TODO: fix issues with buildings with accented characters in name (causes error);
+                    PropInfo newProp = PrefabCollection<PropInfo>.FindLoaded(selectedPrefabReplacement.replacement_name);
+                    foreach (var prop in BuildingSelectionTool.instance.m_selectedBuilding.m_props)
                     {
-                        var propInstance = prop.m_finalProp;
-                        if (propInstance == null)
+                        if (prop.m_prop != null)
                         {
-                            continue;
-                        }
-                        if (propInstance.name == selectedPrefabReplacement.original)
-                        {
-                            prop.m_finalProp = newProp;
-                            prop.m_prop = newProp;
-                            //  TODO: LOD model:
+                            var propInstance = prop.m_finalProp;
+                            if (propInstance == null)
+                            {
+                                continue;
+                            }
+                            if (propInstance.name == selectedPrefabReplacement.original)
+                            {
+                                prop.m_finalProp = newProp;
+                                prop.m_prop = newProp;
+                            }
                         }
                     }
                 }
-            }
-            else
-            {
-                //  Replacement = tree:
-                TreeInfo newTree = PrefabCollection<TreeInfo>.FindLoaded(selectedPrefabReplacement.replacement_name);
-                foreach (var tree in BuildingSelectionTool.instance.m_selectedBuilding.m_props)
+                else
                 {
-                    if (tree.m_tree != null)
+                    //  Replacement = tree:
+                    TreeInfo newTree = PrefabCollection<TreeInfo>.FindLoaded(selectedPrefabReplacement.replacement_name);
+                    foreach (var tree in BuildingSelectionTool.instance.m_selectedBuilding.m_props)
                     {
-                        var treeInstance = tree.m_finalTree;
-                        if (treeInstance == null)
+                        if (tree.m_tree != null)
                         {
-                            continue;
-                        }
-                        if (treeInstance.name == selectedPrefabReplacement.original)
-                        {
-                            tree.m_finalTree = newTree;
-                            tree.m_tree = newTree;
-                            //  TODO: LOD model:
+                            var treeInstance = tree.m_finalTree;
+                            if (treeInstance == null)
+                            {
+                                continue;
+                            }
+                            if (treeInstance.name == selectedPrefabReplacement.original)
+                            {
+                                tree.m_finalTree = newTree;
+                                tree.m_tree = newTree;
+                            }
                         }
                     }
                 }
-            }
+                UpdateBuildingsRenderers(); //that should update LODs
+            });
         }
 
         //  Save/apply selected tree/prop replacement for building:
