@@ -269,33 +269,62 @@ namespace PropItUp
         //  Apply selected global tree/prop replacement (runtime):
         public static void ReplaceTreeGlobal(PrefabReplacement selectedTreeReplacement)
         {
-            TreeInfo newTree = PrefabCollection<TreeInfo>.FindLoaded(selectedTreeReplacement.replacement_name);
-            TreeInfo oldTree = PrefabCollection<TreeInfo>.FindLoaded(selectedTreeReplacement.original);
-            //  
-            List<string> allBuildings = config.GetAllBuildings();
-            //  Replace building trees:
-            var buildings = Resources.FindObjectsOfTypeAll<BuildingInfo>();
-            foreach (var building in buildings)
+            SimulationManager.instance.AddAction(() =>
             {
-                //  Skip buildings that have no trees or have custom TreeReplacements:
-                if (building.m_props == null || allBuildings.Contains(building.name))
+                TreeInfo newTree = PrefabCollection<TreeInfo>.FindLoaded(selectedTreeReplacement.replacement_name);
+                TreeInfo oldTree = PrefabCollection<TreeInfo>.FindLoaded(selectedTreeReplacement.original);
+                //  
+                List<string> allBuildings = config.GetAllBuildings();
+                //  Replace building trees:
+                var buildings = Resources.FindObjectsOfTypeAll<BuildingInfo>();
+                foreach (var building in buildings)
                 {
-                    continue;
-                }
-                foreach (var tree in building.m_props)
-                {
-                    var treeInstance = tree.m_finalTree;
-                    if (treeInstance == null)
+                    //  Skip buildings that have no trees or have custom TreeReplacements:
+                    if (building.m_props == null || allBuildings.Contains(building.name))
                     {
                         continue;
                     }
-                    if (treeInstance.name == oldTree.name)
+                    foreach (var tree in building.m_props)
                     {
-                        tree.m_finalTree = newTree;
-                        tree.m_tree = newTree;
-                        //  TODO: LOD model:
+                        var treeInstance = tree.m_finalTree;
+                        if (treeInstance == null)
+                        {
+                            continue;
+                        }
+                        if (treeInstance.name == oldTree.name)
+                        {
+                            tree.m_finalTree = newTree;
+                            tree.m_tree = newTree;
+                            //  TODO: LOD model:
+                        }
                     }
                 }
+                ReplaceFreeStandingTree(oldTree, newTree);
+            });
+        }
+
+        private static void ReplaceFreeStandingTree(TreeInfo oldTree, TreeInfo newTree)
+        {
+            var trees = TreeManager.instance.m_trees.m_buffer;
+            for (uint index = 0; index < trees.Length; index++)
+            {
+                var tree = trees[index];
+                if (tree.m_flags == (ushort) TreeInstance.Flags.None)
+                {
+                    continue;
+                }
+                var treeInstance = tree.Info;
+                if (treeInstance == null)
+                {
+                    continue;
+                }
+                if (treeInstance.name != oldTree.name)
+                {
+                    continue;
+                }
+                tree.Info = newTree;
+                trees[index] = tree;
+                TreeManager.instance.UpdateTree(index);
             }
         }
 
