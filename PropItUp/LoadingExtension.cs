@@ -23,7 +23,7 @@ namespace PropItUp
         public override void OnLevelLoaded(LoadMode mode)
         {
             // Check if in-game:
-            if (mode != LoadMode.LoadGame && mode != LoadMode.NewGame)
+            if (mode != LoadMode.LoadGame && mode != LoadMode.NewGame && mode != LoadMode.NewGameFromScenario)
             {
                 DebugUtils.Log($"Mod not loaded: only available in-game, not in editors.");
                 return;
@@ -52,7 +52,7 @@ namespace PropItUp
             {
                 PropItUpTool.ReplaceTreesGlobal();
             }
-            
+
             base.OnLevelLoaded(mode);
         }
 

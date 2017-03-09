@@ -231,7 +231,7 @@ namespace PropItUp
                 DebugUtils.Log($"Finished listing all trees: {allAvailableTrees.Count} trees found.");
             }
         }
-        
+
 
         //  Global replacements:
         #region Global replacements:

@@ -162,7 +162,7 @@ namespace PropItUp
         }
 
         public class PrefabReplacement
-        {   
+        {
             [XmlAttribute("index")]
             public int index;
 
