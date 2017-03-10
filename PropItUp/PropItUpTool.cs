@@ -303,13 +303,17 @@ namespace PropItUp
         }
 
 
-        private static void UpdateBuildingsRenderers() //TODO(earalov): limit updated buildings only to those that have replaced trees
+        private static void UpdateBuildingsRenderers(BuildingInfo buildingInfo = null)
         {
             var buildings = BuildingManager.instance.m_buildings.m_buffer;
             for (ushort index = 0; index < buildings.Length; index++)
             {
                 var building = buildings[index];
                 if (building.m_flags == Building.Flags.None)
+                {
+                    continue;
+                }
+                if (buildingInfo != null && building.Info != buildingInfo)
                 {
                     continue;
                 }
@@ -495,8 +499,12 @@ namespace PropItUp
         }
 
         //  Replace selected tree/prop with replacement for building (runtime):
-        public static void ReplacePrefabBuilding(BuildingInfo building, PrefabReplacement selectedPrefabReplacement)
+        public static void ReplacePrefabBuilding(BuildingInfo buildingInfo, PrefabReplacement selectedPrefabReplacement)
         {
+            if (buildingInfo == null)
+            {
+                return;
+            }
             SimulationManager.instance.AddAction(() =>
             {
                 //  Replacement = prop:
@@ -504,7 +512,7 @@ namespace PropItUp
                 {
                     //  TODO: fix issues with buildings with accented characters in name (causes error);
                     PropInfo newProp = PrefabCollection<PropInfo>.FindLoaded(selectedPrefabReplacement.replacement_name);
-                    foreach (var prop in building.m_props)
+                    foreach (var prop in buildingInfo.m_props)
                     {
                         if (prop.m_prop != null)
                         {
@@ -525,7 +533,7 @@ namespace PropItUp
                 {
                     //  Replacement = tree:
                     TreeInfo newTree = PrefabCollection<TreeInfo>.FindLoaded(selectedPrefabReplacement.replacement_name);
-                    foreach (var tree in building.m_props)
+                    foreach (var tree in buildingInfo.m_props)
                     {
                         if (tree.m_tree != null)
                         {
@@ -542,7 +550,7 @@ namespace PropItUp
                         }
                     }
                 }
-                UpdateBuildingsRenderers(); //that should update LODs
+                UpdateBuildingsRenderers(buildingInfo); //that should update LODs
             });
         }
 
