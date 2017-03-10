@@ -12,7 +12,6 @@ namespace PropItUp
 {
     public class PropItUpTool : MonoBehaviour
     {
-        public static PropItUpTool instance;
         private static UIMainButton m_mainbutton;
         private static UIMainPanel m_mainpanel;
 
@@ -474,10 +473,9 @@ namespace PropItUp
             {
                 foreach (PrefabReplacement prefabReplacement in building.prefabReplacements)
                 {
-                    BuildingSelectionTool.instance.m_selectedBuilding = PrefabCollection<BuildingInfo>.FindLoaded(building.name);
                     try
                     {
-                        ReplacePrefabBuilding(prefabReplacement);
+                        ReplacePrefabBuilding(PrefabCollection<BuildingInfo>.FindLoaded(building.name), prefabReplacement);
                     }
                     catch (Exception e)
                     {
@@ -487,7 +485,6 @@ namespace PropItUp
                     }
                 }
             }
-            BuildingSelectionTool.instance.m_selectedBuilding = null;
             //  Output timer data:
             ReplaceTreesTimer.Stop();
             //  
@@ -498,7 +495,7 @@ namespace PropItUp
         }
 
         //  Replace selected tree/prop with replacement for building (runtime):
-        public static void ReplacePrefabBuilding(PrefabReplacement selectedPrefabReplacement)
+        public static void ReplacePrefabBuilding(BuildingInfo building, PrefabReplacement selectedPrefabReplacement)
         {
             SimulationManager.instance.AddAction(() =>
             {
@@ -507,7 +504,7 @@ namespace PropItUp
                 {
                     //  TODO: fix issues with buildings with accented characters in name (causes error);
                     PropInfo newProp = PrefabCollection<PropInfo>.FindLoaded(selectedPrefabReplacement.replacement_name);
-                    foreach (var prop in BuildingSelectionTool.instance.m_selectedBuilding.m_props)
+                    foreach (var prop in building.m_props)
                     {
                         if (prop.m_prop != null)
                         {
@@ -528,7 +525,7 @@ namespace PropItUp
                 {
                     //  Replacement = tree:
                     TreeInfo newTree = PrefabCollection<TreeInfo>.FindLoaded(selectedPrefabReplacement.replacement_name);
-                    foreach (var tree in BuildingSelectionTool.instance.m_selectedBuilding.m_props)
+                    foreach (var tree in building.m_props)
                     {
                         if (tree.m_tree != null)
                         {
@@ -629,7 +626,7 @@ namespace PropItUp
                 //  Replace tree/prop:
                 try
                 {
-                    ReplacePrefabBuilding(executablePrefabReplacement);
+                    ReplacePrefabBuilding(BuildingSelectionTool.instance.m_selectedBuilding, executablePrefabReplacement);
                 }
                 catch (Exception e)
                 {
@@ -683,7 +680,7 @@ namespace PropItUp
                 //  Reset tree/prop:
                 try
                 {
-                    ReplacePrefabBuilding(executablePrefabReplacement);
+                    ReplacePrefabBuilding(BuildingSelectionTool.instance.m_selectedBuilding, executablePrefabReplacement);
                 }
                 catch (Exception e)
                 {
