@@ -5,11 +5,12 @@ namespace PropItUp
 {
     class BuildingSelectionTool : ToolBase
     {
-        public static BuildingSelectionTool instance;
+        public static BuildingSelectionTool instance; //TODO(earalov): this is pure evil. Add tool properly and access it via ToolsModifierControl
         private bool m_prevRenderZones;
         private ToolBase m_prevTool;
 
         private Selectable m_hoverInstance;
+
         public Selectable hoverInstance
         {
             get { return m_hoverInstance; }
