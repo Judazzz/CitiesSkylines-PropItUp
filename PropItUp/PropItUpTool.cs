@@ -634,7 +634,7 @@ namespace PropItUp
                 //  Replace tree/prop:
                 try
                 {
-                    ReplacePrefabBuilding(BuildingSelectionTool.instance.m_selectedBuilding, executablePrefabReplacement);
+                    ReplacePrefabBuilding(PropCustomizerPanel.instance.selectedBuilding, executablePrefabReplacement);
                 }
                 catch (Exception e)
                 {
@@ -688,7 +688,7 @@ namespace PropItUp
                 //  Reset tree/prop:
                 try
                 {
-                    ReplacePrefabBuilding(BuildingSelectionTool.instance.m_selectedBuilding, executablePrefabReplacement);
+                    ReplacePrefabBuilding(affectedBuilding, executablePrefabReplacement);
                 }
                 catch (Exception e)
                 {

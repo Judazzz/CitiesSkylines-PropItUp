@@ -231,10 +231,10 @@ namespace PropItUp.GUI
         {
             //  Set selected building label:
             selectedBuildingLabel.text =
-                $"{UIUtils.GenerateBeautifiedPrefabName(BuildingSelectionTool.instance.m_selectedBuilding)}";
+                $"{UIUtils.GenerateBeautifiedPrefabName(_selectedBuilding)}";
             UIUtils.TruncateLabel(selectedBuildingLabel, _replacementPropFastListSearchBox.width); // ({BuildingSelectionTool.instance.m_selectedBuildingInstanceId})
             //  Null/empty check:
-            if (BuildingSelectionTool.instance.m_selectedBuilding.m_props == null || BuildingSelectionTool.instance.m_selectedBuilding.m_props.Length == 0)
+            if (_selectedBuilding.m_props == null || _selectedBuilding.m_props.Length == 0)
             {
                 return;
             }
@@ -246,7 +246,7 @@ namespace PropItUp.GUI
             //  List all props in selected building:
             listIsUpdating = true;
             List<PropInfo> selectedBuildingPropList = new List<PropInfo>();
-            foreach (var prop in BuildingSelectionTool.instance.m_selectedBuilding.m_props)
+            foreach (var prop in _selectedBuilding.m_props)
             {
                 if (prop.m_prop != null)
                 {
@@ -271,7 +271,7 @@ namespace PropItUp.GUI
             //  
             if (PropItUpTool.config.enable_debug)
             {
-                DebugUtils.Log($"PropCustomizerPanel: OriginalFastList populated with {selectedBuildingPropList.Count} props for building '{BuildingSelectionTool.instance.m_selectedBuilding.name}'.");
+                DebugUtils.Log($"PropCustomizerPanel: OriginalFastList populated with {selectedBuildingPropList.Count} props for building '{_selectedBuilding.name}'.");
             }
         }
         protected void OnSelectedOriginalChanged(UIComponent component, int i)
@@ -286,7 +286,7 @@ namespace PropItUp.GUI
                 _selectedPropOriginal = _originalPropFastList.rowsData[i] as PropInfo;
                 _selectedPropOriginalIndex = i;
                 //  Enable Reset Button if selected building has tree replacements and tree replacement is set for selected building:
-                Configuration.Building selectedBuilding = PropItUpTool.config.GetBuilding(BuildingSelectionTool.instance.m_selectedBuilding.name);
+                Configuration.Building selectedBuilding = PropItUpTool.config.GetBuilding(_selectedBuilding.name);
                 if (selectedBuilding == null)
                 {
                     _resetReplacementButton.isEnabled = false;

@@ -5,7 +5,6 @@ namespace PropItUp
 {
     class BuildingSelectionTool : ToolBase
     {
-        public static BuildingSelectionTool instance; //TODO(earalov): this is pure evil. Add tool properly and access it via ToolsModifierControl
         private bool m_prevRenderZones;
         private ToolBase m_prevTool;
 
@@ -18,7 +17,6 @@ namespace PropItUp
         }
 
         public BuildingInfo m_selectedBuilding;
-        public ushort m_selectedBuildingInstanceId;
 
         private static Color m_hoverSelectableColor = new Color32(0, 181, 255, 255);
         private static Color m_hoverUnselectableColor = new Color32(204, 0, 0, 255);
@@ -81,12 +79,9 @@ namespace PropItUp
                         PropCustomizerPanel.instance.PopulateIncludedPropsFastList();
                         TreeCustomizerPanel.instance.PopulateIncludedTreesFastList();
                         //  
-                        PropCustomizerPanel.instance.selectedBuilding = m_selectedBuilding;
-                        TreeCustomizerPanel.instance.selectedBuilding = m_selectedBuilding;
-                        //  
                         if (PropItUpTool.config.enable_debug)
                         {
-                            DebugUtils.Log($"BuildingSelectionTool: selected building '{m_selectedBuilding.name}', with InstanceID {m_selectedBuildingInstanceId}).");
+                            DebugUtils.Log($"BuildingSelectionTool: selected building '{m_selectedBuilding.name}'.");
                         }
                     }
                     //  Deselect

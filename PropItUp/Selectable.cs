@@ -1,4 +1,5 @@
 ﻿using ColossalFramework;
+using PropItUp.GUI;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -241,8 +242,8 @@ namespace PropItUp
                             }
                         }
                         //  
-                        BuildingSelectionTool.instance.m_selectedBuilding = buildingInfo;
-                        BuildingSelectionTool.instance.m_selectedBuildingInstanceId = building;
+                        TreeCustomizerPanel.instance.selectedBuilding = buildingInfo;
+                        PropCustomizerPanel.instance.selectedBuilding = buildingInfo;
 
                         break;
                     }

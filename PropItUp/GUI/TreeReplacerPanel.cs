@@ -74,8 +74,11 @@ namespace PropItUp.GUI
             isInteractive = true;
             //  
             SetupControls();
-            PopulateVanillaTreesFastList();
-            PopulateCustomTreesFastList();
+            if (PropItUpTool.allCustomTrees.Count > 0)
+            {
+                PopulateVanillaTreesFastList();
+                PopulateCustomTreesFastList();
+            }
         }
 
         private void SetupControls()
@@ -83,12 +86,19 @@ namespace PropItUp.GUI
             // Vanilla Container:
             var originalContainer = UIUtils.CreateFormElement(this, "top");
             originalContainer.name = "originalContainer";
-            //  Selected building:
+            //  Label:
             _introLabel = originalContainer.AddUIComponent<UILabel>();
-            _introLabel.text = "Global replacement";
             _introLabel.textColor = new Color(187, 187, 187, 255);
             _introLabel.textScale = 0.8f;
             _introLabel.padding = new RectOffset(0, 0, 0, 5);
+            //  No custom trees: hide UI:
+            if (PropItUpTool.allCustomTrees.Count == 0)
+            {
+                _introLabel.width = parent.width;
+                _introLabel.text = "THIS FEATURE IS UNAVAILABLE!\n\nReason: no custom trees found";
+                return;
+            }
+            _introLabel.text = "Global replacement";
             //  Source:
             _vanillaTreeLabel = originalContainer.AddUIComponent<UILabel>();
             _vanillaTreeLabel.text = "Vanilla trees";

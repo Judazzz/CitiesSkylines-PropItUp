@@ -32,11 +32,12 @@ namespace PropItUp
             PropItUpTool.Initialize();
             PropItUpTool.LoadConfig();
 
-            if (BuildingSelectionTool.instance == null)
+            //  Add BuildingSelectionTool to ToolController:
+            if (ToolsModifierControl.GetTool<BuildingSelectionTool>() == null)
             {
-                // Create instance:
-                ToolController toolController = GameObject.FindObjectOfType<ToolController>();
-                BuildingSelectionTool.instance = toolController.gameObject.AddComponent<BuildingSelectionTool>();
+                //ToolsModifierControl.SetTool<BuildingSelectionTool>();
+                //BuildingSelectionTool.instance = toolController.gameObject.AddComponent<BuildingSelectionTool>();
+                ToolsModifierControl.toolController.gameObject.AddComponent<BuildingSelectionTool>();
             }
 
             //  Building Prop/Tree Replacements:
@@ -58,10 +59,10 @@ namespace PropItUp
 
         public override void OnLevelUnloading()
         {
-            if (BuildingSelectionTool.instance != null)
-            {
-                BuildingSelectionTool.instance.enabled = false;
-            }
+            //if (BuildingSelectionTool.instance != null)
+            //{
+            //    BuildingSelectionTool.instance.enabled = false;
+            //}
             PropItUpTool.isGameLoaded = false;
             PropItUpTool.Reset();
             //  

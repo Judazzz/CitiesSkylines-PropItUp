@@ -16,6 +16,8 @@ namespace PropItUp.GUI
         public TreeCustomizerPanel treeCustomizerPanel;
         public PropCustomizerPanel propCustomizerPanel;
 
+        private BuildingSelectionTool buildingSelectionTool;
+
         public static UIMainPanel _instance;
         public static UIMainPanel instance
         {
@@ -120,32 +122,31 @@ namespace PropItUp.GUI
             treeReplacerPanel.isVisible = false;
             propCustomizerPanel.isVisible = false;
             treeCustomizerPanel.isVisible = false;
-            BuildingSelectionTool.instance.toolLocked = false;
 
             if (trigger == treeReplacerButton)
             {
                 treeReplacerPanel.isVisible = true;
-                BuildingSelectionTool.instance.enabled = false;
+                ToolsModifierControl.toolController.CurrentTool = ToolsModifierControl.GetTool<DefaultTool>();
+                ToolsModifierControl.SetTool<DefaultTool>();
             }
             if (trigger == propCustomizerButton)
             {
                 propCustomizerPanel.isVisible = true;
-                BuildingSelectionTool.instance.enabled = true;
+                ToolsModifierControl.toolController.CurrentTool = buildingSelectionTool;
+                ToolsModifierControl.SetTool<BuildingSelectionTool>();
             }
             if (trigger == treeCustomizerButton)
             {
                 treeCustomizerPanel.isVisible = true;
-                BuildingSelectionTool.instance.enabled = true;
+                ToolsModifierControl.toolController.CurrentTool = buildingSelectionTool;
+                ToolsModifierControl.SetTool<BuildingSelectionTool>();
             }
         }
 
         //  Toggle main panel and update button state:
         public void Toggle()
         {
-            //  Disable BuildingSelection Tool:
-            BuildingSelectionTool.instance.toolLocked = true;
-            BuildingSelectionTool.instance.hoverInstance = null;
-            BuildingSelectionTool.instance.m_selectedBuilding = null;
+            //  TODO: canel BuildingSelectionTool's selected building + building highlight:
             //  Reset ModPanels:
             TreeReplacerPanel.instance.Reset();
             PropCustomizerPanel.instance.Reset();
@@ -154,7 +155,8 @@ namespace PropItUp.GUI
             {
                 //  Hide MainPanel:
                 _instance.isVisible = false;
-                BuildingSelectionTool.instance.enabled = false;
+                ToolsModifierControl.toolController.CurrentTool = ToolsModifierControl.GetTool<DefaultTool>();
+                ToolsModifierControl.SetTool<DefaultTool>();
                 //  Mod button:
                 UIMainButton.instance.state = UIButton.ButtonState.Normal;
             }
@@ -168,7 +170,8 @@ namespace PropItUp.GUI
                 treeReplacerPanel.isVisible = true;
                 propCustomizerPanel.isVisible = false;
                 treeCustomizerPanel.isVisible = false;
-                BuildingSelectionTool.instance.enabled = false;
+                ToolsModifierControl.toolController.CurrentTool = ToolsModifierControl.GetTool<DefaultTool>();
+                ToolsModifierControl.SetTool<DefaultTool>();
                 //  Mod button:
                 UIMainButton.instance.state = UIButton.ButtonState.Focused;
             }
