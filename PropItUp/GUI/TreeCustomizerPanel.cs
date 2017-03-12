@@ -15,6 +15,8 @@ namespace PropItUp.GUI
         private UIFastList _replacementTreeFastList;
         private UIButton _saveTreeReplacementButton;
 
+        private string searchboxPlaceholder = "Find a tree";
+
         public UILabel selectedBuildingLabel
         {
             get { return _selectedBuildingLabel; }
@@ -125,7 +127,7 @@ namespace PropItUp.GUI
                 _resetReplacementButton.isEnabled = false;
                 //  Repopulate/reset OriginalTreeFastList:
                 PopulateIncludedTreesFastList();
-                _selectedTreeOriginal = _originalTreeFastList.rowsData[_selectedTreeOriginalIndex] as TreeInfo; ;
+                _selectedTreeOriginal = _originalTreeFastList.rowsData[_selectedTreeOriginalIndex] as TreeInfo;
                 _resetReplacementButton.isEnabled = false;
             };
             _resetReplacementButton.isEnabled = false;
@@ -153,7 +155,7 @@ namespace PropItUp.GUI
             //  Search Box:
             _replacementTreeFastListSearchBox = UIUtils.CreateTextField(searchboxContainer);
             _replacementTreeFastListSearchBox.position = new Vector3(_selectedBuildingLabel.relativePosition.x, 205);
-            _replacementTreeFastListSearchBox.width = parent.width - (3 * PropItUpTool.SPACING) - 12;
+            _replacementTreeFastListSearchBox.width = parent.width - (3 * PropItUpTool.SPACING) - 10;
             _replacementTreeFastListSearchBox.height = 25;
             _replacementTreeFastListSearchBox.padding = new RectOffset(6, 6, 6, 6);
             _replacementTreeFastListSearchBox.normalBgSprite = "TextFieldUnderline";
@@ -161,7 +163,7 @@ namespace PropItUp.GUI
             _replacementTreeFastListSearchBox.disabledBgSprite = "TextFieldUnderline";
             _replacementTreeFastListSearchBox.focusedBgSprite = "LevelBarBackground";
             _replacementTreeFastListSearchBox.horizontalAlignment = UIHorizontalAlignment.Left;
-            _replacementTreeFastListSearchBox.text = "Find a tree";
+            _replacementTreeFastListSearchBox.text = searchboxPlaceholder;
             _replacementTreeFastListSearchBox.textColor = new Color32(187, 187, 187, 255);
             _replacementTreeFastListSearchBox.textScale = 0.75f;
             //  Search Box Events:
@@ -172,8 +174,8 @@ namespace PropItUp.GUI
             };
             _replacementTreeFastListSearchBox.eventGotFocus += (c, p) =>
             {
-                _replacementTreeFastList.selectedIndex = -1;
-                if (_replacementTreeFastListSearchBox.text == "Find a tree")
+                //_replacementTreeFastList.selectedIndex = -1;
+                if (_replacementTreeFastListSearchBox.text == searchboxPlaceholder)
                 {
                     _replacementTreeFastListSearchBox.text = string.Empty;
                 }
@@ -182,7 +184,7 @@ namespace PropItUp.GUI
             {
                 if (_replacementTreeFastListSearchBox.text == string.Empty)
                 {
-                    _replacementTreeFastListSearchBox.text = "Find a tree";
+                    _replacementTreeFastListSearchBox.text = searchboxPlaceholder;
                 }
             };
 
@@ -233,7 +235,7 @@ namespace PropItUp.GUI
             //  Set selected building label:
             selectedBuildingLabel.text =
                 $"{UIUtils.GenerateBeautifiedPrefabName(_selectedBuilding)}";
-            UIUtils.TruncateLabel(selectedBuildingLabel, _replacementTreeFastListSearchBox.width); // ({BuildingSelectionTool.instance.m_selectedBuildingInstanceId})
+            UIUtils.TruncateLabel(selectedBuildingLabel, _replacementTreeFastListSearchBox.width);
             //  Null/empty check:
             if (_selectedBuilding.m_props == null || _selectedBuilding.m_props.Length == 0)
             {
@@ -252,8 +254,10 @@ namespace PropItUp.GUI
             {
                 if (prop.m_tree != null)
                 {
-                    //  Exclude trees with double quotes in name (causes infinite 'Array index is out of range' error loops):
-                    if (prop.m_tree.name.Contains("\""))
+                    //  Temporary 'Extreme Mode' feature:
+                    //  TODO: verify if this is still an issue!
+                    //  Exclude props with double quotes in name (causes infinite 'Array index is out of range' error loops):
+                    if (PropItUpTool.config.enable_extrememode == false && prop.m_tree.name.Contains("\""))
                     {
                         continue;
                     }
@@ -314,21 +318,19 @@ namespace PropItUp.GUI
         {
             if (PropItUpTool.allAvailableTrees.Count > 0)
             {
+                //  Search Query set?
+                if (!string.IsNullOrEmpty(searchQuery) && searchQuery != searchboxPlaceholder)
+                {
+                    Search();
+                    return;
+                }
                 //  TODO: Add 'No replacement' option:
 
                 //  Add all available trees:
 
-                //  Search Query set?
-                if (searchQuery != string.Empty)
+                foreach (var tree in PropItUpTool.allAvailableTrees)
                 {
-                    Search();
-                }
-                else
-                {
-                    foreach (var tree in PropItUpTool.allAvailableTrees)
-                    {
-                        _replacementTreeFastList.rowsData.Add(tree);
-                    }
+                    _replacementTreeFastList.rowsData.Add(tree);
                 }
                 _replacementTreeFastList.rowHeight = 26f;
                 _replacementTreeFastList.DisplayAt(0);
@@ -348,7 +350,7 @@ namespace PropItUp.GUI
             _selectedTreeReplacement = _replacementTreeFastList.rowsData[i] as TreeInfo;
             //  TODO: visually highlight selected tree instance:
             //TreeInstance t = TreeManager.instance.m_trees.m_buffer[_selectedTreeOriginal.GetInstanceID()];
-
+            //  
             if (PropItUpTool.config.enable_debug)
             {
                 DebugUtils.Log($"TreeCustomizerPanel: ReplacementFastList selected: tree '{UIUtils.GenerateBeautifiedPrefabName(_selectedTreeReplacement)}' ('{_selectedTreeReplacement.name}').");
@@ -357,6 +359,10 @@ namespace PropItUp.GUI
 
         public void Search()
         {
+            if (searchQuery == searchboxPlaceholder)
+            {
+                return;
+            }
             //  Deselect and clear FastList:
             _replacementTreeFastList.selectedIndex = -1;
             _replacementTreeFastList.Clear();

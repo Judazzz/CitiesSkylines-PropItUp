@@ -78,11 +78,6 @@ namespace PropItUp
                         //  
                         PropCustomizerPanel.instance.PopulateIncludedPropsFastList();
                         TreeCustomizerPanel.instance.PopulateIncludedTreesFastList();
-                        //  
-                        if (PropItUpTool.config.enable_debug)
-                        {
-                            DebugUtils.Log($"BuildingSelectionTool: selected building '{m_selectedBuilding.name}'.");
-                        }
                     }
                     //  Deselect
                     if (Input.GetMouseButtonDown(1))

@@ -35,8 +35,6 @@ namespace PropItUp
             //  Add BuildingSelectionTool to ToolController:
             if (ToolsModifierControl.GetTool<BuildingSelectionTool>() == null)
             {
-                //ToolsModifierControl.SetTool<BuildingSelectionTool>();
-                //BuildingSelectionTool.instance = toolController.gameObject.AddComponent<BuildingSelectionTool>();
                 ToolsModifierControl.toolController.gameObject.AddComponent<BuildingSelectionTool>();
             }
 
@@ -59,10 +57,6 @@ namespace PropItUp
 
         public override void OnLevelUnloading()
         {
-            //if (BuildingSelectionTool.instance != null)
-            //{
-            //    BuildingSelectionTool.instance.enabled = false;
-            //}
             PropItUpTool.isGameLoaded = false;
             PropItUpTool.Reset();
             //  

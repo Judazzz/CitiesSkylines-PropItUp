@@ -1,4 +1,6 @@
-﻿using ColossalFramework.UI;
+﻿using ColossalFramework.Plugins;
+using ColossalFramework.UI;
+using System.Linq;
 using UnityEngine;
 
 namespace PropItUp.GUI
@@ -131,12 +133,24 @@ namespace PropItUp.GUI
             }
             if (trigger == propCustomizerButton)
             {
+                //  Refresh prop list if Aedificium mod is detected (to include newly hotloaded trees):
+                if (PluginManager.instance.GetPluginsInfo().Any(mod => (mod.publishedFileID.AsUInt64 == 793489846 && mod.isEnabled)))
+                {
+                    PropItUpTool.ListPropPrefabs(true);
+                    propCustomizerPanel.PopulateAvailablePropsFastList();
+                }
                 propCustomizerPanel.isVisible = true;
                 ToolsModifierControl.toolController.CurrentTool = buildingSelectionTool;
                 ToolsModifierControl.SetTool<BuildingSelectionTool>();
             }
             if (trigger == treeCustomizerButton)
             {
+                //  Refresh prop list if Aedificium mod is detected (to include newly hotloaded props):
+                if (PluginManager.instance.GetPluginsInfo().Any(mod => (mod.publishedFileID.AsUInt64 == 793489846 && mod.isEnabled)))
+                {
+                    PropItUpTool.ListTreePrefabs(true);
+                    treeCustomizerPanel.PopulateAvailableTreesFastList();
+                }
                 treeCustomizerPanel.isVisible = true;
                 ToolsModifierControl.toolController.CurrentTool = buildingSelectionTool;
                 ToolsModifierControl.SetTool<BuildingSelectionTool>();

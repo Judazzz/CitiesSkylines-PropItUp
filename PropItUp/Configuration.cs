@@ -18,6 +18,7 @@ namespace PropItUp
         public bool enable_applyglobalonload = true;
         public bool enable_applybuildingonload = true;
         public bool enable_runtimereload = true;
+        public bool enable_extrememode = false;
         public bool enable_debug = false;
 
         [XmlArray(ElementName = "GlobalTreeReplacements")]
@@ -55,6 +56,7 @@ namespace PropItUp
                         enable_applyglobalonload = PropItUpTool.config.enable_applyglobalonload,
                         enable_applybuildingonload = PropItUpTool.config.enable_applybuildingonload,
                         enable_runtimereload = PropItUpTool.config.enable_runtimereload,
+                        enable_extrememode = PropItUpTool.config.enable_extrememode,
                         enable_debug = PropItUpTool.config.enable_debug
                     };
 

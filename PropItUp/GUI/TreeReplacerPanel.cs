@@ -7,13 +7,15 @@ namespace PropItUp.GUI
     public class TreeReplacerPanel : UIPanel
     {
         private UILabel _introLabel;
-        private UILabel _vanillaTreeLabel;
+        private UILabel _originalTreeLabel;
         private UIButton _resetReplacementButton;
-        private UIFastList _vanillaTreeFastList;
-        private UILabel _customTreeLabel;
-        private UITextField _customTreeFastListSearchBox;
-        private UIFastList _customTreeFastList;
+        private UIFastList _originalTreeFastList;
+        private UILabel _replacementTreeLabel;
+        private UITextField _replacementTreeFastListSearchBox;
+        private UIFastList _replacementTreeFastList;
         private UIButton _saveTreeReplacementButton;
+
+        private string searchboxPlaceholder = "Find a tree";
 
         public UILabel introLabel
         {
@@ -21,41 +23,41 @@ namespace PropItUp.GUI
             set { _introLabel = value; }
         }
 
-        public UIFastList vanillaTreeFastList
+        public UIFastList originalTreeFastList
         {
-            get { return _vanillaTreeFastList; }
+            get { return _originalTreeFastList; }
         }
-        public UITextField customTreeFastListSearchBox
+        public UITextField replacementTreeFastListSearchBox
         {
-            get { return _customTreeFastListSearchBox; }
+            get { return _replacementTreeFastListSearchBox; }
         }
-        public UIFastList customTreeFastList
+        public UIFastList replacementTreeFastList
         {
-            get { return _customTreeFastList; }
+            get { return _replacementTreeFastList; }
         }
         public UIButton saveTreeReplacementButton
         {
             get { return _saveTreeReplacementButton; }
         }
 
-        private int _selectedTreeVanillaIndex;
-        public int selectedTreeVanillaIndex
+        private int _selectedTreeOriginalIndex;
+        public int selectedTreeOriginalIndex
         {
-            get { return _selectedTreeVanillaIndex; }
+            get { return _selectedTreeOriginalIndex; }
         }
 
-        private TreeInfo _selectedTreeVanilla;
-        public TreeInfo selectedTreeVanilla
+        private TreeInfo _selectedTreeOriginal;
+        public TreeInfo selectedTreeOriginal
         {
-            get { return _selectedTreeVanilla; }
-            set { _selectedTreeVanilla = value; }
+            get { return _selectedTreeOriginal; }
+            set { _selectedTreeOriginal = value; }
         }
 
-        private TreeInfo _selectedTreeCustom;
-        public TreeInfo selectedTreeCustom
+        private TreeInfo _selectedTreeReplacement;
+        public TreeInfo selectedTreeReplacement
         {
-            get { return _selectedTreeCustom; }
-            set { _selectedTreeCustom = value; }
+            get { return _selectedTreeReplacement; }
+            set { _selectedTreeReplacement = value; }
         }
 
         private static TreeReplacerPanel _instance;
@@ -100,12 +102,12 @@ namespace PropItUp.GUI
             }
             _introLabel.text = "Global replacement";
             //  Source:
-            _vanillaTreeLabel = originalContainer.AddUIComponent<UILabel>();
-            _vanillaTreeLabel.text = "Vanilla trees";
-            _vanillaTreeLabel.textScale = 0.8f;
-            _vanillaTreeLabel.padding = new RectOffset(0, 0, 0, 5);
+            _originalTreeLabel = originalContainer.AddUIComponent<UILabel>();
+            _originalTreeLabel.text = "Vanilla trees";
+            _originalTreeLabel.textScale = 0.8f;
+            _originalTreeLabel.padding = new RectOffset(0, 0, 0, 5);
             //  'Reset replacement' Button
-            _resetReplacementButton = UIUtils.CreateButton(_vanillaTreeLabel);
+            _resetReplacementButton = UIUtils.CreateButton(_originalTreeLabel);
             _resetReplacementButton.text = "(reset selected)";
             _resetReplacementButton.relativePosition = new Vector3(149f, -1.25f);
             _resetReplacementButton.textScale = 0.65f;
@@ -125,66 +127,68 @@ namespace PropItUp.GUI
                 }
                 //  
                 PropItUpTool.RestoreReplacementGlobal();
-                //  Repopulate VanillaTreeFastList:
+                //  Repopulate originalTreeFastList:
                 //  TODO: stay at selected index:
                 PopulateVanillaTreesFastList();
+                _selectedTreeOriginal = _originalTreeFastList.rowsData[_selectedTreeOriginalIndex] as TreeInfo;
+                _resetReplacementButton.isEnabled = false;
             };
             _resetReplacementButton.isEnabled = false;
             // FastList
-            _vanillaTreeFastList = UIFastList.Create<UIVanillaTreeItem>(originalContainer);
-            _vanillaTreeFastList.backgroundSprite = "UnlockingPanel";
-            _vanillaTreeFastList.width = parent.width - (3 * PropItUpTool.SPACING) - 12;
-            _vanillaTreeFastList.height = 90;
-            _vanillaTreeFastList.canSelect = true;
-            _vanillaTreeFastList.eventSelectedIndexChanged += OnSelectedVanillaChanged;
+            _originalTreeFastList = UIFastList.Create<UIVanillaTreeItem>(originalContainer);
+            _originalTreeFastList.backgroundSprite = "UnlockingPanel";
+            _originalTreeFastList.width = parent.width - (3 * PropItUpTool.SPACING) - 12;
+            _originalTreeFastList.height = 90;
+            _originalTreeFastList.canSelect = true;
+            _originalTreeFastList.eventSelectedIndexChanged += OnSelectedVanillaChanged;
 
             // Replacement Label Container:
             var replacementContainer = UIUtils.CreateFormElement(this, "center");
             replacementContainer.name = "replacementContainer";
             replacementContainer.relativePosition = new Vector3(0, 165);
             //  Label:
-            _customTreeLabel = originalContainer.AddUIComponent<UILabel>();
-            _customTreeLabel.text = "Select custom tree";
-            _customTreeLabel.textScale = 0.8f;
-            _customTreeLabel.padding = new RectOffset(0, 0, 15, 5);
+            _replacementTreeLabel = originalContainer.AddUIComponent<UILabel>();
+            _replacementTreeLabel.text = "Select custom tree";
+            _replacementTreeLabel.textScale = 0.8f;
+            _replacementTreeLabel.padding = new RectOffset(0, 0, 15, 5);
 
             // Search Box Container:
             var searchboxContainer = UIUtils.CreateFormElement(this, "center");
             searchboxContainer.name = "searchboxContainer";
             searchboxContainer.relativePosition = new Vector3(0, 182);
             //  Search Box:
-            _customTreeFastListSearchBox = UIUtils.CreateTextField(searchboxContainer);
-            _customTreeFastListSearchBox.position = new Vector3(_introLabel.relativePosition.x, 205);
-            _customTreeFastListSearchBox.width = parent.width - (3 * PropItUpTool.SPACING) - 12;
-            _customTreeFastListSearchBox.height = 25;
-            _customTreeFastListSearchBox.padding = new RectOffset(6, 6, 6, 6);
-            _customTreeFastListSearchBox.normalBgSprite = "TextFieldUnderline";
-            _customTreeFastListSearchBox.hoveredBgSprite = "TextFieldUnderline";
-            _customTreeFastListSearchBox.disabledBgSprite = "TextFieldUnderline";
-            _customTreeFastListSearchBox.focusedBgSprite = "LevelBarBackground";
-            _customTreeFastListSearchBox.horizontalAlignment = UIHorizontalAlignment.Left;
-            _customTreeFastListSearchBox.text = "Find a tree";
-            _customTreeFastListSearchBox.textColor = new Color32(187, 187, 187, 255);
-            _customTreeFastListSearchBox.textScale = 0.75f;
+            _replacementTreeFastListSearchBox = UIUtils.CreateTextField(searchboxContainer);
+            _replacementTreeFastListSearchBox.position = new Vector3(_introLabel.relativePosition.x, 205);
+            _replacementTreeFastListSearchBox.width = parent.width - (3 * PropItUpTool.SPACING) - 10;
+            _replacementTreeFastListSearchBox.height = 25;
+            _replacementTreeFastListSearchBox.padding = new RectOffset(6, 6, 6, 6);
+            _replacementTreeFastListSearchBox.normalBgSprite = "TextFieldUnderline";
+            _replacementTreeFastListSearchBox.hoveredBgSprite = "TextFieldUnderline";
+            _replacementTreeFastListSearchBox.disabledBgSprite = "TextFieldUnderline";
+            _replacementTreeFastListSearchBox.focusedBgSprite = "LevelBarBackground";
+            _replacementTreeFastListSearchBox.horizontalAlignment = UIHorizontalAlignment.Left;
+            _replacementTreeFastListSearchBox.text = searchboxPlaceholder;
+            _replacementTreeFastListSearchBox.textColor = new Color32(187, 187, 187, 255);
+            _replacementTreeFastListSearchBox.textScale = 0.75f;
             //  Search Box Events:
-            _customTreeFastListSearchBox.eventTextChanged += (c, p) =>
+            _replacementTreeFastListSearchBox.eventTextChanged += (c, p) =>
             {
                 searchQuery = p;
                 Search();
             };
-            _customTreeFastListSearchBox.eventGotFocus += (c, p) =>
+            _replacementTreeFastListSearchBox.eventGotFocus += (c, p) =>
             {
-                _customTreeFastList.selectedIndex = -1;
-                if (_customTreeFastListSearchBox.text == "Find a tree")
+                //_replacementTreeFastList.selectedIndex = -1;
+                if (_replacementTreeFastListSearchBox.text == searchboxPlaceholder)
                 {
-                    _customTreeFastListSearchBox.text = string.Empty;
+                    _replacementTreeFastListSearchBox.text = string.Empty;
                 }
             };
-            _customTreeFastListSearchBox.eventLostFocus += (c, p) =>
+            _replacementTreeFastListSearchBox.eventLostFocus += (c, p) =>
             {
-                if (_customTreeFastListSearchBox.text == string.Empty)
+                if (_replacementTreeFastListSearchBox.text == string.Empty)
                 {
-                    _customTreeFastListSearchBox.text = "Find a tree";
+                    _replacementTreeFastListSearchBox.text = searchboxPlaceholder;
                 }
             };
 
@@ -193,13 +197,13 @@ namespace PropItUp.GUI
             fastlistContainer.name = "fastlistContainer";
             fastlistContainer.relativePosition = new Vector3(0, 205);
             // FastList:
-            _customTreeFastList = UIFastList.Create<UITreeItem>(fastlistContainer);
-            _customTreeFastList.position = new Vector3(_introLabel.relativePosition.x, 233);
-            _customTreeFastList.width = parent.width - (3 * PropItUpTool.SPACING) - 12;
-            _customTreeFastList.height = 90;
-            _customTreeFastList.backgroundSprite = "UnlockingPanel";
-            _customTreeFastList.canSelect = true;
-            _customTreeFastList.eventSelectedIndexChanged += OnSelectedCustomChanged;
+            _replacementTreeFastList = UIFastList.Create<UITreeItem>(fastlistContainer);
+            _replacementTreeFastList.position = new Vector3(_introLabel.relativePosition.x, 233);
+            _replacementTreeFastList.width = parent.width - (3 * PropItUpTool.SPACING) - 12;
+            _replacementTreeFastList.height = 90;
+            _replacementTreeFastList.backgroundSprite = "UnlockingPanel";
+            _replacementTreeFastList.canSelect = true;
+            _replacementTreeFastList.eventSelectedIndexChanged += OnSelectedCustomChanged;
 
             //  Button Container:
             var buttonContainer = UIUtils.CreateFormElement(this, "bottom");
@@ -214,7 +218,7 @@ namespace PropItUp.GUI
             _saveTreeReplacementButton.eventClicked += (c, e) =>
             {
                 //  Only save if original and replacement are selected:
-                if (selectedTreeVanilla == null || selectedTreeCustom == null)
+                if (selectedTreeOriginal == null || selectedTreeReplacement == null)
                 {
                     return;
                 }
@@ -224,37 +228,39 @@ namespace PropItUp.GUI
                     DebugUtils.Log($"TreeReplacerPanel: 'Replace tree' clicked'.");
                 }
                 PropItUpTool.SaveReplacementGlobal();
-                //  Repopulate VanillaTreeFastList:
+                //  Repopulate originalTreeFastList:
                 //  TODO: stay at selected index:
                 PopulateVanillaTreesFastList();
+                _selectedTreeOriginal = _selectedTreeReplacement;
+                _resetReplacementButton.isEnabled = true;
             };
         }
 
         public void PopulateVanillaTreesFastList()
         {
             //  
-            if (_vanillaTreeFastList.rowsData.m_size > 0) {
-                _vanillaTreeFastList.Clear();
+            if (_originalTreeFastList.rowsData.m_size > 0) {
+                _originalTreeFastList.Clear();
             }
             //  
             foreach (var tree in PropItUpTool.allVanillaTrees)
             {
-                _vanillaTreeFastList.rowsData.Add(tree);
+                _originalTreeFastList.rowsData.Add(tree);
             }
-            _vanillaTreeFastList.rowHeight = 26f;
-            _vanillaTreeFastList.DisplayAt(0);
+            _originalTreeFastList.rowHeight = 26f;
+            _originalTreeFastList.DisplayAt(0);
             //  
             if (PropItUpTool.config.enable_debug)
             {
-                DebugUtils.Log($"TreeReplacerPanel: VanillaTreeFastList populated with {PropItUpTool.allVanillaTrees.Count} trees.");
+                DebugUtils.Log($"TreeReplacerPanel: originalTreeFastList populated with {PropItUpTool.allVanillaTrees.Count} trees.");
             }
         }
         protected void OnSelectedVanillaChanged(UIComponent component, int i)
         {
-            _selectedTreeVanilla = _vanillaTreeFastList.rowsData[i] as TreeInfo;
-            _selectedTreeVanillaIndex = i;
+            _selectedTreeOriginal = _originalTreeFastList.rowsData[i] as TreeInfo;
+            _selectedTreeOriginalIndex = i;
             //  Enable Reset Button if global replacement is set for selected tree:
-            if (PropItUpTool.config.GetGlobalReplacementByVanillaTreeName(_selectedTreeVanilla.name) != null) {
+            if (PropItUpTool.config.GetGlobalReplacementByVanillaTreeName(_selectedTreeOriginal.name) != null) {
                 _resetReplacementButton.isEnabled = true;
             }
             else
@@ -264,25 +270,31 @@ namespace PropItUp.GUI
             //  
             if (PropItUpTool.config.enable_debug)
             {
-                DebugUtils.Log($"TreeReplacerPanel: VanillaTreeFastList selected: tree '{_selectedTreeVanilla.name}'.");
+                DebugUtils.Log($"TreeReplacerPanel: originalTreeFastList selected: tree '{_selectedTreeOriginal.name}'.");
             }
         }
 
         public void PopulateCustomTreesFastList()
-        {
+        {   
+            //  Search Query set?
+            if (!string.IsNullOrEmpty(searchQuery) && searchQuery != searchboxPlaceholder)
+            {
+                Search();
+                return;
+            }
             //  TODO: Add 'No replacement' option:
 
             //  Add all available custom trees:
             foreach (var tree in PropItUpTool.allCustomTrees)
             {
-                _customTreeFastList.rowsData.Add(tree);
+                _replacementTreeFastList.rowsData.Add(tree);
             }
-            _customTreeFastList.rowHeight = 26f;
-            _customTreeFastList.DisplayAt(0);
+            _replacementTreeFastList.rowHeight = 26f;
+            _replacementTreeFastList.DisplayAt(0);
             //  
             if (PropItUpTool.config.enable_debug)
             {
-                DebugUtils.Log($"TreeReplacerPanel: CustomTreeFastList populated with {PropItUpTool.allCustomTrees.Count} trees.");
+                DebugUtils.Log($"TreeReplacerPanel: replacementTreeFastList populated with {PropItUpTool.allCustomTrees.Count} trees.");
             }
         }
         protected void OnSelectedCustomChanged(UIComponent component, int i)
@@ -291,24 +303,24 @@ namespace PropItUp.GUI
             {
                 return;
             }
-            _selectedTreeCustom = _customTreeFastList.rowsData[i] as TreeInfo;
+            _selectedTreeReplacement = _replacementTreeFastList.rowsData[i] as TreeInfo;
             if (PropItUpTool.config.enable_debug)
             {
-                DebugUtils.Log($"TreeReplacerPanel: CustomFastList selected: tree '{_selectedTreeCustom.name}'.");
+                DebugUtils.Log($"TreeReplacerPanel: CustomFastList selected: tree '{_selectedTreeReplacement.name}'.");
             }
         }
 
         public void Search()
         {
             //  
-            if (searchQuery == "Find a tree")
+            if (searchQuery == searchboxPlaceholder)
             {
-                searchQuery = string.Empty;
+                return;
             }
             //  Deselect and clear FastList:
-            _customTreeFastList.selectedIndex = -1;
-            _customTreeFastList.Clear();
-            _selectedTreeCustom = null;
+            _replacementTreeFastList.selectedIndex = -1;
+            _replacementTreeFastList.Clear();
+            _selectedTreeReplacement = null;
             //  Create temporary list for search results:
             List<TreeInfo> tmpItemList = new List<TreeInfo>();
             if (string.IsNullOrEmpty(searchQuery))
@@ -330,12 +342,12 @@ namespace PropItUp.GUI
             {
                 if (tmpItemList[i] != null)
                 {
-                    _customTreeFastList.rowsData.Add(tmpItemList[i]);
+                    _replacementTreeFastList.rowsData.Add(tmpItemList[i]);
                 }
             }
             if (tmpItemList.Count > 0)
             {
-                _customTreeFastList.DisplayAt(0);
+                _replacementTreeFastList.DisplayAt(0);
             }
             //  
             if (PropItUpTool.config.enable_debug)
@@ -347,10 +359,10 @@ namespace PropItUp.GUI
         public void ResetPanel()
         {
             _resetReplacementButton.isEnabled = false;
-            customTreeFastList.DisplayAt(0);
-            customTreeFastList.selectedIndex = -1;
-            selectedTreeVanilla = null;
-            selectedTreeCustom = null;
+            replacementTreeFastList.DisplayAt(0);
+            replacementTreeFastList.selectedIndex = -1;
+            selectedTreeOriginal = null;
+            selectedTreeReplacement = null;
             //PropItUpTool.selectedPropInstanceId = 0;
         }
     }

@@ -5,7 +5,7 @@ namespace PropItUp
 {
     public class Mod : IUserMod
     {
-        public const string version = "1.1.0";
+        public const string version = "1.1.1";
 
         public string Name
         {
@@ -41,6 +41,12 @@ namespace PropItUp
             PropItUpTool.config.enable_runtimereload = c;
             PropItUpTool.SaveConfig();
         }
+        //  Toggle Option Extreme Mode:
+        private void OnEnableExtremeModeChanged(bool c)
+        {
+            PropItUpTool.config.enable_extrememode = c;
+            PropItUpTool.SaveConfig();
+        }
         //  Toggle Option Debug Output:
         private void OnEnableDebugChanged(bool c)
         {
@@ -68,8 +74,14 @@ namespace PropItUp
                 group.AddSpace(5);
                 //  Toggle Option Runtime Reload:
                 group.AddCheckbox("Replace trees/props at runtime (default: on)", PropItUpTool.config.enable_runtimereload, new OnCheckChanged(OnEnableRuntimeReloadChanged));
+                group.AddSpace(10);
+
+                //  Toggle Option Extreme Mode (no restrictions on allowed props):
+                group.AddCheckbox("Enable Extreme Mode to allow untested props (default: off)", PropItUpTool.config.enable_extrememode, new OnCheckChanged(OnEnableExtremeModeChanged));
                 group.AddSpace(5);
-                //group.AddSpace(10);
+                group.AddGroup("WARNING: Extreme Mode is a beta feature that is NOT eligeble for support.\nUse this feature at your own risk!");
+                group.AddSpace(10);
+
                 //  Toggle Option Debug Output:
                 group.AddCheckbox("Write additional data to debug log (default: off)", PropItUpTool.config.enable_debug, new OnCheckChanged(OnEnableDebugChanged));
                 group.AddSpace(5);

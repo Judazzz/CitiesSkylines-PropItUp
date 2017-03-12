@@ -15,6 +15,8 @@ namespace PropItUp.GUI
         private UIFastList _replacementPropFastList;
         private UIButton _savePropReplacementButton;
 
+        private string searchboxPlaceholder = "Find a prop";
+
         public UILabel selectedBuildingLabel
         {
             get { return _selectedBuildingLabel; }
@@ -124,7 +126,7 @@ namespace PropItUp.GUI
                 PropItUpTool.RestoreReplacementBuilding("prop");
                 //  Repopulate/reset OriginalPropFastList:
                 PopulateIncludedPropsFastList();
-                _selectedPropOriginal = _originalPropFastList.rowsData[_selectedPropOriginalIndex] as PropInfo; ;
+                _selectedPropOriginal = _originalPropFastList.rowsData[_selectedPropOriginalIndex] as PropInfo;
                 _resetReplacementButton.isEnabled = false;
             };
             _resetReplacementButton.isEnabled = false;
@@ -152,7 +154,7 @@ namespace PropItUp.GUI
             //  Search Box:
             _replacementPropFastListSearchBox = UIUtils.CreateTextField(searchboxContainer);
             _replacementPropFastListSearchBox.position = new Vector3(_selectedBuildingLabel.relativePosition.x, 205);
-            _replacementPropFastListSearchBox.width = parent.width - (3 * PropItUpTool.SPACING) - 12;
+            _replacementPropFastListSearchBox.width = parent.width - (3 * PropItUpTool.SPACING) - 10;
             _replacementPropFastListSearchBox.height = 25;
             _replacementPropFastListSearchBox.padding = new RectOffset(6, 6, 6, 6);
             _replacementPropFastListSearchBox.normalBgSprite = "TextFieldUnderline";
@@ -160,7 +162,7 @@ namespace PropItUp.GUI
             _replacementPropFastListSearchBox.disabledBgSprite = "TextFieldUnderline";
             _replacementPropFastListSearchBox.focusedBgSprite = "LevelBarBackground";
             _replacementPropFastListSearchBox.horizontalAlignment = UIHorizontalAlignment.Left;
-            _replacementPropFastListSearchBox.text = "Find a prop";
+            _replacementPropFastListSearchBox.text = searchboxPlaceholder;
             _replacementPropFastListSearchBox.textColor = new Color32(187, 187, 187, 255);
             _replacementPropFastListSearchBox.textScale = 0.75f;
             //  Search Box Events:
@@ -171,8 +173,8 @@ namespace PropItUp.GUI
             };
             _replacementPropFastListSearchBox.eventGotFocus += (c, p) =>
             {
-                _replacementPropFastList.selectedIndex = -1;
-                if (_replacementPropFastListSearchBox.text == "Find a prop")
+                //_replacementPropFastList.selectedIndex = -1;
+                if (_replacementPropFastListSearchBox.text == searchboxPlaceholder)
                 {
                     _replacementPropFastListSearchBox.text = string.Empty;
                 }
@@ -181,7 +183,7 @@ namespace PropItUp.GUI
             {
                 if (_replacementPropFastListSearchBox.text == string.Empty)
                 {
-                    _replacementPropFastListSearchBox.text = "Find a prop";
+                    _replacementPropFastListSearchBox.text = searchboxPlaceholder;
                 }
             };
 
@@ -232,7 +234,7 @@ namespace PropItUp.GUI
             //  Set selected building label:
             selectedBuildingLabel.text =
                 $"{UIUtils.GenerateBeautifiedPrefabName(_selectedBuilding)}";
-            UIUtils.TruncateLabel(selectedBuildingLabel, _replacementPropFastListSearchBox.width); // ({BuildingSelectionTool.instance.m_selectedBuildingInstanceId})
+            UIUtils.TruncateLabel(selectedBuildingLabel, _replacementPropFastListSearchBox.width);
             //  Null/empty check:
             if (_selectedBuilding.m_props == null || _selectedBuilding.m_props.Length == 0)
             {
@@ -250,8 +252,10 @@ namespace PropItUp.GUI
             {
                 if (prop.m_prop != null)
                 {
+                    //  Temporary 'Extreme Mode' feature:
+                    //  TODO: verify if this is still an issue (lots of props are now not listed in orif=ginal fastlist)!
                     //  Exclude props without LOD/with double quotes in name (causes infinite 'Array index is out of range' error loops):
-                    if (prop.m_prop.name.Contains("\"") || prop.m_prop.m_lodMesh == null || prop.m_prop.m_lodObject == null)
+                    if (PropItUpTool.config.enable_extrememode == false && (prop.m_prop.name.Contains("\"") || prop.m_prop.m_lodMesh == null || prop.m_prop.m_lodObject == null))
                     {
                         continue;
                     }
@@ -317,6 +321,12 @@ namespace PropItUp.GUI
         {
             if (PropItUpTool.allAvailableProps.Count > 0)
             {
+                //  Search Query set?
+                if (!string.IsNullOrEmpty(searchQuery) && searchQuery != searchboxPlaceholder)
+                {
+                    Search();
+                    return;
+                }
                 //  TODO: Add 'No replacement' option:
 
                 //  Add all available props:
@@ -370,7 +380,6 @@ namespace PropItUp.GUI
                 {
                     DebugUtils.Log($"PropCustomizerPanel: ReplacementFastList re-populated with {PropItUpTool.allAvailableProps.Count} props.");
                 }
-                //}
             }
         }
         protected void OnSelectedReplacementChanged(UIComponent component, int i)
@@ -380,10 +389,9 @@ namespace PropItUp.GUI
                 return;
             }
             _selectedPropReplacement = _replacementPropFastList.rowsData[i] as PropInfo;
-
             //  TODO: visually highlight selected prop instance:
             //PropInstance p = PropManager.instance.m_props.m_buffer[_selectedPropOriginal.GetInstanceID()];
-
+            //  
             if (PropItUpTool.config.enable_debug)
             {
                 DebugUtils.Log($"PropCustomizerPanel: ReplacementFastList selected: prop '{UIUtils.GenerateBeautifiedPrefabName(_selectedPropReplacement)}' ('{_selectedPropReplacement.name}').");
@@ -392,28 +400,39 @@ namespace PropItUp.GUI
 
         public void Search()
         {
+            if (searchQuery == searchboxPlaceholder)
+            {
+                return;
+            }
             //  Deselect and clear FastList:
             _replacementPropFastList.selectedIndex = -1;
             _replacementPropFastList.Clear();
             _selectedPropReplacement = null;
             //  Create temporary list for search results:
             List<PropInfo> tmpItemList = new List<PropInfo>();
-            foreach (PropInfo result in PropItUpTool.allAvailableProps)
+            if (string.IsNullOrEmpty(searchQuery))
             {
-                if (result.name.ToLower().Contains(searchQuery.ToLower()))
+                tmpItemList = PropItUpTool.allAvailableProps;
+            }
+            else
+            {
+                foreach (PropInfo result in PropItUpTool.allAvailableProps)
                 {
-                    if (_selectedPropOriginal != null)
+                    if (result.name.ToLower().Contains(searchQuery.ToLower()))
                     {
-                        if (result.m_isDecal != _selectedPropOriginal.m_isDecal)
+                        if (_selectedPropOriginal != null)
                         {
-                            continue;
+                            if (result.m_isDecal != _selectedPropOriginal.m_isDecal)
+                            {
+                                continue;
+                            }
+                            if (result.m_specialPlaces.Length != _selectedPropOriginal.m_specialPlaces.Length)
+                            {
+                                continue;
+                            }
                         }
-                        if (result.m_specialPlaces.Length != _selectedPropOriginal.m_specialPlaces.Length)
-                        {
-                            continue;
-                        }
+                        tmpItemList.Add(result);
                     }
-                    tmpItemList.Add(result);
                 }
             }
             //  Repopulate with search results, and show at first item if results are found:

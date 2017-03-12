@@ -123,6 +123,7 @@ namespace PropItUp
                 {
                     //  Load config:
                     config = Configuration.Load(fileName);
+                    SaveConfig();
                     if (config.enable_debug)
                     {
                         DebugUtils.Log($"OnSettingsUI: configuration loaded (file name: {fileName}).");
@@ -165,8 +166,14 @@ namespace PropItUp
 
         //  PREFAB-RELATED:
         //  List all available props:
-        public static void ListPropPrefabs()
+        public static void ListPropPrefabs(bool isRefresh = false)
         {
+            //  Clear prop list for refresh:
+            if (isRefresh)
+            {
+                allAvailableProps.Clear();
+            }
+            //  Loop all props in 'PropCollection':
             int skipped = 0;
             for (uint i = 0; i < PrefabCollection<PropInfo>.PrefabCount(); i++)
             {
@@ -176,8 +183,10 @@ namespace PropItUp
                 {
                     continue;
                 }
+                //  Temporary 'Extreme Mode' feature:
+                //  TODO: verify if this is still an issue (lots of props are now not listed in replacement fastlist)!
                 //  Exclude props without LOD or with double quotes in name (causes infinite 'Array index is out of range' error loops):
-                if (prop.name.Contains("\"") || prop.m_lodMesh == null || prop.m_lodObject == null)
+                if (config.enable_extrememode == false && (prop.name.Contains("\"") || prop.m_lodMesh == null || prop.m_lodObject == null))
                 {
                     skipped++;
                     continue;
@@ -190,14 +199,20 @@ namespace PropItUp
             //  
             if (config.enable_debug)
             {
-                DebugUtils.Log($"Finished listing all props: {allAvailableProps.Count} props added, {skipped} unsuitable props skipped.");
+                DebugUtils.Log($"Finished listing all props: {allAvailableProps.Count} props added ({skipped} potentially incompatible props skipped).");
             }
         }
 
         //  List all available, all vanilla, all Workshop trees:
-        public static void ListTreePrefabs()
+        public static void ListTreePrefabs(bool isRefresh = false)
         {
-
+            //  Clear tree list for refresh:
+            if (isRefresh)
+            {
+                allAvailableTrees.Clear();
+            }
+            //  Loop all props in 'PropCollection':
+            int skipped = 0;
             for (uint i = 0; i < PrefabCollection<TreeInfo>.PrefabCount(); i++)
             {
                 TreeInfo tree = PrefabCollection<TreeInfo>.GetPrefab(i);
@@ -206,9 +221,12 @@ namespace PropItUp
                 {
                     continue;
                 }
-                //  Exclude trees with double quotes in name (causes infinite 'Array index is out of range' error loops):
-                if (tree.name.Contains("\""))
+                //  Temporary 'Extreme Mode' feature:
+                //  TODO: verify if this is still an issue!
+                //  Exclude props without LOD or with double quotes in name (causes infinite 'Array index is out of range' error loops):
+                if (config.enable_extrememode == false && tree.name.Contains("\""))
                 {
+                    skipped++;
                     continue;
                 }
                 //  Add to list:
@@ -219,7 +237,10 @@ namespace PropItUp
                 }
                 else
                 {
-                    allVanillaTrees.Add(tree);
+                    if (!isRefresh)
+                    {
+                        allVanillaTrees.Add(tree);
+                    }
                 }
             }
             //  Sort list alphabetically:
@@ -227,7 +248,7 @@ namespace PropItUp
             //  
             if (config.enable_debug)
             {
-                DebugUtils.Log($"Finished listing all trees: {allAvailableTrees.Count} trees found.");
+                DebugUtils.Log($"Finished listing all trees: {allAvailableTrees.Count} trees found ({skipped} potentially incompatible trees skipped).");
             }
         }
 
@@ -349,9 +370,9 @@ namespace PropItUp
         //  Save/apply selected global tree replacement:
         public static void SaveReplacementGlobal()
         {
-            int index = TreeReplacerPanel.instance.selectedTreeVanillaIndex;
-            TreeInfo originalTree = TreeReplacerPanel.instance.selectedTreeVanilla;
-            TreeInfo replacementTree = TreeReplacerPanel.instance.selectedTreeCustom;
+            int index = TreeReplacerPanel.instance.selectedTreeOriginalIndex;
+            TreeInfo originalTree = TreeReplacerPanel.instance.selectedTreeOriginal;
+            TreeInfo replacementTree = TreeReplacerPanel.instance.selectedTreeReplacement;
 
             //  New tree replacement object:
             PrefabReplacement newTreeReplacement = new PrefabReplacement()
@@ -417,7 +438,7 @@ namespace PropItUp
         //  Restore selected global tree replacement:
         public static void RestoreReplacementGlobal()
         {
-            TreeInfo originalTree = TreeReplacerPanel.instance.selectedTreeVanilla;
+            TreeInfo originalTree = TreeReplacerPanel.instance.selectedTreeOriginal;
             PrefabReplacement selectedTreeReplacement = config.GetGlobalReplacementByVanillaTreeName(originalTree.name);
             PrefabReplacement executableTreeReplacement = new PrefabReplacement()
             {
