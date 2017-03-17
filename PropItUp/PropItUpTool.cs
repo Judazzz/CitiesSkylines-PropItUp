@@ -199,7 +199,7 @@ namespace PropItUp
             //  
             if (config.enable_debug)
             {
-                DebugUtils.Log($"Finished listing all props: {allAvailableProps.Count} props added ({skipped} potentially incompatible props skipped).");
+                DebugUtils.Log($"Finished listing all props: {allAvailableProps.Count} props found ({skipped} potentially incompatible props skipped - Extreme Mode enabled: {config.enable_extrememode}).");
             }
         }
 
@@ -248,7 +248,7 @@ namespace PropItUp
             //  
             if (config.enable_debug)
             {
-                DebugUtils.Log($"Finished listing all trees: {allAvailableTrees.Count} trees found ({skipped} potentially incompatible trees skipped).");
+                DebugUtils.Log($"Finished listing all trees: {allAvailableProps.Count} trees found ({skipped} potentially incompatible trees skipped - Extreme Mode enabled: {config.enable_extrememode}).");
             }
         }
 

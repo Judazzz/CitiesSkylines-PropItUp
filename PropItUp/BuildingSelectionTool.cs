@@ -8,6 +8,8 @@ namespace PropItUp
         private bool m_prevRenderZones;
         private ToolBase m_prevTool;
 
+        public BuildingSelectionTool m_buildingSelectionTool = null;
+
         private Selectable m_hoverInstance;
 
         public Selectable hoverInstance
@@ -37,6 +39,7 @@ namespace PropItUp
 
         protected override void OnEnable()
         {
+            //base.OnEnable();
             InfoManager.InfoMode infoMode = InfoManager.instance.CurrentMode;
             InfoManager.SubInfoMode subInfoMode = InfoManager.instance.CurrentSubMode;
 

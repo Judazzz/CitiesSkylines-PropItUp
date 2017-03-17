@@ -26,7 +26,10 @@ I have not done compatibility tests for every mod available in the Workshop for 
 - per-building replacements on instance level instead of asset level: this would allow players to customize each and every building in their cities individually.[/quote]
 
 [h1]Updates[/h1]
-[quote][b]March 12th, 2017 - v1.1.0[/b]
+[quote][b]March 17th, 2017 - v1.1.2[/b]
+- Fixed broken BuildingSelectionTool issue and all accompanying errors \o/
+
+[b]March 12th, 2017 - v1.1.1[/b]
 - Added Extreme Mode option, an experimental, [b]unsupported[/b] feature that gives access to all props and trees;
 - [url=http://steamcommunity.com/sharedfiles/filedetails/?id=793489846]Aedificium[/url] prop/tree hot-loading support;
 - Various bugfixes (mostly related to reset and search features).

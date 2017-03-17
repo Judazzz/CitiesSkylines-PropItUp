@@ -70,7 +70,10 @@
     <Compile Include="ThreadingExtension.cs" />
     <Compile Include="PropItUpTool.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Assets\PreviewImage.png" />
+    <Content Include="Assets\WorkshopDescription.txt" />
+  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Assets\ToolbarAtlas.png" />
   </ItemGroup>

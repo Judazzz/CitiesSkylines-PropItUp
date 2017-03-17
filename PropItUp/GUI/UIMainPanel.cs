@@ -18,7 +18,8 @@ namespace PropItUp.GUI
         public TreeCustomizerPanel treeCustomizerPanel;
         public PropCustomizerPanel propCustomizerPanel;
 
-        private BuildingSelectionTool buildingSelectionTool;
+        private BuildingSelectionTool buildingSelectionTool = ToolsModifierControl.toolController.gameObject.AddComponent<BuildingSelectionTool>();
+        
 
         public static UIMainPanel _instance;
         public static UIMainPanel instance
@@ -46,6 +47,8 @@ namespace PropItUp.GUI
             relativePosition = new Vector3(width + 25, 60);
             //  
             SetupControls();
+            //  
+            buildingSelectionTool = ToolsModifierControl.toolController.gameObject.AddComponent<BuildingSelectionTool>();
         }
 
         public void SetupControls()
@@ -131,8 +134,10 @@ namespace PropItUp.GUI
                 ToolsModifierControl.toolController.CurrentTool = ToolsModifierControl.GetTool<DefaultTool>();
                 ToolsModifierControl.SetTool<DefaultTool>();
             }
-            if (trigger == propCustomizerButton)
+            else if (trigger == propCustomizerButton)
             {
+                ToolsModifierControl.toolController.CurrentTool = buildingSelectionTool;
+                ToolsModifierControl.SetTool<BuildingSelectionTool>();
                 //  Refresh prop list if Aedificium mod is detected (to include newly hotloaded trees):
                 if (PluginManager.instance.GetPluginsInfo().Any(mod => (mod.publishedFileID.AsUInt64 == 793489846 && mod.isEnabled)))
                 {
@@ -140,11 +145,11 @@ namespace PropItUp.GUI
                     propCustomizerPanel.PopulateAvailablePropsFastList();
                 }
                 propCustomizerPanel.isVisible = true;
+            }
+            else if (trigger == treeCustomizerButton)
+            {
                 ToolsModifierControl.toolController.CurrentTool = buildingSelectionTool;
                 ToolsModifierControl.SetTool<BuildingSelectionTool>();
-            }
-            if (trigger == treeCustomizerButton)
-            {
                 //  Refresh prop list if Aedificium mod is detected (to include newly hotloaded props):
                 if (PluginManager.instance.GetPluginsInfo().Any(mod => (mod.publishedFileID.AsUInt64 == 793489846 && mod.isEnabled)))
                 {
@@ -152,9 +157,8 @@ namespace PropItUp.GUI
                     treeCustomizerPanel.PopulateAvailableTreesFastList();
                 }
                 treeCustomizerPanel.isVisible = true;
-                ToolsModifierControl.toolController.CurrentTool = buildingSelectionTool;
-                ToolsModifierControl.SetTool<BuildingSelectionTool>();
             }
+            DebugUtils.Log($"CurrentTool: {ToolsModifierControl.toolController.CurrentTool.name}");
         }
 
         //  Toggle main panel and update button state:
@@ -184,8 +188,8 @@ namespace PropItUp.GUI
                 treeReplacerPanel.isVisible = true;
                 propCustomizerPanel.isVisible = false;
                 treeCustomizerPanel.isVisible = false;
-                ToolsModifierControl.toolController.CurrentTool = ToolsModifierControl.GetTool<DefaultTool>();
-                ToolsModifierControl.SetTool<DefaultTool>();
+                //ToolsModifierControl.toolController.CurrentTool = ToolsModifierControl.GetTool<DefaultTool>();
+                //ToolsModifierControl.SetTool<DefaultTool>();
                 //  Mod button:
                 UIMainButton.instance.state = UIButton.ButtonState.Focused;
             }
