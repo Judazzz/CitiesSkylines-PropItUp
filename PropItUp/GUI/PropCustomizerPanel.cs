@@ -120,11 +120,15 @@ namespace PropItUp.GUI
             {
                 if (PropItUpTool.config.enable_debug)
                 {
-                    DebugUtils.Log($"PropCustomizerPanel: 'Reset replacement' clicked'.");
+                    DebugUtils.Log($"PropCustomizerPanel: 'Reset replacement' clicked.");
                 }
-                //  
-                PropItUpTool.RestoreReplacementBuilding("prop");
+                //  Get original prop:
+                Configuration.Building building = PropItUpTool.config.GetBuilding(_selectedBuilding.name);
+                Configuration.PrefabReplacement replacement = PropItUpTool.config.GetBuildingPrefabReplacementByIndex(building, "prop", _originalPropFastList.selectedIndex);
+                //  Restore replacement:
+                PropItUpTool.RestoreReplacementBuilding(_selectedPropOriginalIndex, "prop", _selectedBuilding);
                 //  Repopulate/reset OriginalPropFastList:
+                _selectedPropReplacement = PrefabCollection<PropInfo>.FindLoaded(replacement.original);
                 PopulateIncludedPropsFastList();
                 _selectedPropOriginal = _originalPropFastList.rowsData[_selectedPropOriginalIndex] as PropInfo;
                 _resetReplacementButton.isEnabled = false;
@@ -221,7 +225,8 @@ namespace PropItUp.GUI
                 {
                     DebugUtils.Log($"PropCustomizerPanel: 'Replace prop' clicked'.");
                 }
-                PropItUpTool.SaveReplacementBuilding("prop");
+                //  Replace prop:
+                PropItUpTool.SaveReplacementBuilding(_selectedPropOriginalIndex, "prop", _selectedPropOriginal, _selectedPropReplacement, _selectedBuilding);
                 //  Repopulate/reset OriginalPropFastList:
                 PopulateIncludedPropsFastList();
                 _selectedPropOriginal = _selectedPropReplacement;
@@ -248,18 +253,22 @@ namespace PropItUp.GUI
             //  List all props in selected building:
             listIsUpdating = true;
             List<PropInfo> selectedBuildingPropList = new List<PropInfo>();
+            //  TODO: POPULATE PROP LIST BASED ON ACTUAL, CURRENT PROPS
             foreach (var prop in _selectedBuilding.m_props)
             {
                 if (prop.m_prop != null)
                 {
-                    //  Temporary 'Extreme Mode' feature:
-                    //  TODO: verify if this is still an issue (lots of props are now not listed in orif=ginal fastlist)!
-                    //  Exclude props without LOD/with double quotes in name (causes infinite 'Array index is out of range' error loops):
+                    //  'Extreme Mode':
+                    //  TODO: verify if this is still an issue: Exclude props without LOD/with double quotes in name (causes infinite 'Array index is out of range' error loops):
                     if (PropItUpTool.config.enable_extrememode == false && (prop.m_prop.name.Contains("\"") || prop.m_prop.m_lodMesh == null || prop.m_prop.m_lodObject == null))
                     {
                         continue;
                     }
-                    //  TODO: list each prop (instance) individually (with index), so they can be replaced separately (if possible):
+                    //  TODO? list each prop (instance) individually (with index), so they can be replaced separately (if possible):
+                    if (prop.m_prop == _selectedPropOriginal)
+                    {
+                        prop.m_prop = _selectedPropReplacement;
+                    }
                     if (!selectedBuildingPropList.Contains(prop.m_prop))
                     {
                         selectedBuildingPropList.Add(prop.m_prop);
@@ -461,10 +470,10 @@ namespace PropItUp.GUI
             _resetReplacementButton.isEnabled = false;
             if (_originalPropFastList.rowsData.m_size > 0)
             {
+                _originalPropFastList.Clear();
                 _selectedPropOriginalIndex = 0;
                 _originalPropFastList.selectedIndex = -1;
             }
-            _originalPropFastList.Clear();
             searchQuery = string.Empty;
             _replacementPropFastListSearchBox.text = string.Empty;
             if (_replacementPropFastList.rowsData.m_size > 0)

@@ -15,9 +15,10 @@ namespace PropItUp
         public string version;
         public int keyboardshortcut = 0;
         public Vector3 buttonposition = new Vector3(-9999, -9999, -9999);
+        public bool enable_runtimereload = true;
+        public bool enable_globalfreestanding = true;
         public bool enable_applyglobalonload = true;
         public bool enable_applybuildingonload = true;
-        public bool enable_runtimereload = true;
         public bool enable_extrememode = false;
         public bool enable_debug = false;
 
@@ -25,9 +26,25 @@ namespace PropItUp
         [XmlArrayItem(ElementName = "TreeReplacement")]
         public List<PrefabReplacement> globalTreeReplacements = new List<PrefabReplacement>();
 
+        [XmlArray(ElementName = "GlobalBuildingTreeReplacements")]
+        [XmlArrayItem(ElementName = "TreeReplacement")]
+        public List<PrefabReplacement> globalBuildingTreeReplacements = new List<PrefabReplacement>();
+
         public PrefabReplacement GetGlobalReplacementByVanillaTreeName(string vanillaPrefabName)
         {
             foreach (PrefabReplacement prefabReplacement in globalTreeReplacements)
+            {
+                if (prefabReplacement.original == vanillaPrefabName)
+                {
+                    return prefabReplacement;
+                }
+            }
+            return null;
+        }
+
+        public PrefabReplacement GetGlobalBuildingReplacementByVanillaTreeName(string vanillaPrefabName)
+        {
+            foreach (PrefabReplacement prefabReplacement in globalBuildingTreeReplacements)
             {
                 if (prefabReplacement.original == vanillaPrefabName)
                 {
@@ -53,9 +70,10 @@ namespace PropItUp
                         version = PropItUpTool.config.version,
                         keyboardshortcut = PropItUpTool.config.keyboardshortcut,
                         buttonposition = PropItUpTool.config.buttonposition,
+                        enable_runtimereload = PropItUpTool.config.enable_runtimereload,
+                        enable_globalfreestanding = PropItUpTool.config.enable_globalfreestanding,
                         enable_applyglobalonload = PropItUpTool.config.enable_applyglobalonload,
                         enable_applybuildingonload = PropItUpTool.config.enable_applybuildingonload,
-                        enable_runtimereload = PropItUpTool.config.enable_runtimereload,
                         enable_extrememode = PropItUpTool.config.enable_extrememode,
                         enable_debug = PropItUpTool.config.enable_debug
                     };
@@ -71,6 +89,19 @@ namespace PropItUp
                             replacement_name = treeReplacement.replacement_name
                         };
                         configCopy.globalTreeReplacements.Add(treeReplacement);
+                    }
+
+                    //  Existing Global Building PrefabReplacements:
+                    foreach (var treeReplacement in PropItUpTool.config.globalBuildingTreeReplacements)
+                    {
+                        var newPrefabReplacement = new PrefabReplacement
+                        {
+                            index = treeReplacement.index,
+                            type = "tree",
+                            original = treeReplacement.original,
+                            replacement_name = treeReplacement.replacement_name
+                        };
+                        configCopy.globalBuildingTreeReplacements.Add(treeReplacement);
                     }
 
                     //  Existing Building PrefabReplacements:
@@ -136,16 +167,26 @@ namespace PropItUp
         {
             foreach (Building building in buildings)
             {
-                if (building.name == name) return building;
+                if (building.name == name)
+                {
+                    return building;
+                }
             }
             return null;
         }
 
         public PrefabReplacement GetBuildingPrefabReplacementByIndex(Building building, string type, int index)
         {
+            //DebugUtils.Log($"[DEBUG] - building = {building} ({building.prefabReplacements.Count})");
+            //DebugUtils.Log($"[DEBUG] - type = {type}");
+            //DebugUtils.Log($"[DEBUG] - index = {index}");
             foreach (PrefabReplacement prefabReplacement in building.prefabReplacements)
             {
-                if (prefabReplacement.type == type && prefabReplacement.index == index) return prefabReplacement;
+                if (prefabReplacement.type == type && prefabReplacement.index == index)
+                {
+                    //DebugUtils.Log($"[DEBUG]: selected buildingReplacement = {prefabReplacement.original} / {prefabReplacement.replacement_name}");
+                    return prefabReplacement;
+                }
             }
             return null;
         }

@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="Configuration.cs" />
     <Compile Include="DebugUtils.cs" />
+    <Compile Include="GUI\BuildingTreeReplacerPanel.cs" />
     <Compile Include="GUI\PropCustomizerPanel.cs" />
     <Compile Include="GUI\TreeCustomizerPanel.cs" />
     <Compile Include="GUI\TreeReplacerPanel.cs" />
@@ -71,6 +72,7 @@
     <Compile Include="PropItUpTool.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\WorkshopUserGuide.txt" />
     <Content Include="Assets\PreviewImage.png" />
     <Content Include="Assets\WorkshopDescription.txt" />
   </ItemGroup>

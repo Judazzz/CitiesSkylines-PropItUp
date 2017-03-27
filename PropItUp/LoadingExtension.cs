@@ -46,10 +46,16 @@ namespace PropItUp
                 PropItUpTool.ReplacePrefabsBuilding();
             }
 
-            //  Global Tree Replacements:
-            if (PropItUpTool.config.enable_applyglobalonload && PropItUpTool.config.globalTreeReplacements.Count > 0)
+            //  Global Free-standing Tree Replacements:
+            if (PropItUpTool.config.enable_globalfreestanding && PropItUpTool.config.globalTreeReplacements.Count > 0)
             {
                 PropItUpTool.ReplaceTreesGlobal();
+            }
+
+            //  Global Building Tree Replacements:
+            if (PropItUpTool.config.enable_applyglobalonload && PropItUpTool.config.globalBuildingTreeReplacements.Count > 0)
+            {
+                PropItUpTool.ReplaceBuildingTreesGlobal();
             }
 
             base.OnLevelLoaded(mode);

@@ -11,16 +11,17 @@ namespace PropItUp.GUI
 
         public UITabstrip panelTabs;
         public UIButton treeReplacerButton;
+        public UIButton buildingTreeReplacerButton;
         public UIButton treeCustomizerButton;
         public UIButton propCustomizerButton;
 
         public TreeReplacerPanel treeReplacerPanel;
+        public BuildingTreeReplacerPanel buildingTreeReplacerPanel;
         public TreeCustomizerPanel treeCustomizerPanel;
         public PropCustomizerPanel propCustomizerPanel;
 
         private BuildingSelectionTool buildingSelectionTool = ToolsModifierControl.toolController.gameObject.AddComponent<BuildingSelectionTool>();
         
-
         public static UIMainPanel _instance;
         public static UIMainPanel instance
         {
@@ -64,25 +65,36 @@ namespace PropItUp.GUI
 
             //  Tab Buttons:
             //  Global Tree Replacer Button:
-            treeReplacerButton = UIUtils.CreateTab(panelTabs, "Global", true);
-            treeReplacerButton.name = "globalCustomizerButton";
-            treeReplacerButton.tooltip = "";
+            treeReplacerButton = UIUtils.CreateTab(panelTabs, "Global");
+            treeReplacerButton.name = "treeReplacerButton";
+            treeReplacerButton.tooltip = "Replace free-standing trees globally";
             treeReplacerButton.textScale = 0.8f;
-            treeReplacerButton.width = 60f;
+            //treeReplacerButton.width = 60f;
+            treeReplacerButton.width = 64f;
+            //  Global BuildingTree Replacer Button:
+            buildingTreeReplacerButton = UIUtils.CreateTab(panelTabs, "Building");
+            buildingTreeReplacerButton.name = "buildingTreeReplacerButton";
+            buildingTreeReplacerButton.tooltip = "Replace building trees globally";
+            buildingTreeReplacerButton.textScale = 0.8f;
+            //buildingTreeReplacerButton.width = 60f;
+            buildingTreeReplacerButton.width = 64f;
             //  Prop Customizer Button:
-            propCustomizerButton = UIUtils.CreateTab(panelTabs, "Asset props", true);
+            propCustomizerButton = UIUtils.CreateTab(panelTabs, "Props");
             propCustomizerButton.name = "propCustomizerButton";
-            propCustomizerButton.tooltip = "";
+            propCustomizerButton.tooltip = "Replace props per building";
             propCustomizerButton.textScale = 0.8f;
-            propCustomizerButton.width = 100f;
+            //propCustomizerButton.width = 100f;
+            propCustomizerButton.width = 64f;
             //  Tree Customizer Button:
-            treeCustomizerButton = UIUtils.CreateTab(panelTabs, "Asset trees", true);
+            treeCustomizerButton = UIUtils.CreateTab(panelTabs, "Trees");
             treeCustomizerButton.name = "treeCustomizerButton";
-            treeCustomizerButton.tooltip = "";
+            treeCustomizerButton.tooltip = "Replace trees per building";
             treeCustomizerButton.textScale = 0.8f;
-            treeCustomizerButton.width = 100f;
+            //treeCustomizerButton.width = 100f;
+            treeCustomizerButton.width = 64f;
             //  Tab Button Events:
             treeReplacerButton.eventClick += (c, e) => TabClicked(c, e);
+            buildingTreeReplacerButton.eventClick += (c, e) => TabClicked(c, e);
             treeCustomizerButton.eventClick += (c, e) => TabClicked(c, e);
             propCustomizerButton.eventClick += (c, e) => TabClicked(c, e);
 
@@ -101,6 +113,13 @@ namespace PropItUp.GUI
             treeReplacerPanel.height = PropItUpTool.HEIGHT;
             treeReplacerPanel.relativePosition = new Vector3(5, 0);
             treeReplacerPanel.isVisible = true;
+            //  Global Building Tree Replacer Panel:
+            buildingTreeReplacerPanel = body.AddUIComponent<BuildingTreeReplacerPanel>();
+            buildingTreeReplacerPanel.name = "buildingTreeReplacerPanel";
+            buildingTreeReplacerPanel.width = PropItUpTool.WIDTH - (3 * PropItUpTool.SPACING);
+            buildingTreeReplacerPanel.height = PropItUpTool.HEIGHT;
+            buildingTreeReplacerPanel.relativePosition = new Vector3(5, 0);
+            buildingTreeReplacerPanel.isVisible = false;
             //  Prefab Tree Customizer Panel:
             propCustomizerPanel = body.AddUIComponent<PropCustomizerPanel>();
             propCustomizerPanel.name = "propCustomizerPanel";
@@ -125,12 +144,19 @@ namespace PropItUp.GUI
             }
             //  
             treeReplacerPanel.isVisible = false;
+            buildingTreeReplacerPanel.isVisible = false;
             propCustomizerPanel.isVisible = false;
             treeCustomizerPanel.isVisible = false;
 
             if (trigger == treeReplacerButton)
             {
                 treeReplacerPanel.isVisible = true;
+                ToolsModifierControl.toolController.CurrentTool = ToolsModifierControl.GetTool<DefaultTool>();
+                ToolsModifierControl.SetTool<DefaultTool>();
+            }
+            else if (trigger == buildingTreeReplacerButton)
+            {
+                buildingTreeReplacerPanel.isVisible = true;
                 ToolsModifierControl.toolController.CurrentTool = ToolsModifierControl.GetTool<DefaultTool>();
                 ToolsModifierControl.SetTool<DefaultTool>();
             }
@@ -158,7 +184,6 @@ namespace PropItUp.GUI
                 }
                 treeCustomizerPanel.isVisible = true;
             }
-            DebugUtils.Log($"CurrentTool: {ToolsModifierControl.toolController.CurrentTool.name}");
         }
 
         //  Toggle main panel and update button state:
@@ -167,6 +192,7 @@ namespace PropItUp.GUI
             //  TODO: canel BuildingSelectionTool's selected building + building highlight:
             //  Reset ModPanels:
             TreeReplacerPanel.instance.Reset();
+            BuildingTreeReplacerPanel.instance.Reset();
             PropCustomizerPanel.instance.Reset();
             TreeCustomizerPanel.instance.Reset();
             if (_instance.isVisible)
@@ -175,8 +201,6 @@ namespace PropItUp.GUI
                 _instance.isVisible = false;
                 ToolsModifierControl.toolController.CurrentTool = ToolsModifierControl.GetTool<DefaultTool>();
                 ToolsModifierControl.SetTool<DefaultTool>();
-                //  Mod button:
-                UIMainButton.instance.state = UIButton.ButtonState.Normal;
             }
             else
             {
@@ -186,12 +210,18 @@ namespace PropItUp.GUI
                 ResetTabMenu();
                 //  Show ModPanel:
                 treeReplacerPanel.isVisible = true;
+                buildingTreeReplacerPanel.isVisible = false;
                 propCustomizerPanel.isVisible = false;
                 treeCustomizerPanel.isVisible = false;
-                //ToolsModifierControl.toolController.CurrentTool = ToolsModifierControl.GetTool<DefaultTool>();
-                //ToolsModifierControl.SetTool<DefaultTool>();
-                //  Mod button:
+            }
+            //  Mod Main Button state:
+            if (_instance.isVisible)
+            {
                 UIMainButton.instance.state = UIButton.ButtonState.Focused;
+            }
+            else
+            {
+                UIMainButton.instance.state = UIButton.ButtonState.Normal;
             }
         }
 
@@ -200,6 +230,7 @@ namespace PropItUp.GUI
         {
             treeReplacerButton.SimulateClick();
             treeReplacerButton.Focus();
+            buildingTreeReplacerButton.Unfocus();
             propCustomizerButton.Unfocus();
             treeCustomizerButton.Unfocus();
         }

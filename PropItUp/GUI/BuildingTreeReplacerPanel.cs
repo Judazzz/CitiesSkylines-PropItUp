@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace PropItUp.GUI
 {
-    public class TreeReplacerPanel : UIPanel
+    public class BuildingTreeReplacerPanel : UIPanel
     {
         private UILabel _introLabel;
         private UILabel _originalTreeLabel;
@@ -60,8 +60,8 @@ namespace PropItUp.GUI
             set { _selectedTreeReplacement = value; }
         }
 
-        private static TreeReplacerPanel _instance;
-        public static TreeReplacerPanel instance
+        private static BuildingTreeReplacerPanel _instance;
+        public static BuildingTreeReplacerPanel instance
         {
             get { return _instance; }
         }
@@ -100,14 +100,7 @@ namespace PropItUp.GUI
                 _introLabel.text = "THIS FEATURE IS UNAVAILABLE!\n\nReason: no custom trees found";
                 return;
             }
-            //  Feature disabled: hide UI:
-            if (!PropItUpTool.config.enable_globalfreestanding)
-            {
-                _introLabel.width = parent.width;
-                _introLabel.text = "THIS FEATURE IS UNAVAILABLE!\n\nReason: feature disabled by player";
-                return;
-            }
-            _introLabel.text = "Global replacement";
+            _introLabel.text = "Global building replacement";
             //  Source:
             _originalTreeLabel = originalContainer.AddUIComponent<UILabel>();
             _originalTreeLabel.text = "Vanilla trees";
@@ -130,10 +123,10 @@ namespace PropItUp.GUI
             {
                 if (PropItUpTool.config.enable_debug)
                 {
-                    DebugUtils.Log($"TreeReplacerPanel: 'Reset replacement' clicked'.");
+                    DebugUtils.Log($"BuildingTreeReplacerPanel: 'Reset replacement' clicked'.");
                 }
                 //  
-                PropItUpTool.RestoreReplacementGlobal();
+                PropItUpTool.RestoreBuildingReplacementGlobal();
                 //  Repopulate originalTreeFastList:
                 //  TODO: stay at selected index:
                 PopulateVanillaTreesFastList();
@@ -221,7 +214,7 @@ namespace PropItUp.GUI
             _saveTreeReplacementButton.width = 110;
             _saveTreeReplacementButton.name = "saveReplacementButton";
             _saveTreeReplacementButton.text = "Replace tree";
-            _saveTreeReplacementButton.tooltip = "Replace selected vanilla tree with selected custom tree.";
+            _saveTreeReplacementButton.tooltip = "Replace selected building vanilla tree with selected custom tree.";
             _saveTreeReplacementButton.eventClicked += (c, e) =>
             {
                 //  Only save if original and replacement are selected:
@@ -232,9 +225,9 @@ namespace PropItUp.GUI
                 //  
                 if (PropItUpTool.config.enable_debug)
                 {
-                    DebugUtils.Log($"TreeReplacerPanel: 'Replace tree' clicked'.");
+                    DebugUtils.Log($"BuildingTreeReplacerPanel: 'Replace tree' clicked'.");
                 }
-                PropItUpTool.SaveReplacementGlobal();
+                PropItUpTool.SaveBuildingReplacementGlobal();
                 //  Repopulate originalTreeFastList:
                 //  TODO: stay at selected index:
                 PopulateVanillaTreesFastList();
@@ -246,7 +239,8 @@ namespace PropItUp.GUI
         public void PopulateVanillaTreesFastList()
         {
             //  
-            if (_originalTreeFastList.rowsData.m_size > 0) {
+            if (_originalTreeFastList.rowsData.m_size > 0)
+            {
                 _originalTreeFastList.Clear();
             }
             //  
@@ -259,7 +253,7 @@ namespace PropItUp.GUI
             //  
             if (PropItUpTool.config.enable_debug)
             {
-                DebugUtils.Log($"TreeReplacerPanel: originalTreeFastList populated with {PropItUpTool.allVanillaTrees.Count} trees.");
+                DebugUtils.Log($"BuildingTreeReplacerPanel: originalTreeFastList populated with {PropItUpTool.allVanillaTrees.Count} trees.");
             }
         }
         protected void OnSelectedVanillaChanged(UIComponent component, int i)
@@ -267,7 +261,8 @@ namespace PropItUp.GUI
             _selectedTreeOriginal = _originalTreeFastList.rowsData[i] as TreeInfo;
             _selectedTreeOriginalIndex = i;
             //  Enable Reset Button if global replacement is set for selected tree:
-            if (PropItUpTool.config.GetGlobalReplacementByVanillaTreeName(_selectedTreeOriginal.name) != null) {
+            if (PropItUpTool.config.GetGlobalReplacementByVanillaTreeName(_selectedTreeOriginal.name) != null)
+            {
                 _resetReplacementButton.isEnabled = true;
             }
             else
@@ -277,12 +272,12 @@ namespace PropItUp.GUI
             //  
             if (PropItUpTool.config.enable_debug)
             {
-                DebugUtils.Log($"TreeReplacerPanel: originalTreeFastList selected: tree '{_selectedTreeOriginal.name}'.");
+                DebugUtils.Log($"BuildingTreeReplacerPanel: originalTreeFastList selected: tree '{_selectedTreeOriginal.name}'.");
             }
         }
 
         public void PopulateCustomTreesFastList()
-        {   
+        {
             //  Search Query set?
             if (!string.IsNullOrEmpty(searchQuery) && searchQuery != searchboxPlaceholder)
             {
@@ -301,7 +296,7 @@ namespace PropItUp.GUI
             //  
             if (PropItUpTool.config.enable_debug)
             {
-                DebugUtils.Log($"TreeReplacerPanel: replacementTreeFastList populated with {PropItUpTool.allCustomTrees.Count} trees.");
+                DebugUtils.Log($"BuildingTreeReplacerPanel: replacementTreeFastList populated with {PropItUpTool.allCustomTrees.Count} trees.");
             }
         }
         protected void OnSelectedCustomChanged(UIComponent component, int i)
@@ -313,7 +308,7 @@ namespace PropItUp.GUI
             _selectedTreeReplacement = _replacementTreeFastList.rowsData[i] as TreeInfo;
             if (PropItUpTool.config.enable_debug)
             {
-                DebugUtils.Log($"TreeReplacerPanel: CustomFastList selected: tree '{_selectedTreeReplacement.name}'.");
+                DebugUtils.Log($"BuildingTreeReplacerPanel: CustomFastList selected: tree '{_selectedTreeReplacement.name}'.");
             }
         }
 
@@ -359,7 +354,7 @@ namespace PropItUp.GUI
             //  
             if (PropItUpTool.config.enable_debug)
             {
-                DebugUtils.Log($"TreeReplacerPanel: search query '{searchQuery}' returned {tmpItemList.Count} results.");
+                DebugUtils.Log($"BuildingTreeReplacerPanel: search query '{searchQuery}' returned {tmpItemList.Count} results.");
             }
         }
 

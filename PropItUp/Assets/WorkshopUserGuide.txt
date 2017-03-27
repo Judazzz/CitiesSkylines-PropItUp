@@ -1,0 +1,50 @@
+﻿All features of this mod can be accessed through its panel. To toggle the panel, you can use one of the three available key combinations: by default this is Alt-P, but in the mod options panel you can change this to Ctrl-P or Shift-P. Your preferred key combination will be stored in the mod's config file.
+The second way to toggle the panel is by clicking on the button with the tree icon: by default this button is located in the lower right corner, near the Free Camera button, but you can place it anywhere you want by dragging it while keeping the right mouse button clicked. Its new position will be stored in the mod's config file as soon as you release the right mouse button.
+
+
+
+When you open the mod panel, you will find four tabs: [b]GLOBAL[/b], [b]BUILDING[/b], [b]PROPS[/b], and [b]TREES[/b].
+
+[b]GLOBAL PANEL[/b]
+In this panel you can replace free-standing trees with different ones on a [u]global, city-wide level[/u]. This feature is useful when you quickly want to replace all trees of a certain type on a map to create a specific theme for your city, like removing all pine trees with palms.
+To use this feature, select a tree from the top list, select a replacement tree from the bottom list (1), and click the [b]Replace tree[/b] button to apply the change.
+Vanilla trees that have a global replacement applied to them are indicated in the list with a *. To see what replacement tree you have used, hover the cursor over the vanilla tree item in the list. To undo a replacement, select the tree you want to reset in the top list and click the [b]Reset tree[/b] button. That button will only be available when you have selected a tree in the list that has a replacement applied to it.
+
+[b]NOTE 1[/b]
+Tree replacements applied with this feature are persistent. This means that once you save your city after applying global tree replacements, these replacements will remain even if you disable or uninstall the mod.
+[b]NOTE 2[/b]
+Existing replacements will be applied to all trees in your city of the selected type, both in real-time (when you click the [b]Replace tree[/b]) and every time you load your city. This means that newly placed trees of a type you have created a global replacement for will be replaced the next time you load your city. To avoid this behavior, you can disable this feature in the mod's options panel.
+[b]NOTE 3[/b]
+If you switch from the [b]Props[/b] or [b]Trees[/b] panel, the selected building is unselected, and the Building Selection Tool disabled.
+
+
+
+[b]BUILDING PANEL[/b]
+In this panel you can replace vanilla trees that are embedded within buildings with different ones on a [u]global, city-wide level[/u]. This feature is useful when you quickly want to replace all building trees of a certain type on a map to create a specific theme for your city, like removing all pine trees with palms. It can also be useful as a work-around for the - as-of-yet still unresolved - problem of flickering trees caused by the Random Tree Rotation mod.
+To use this feature, select a tree from the top list, select a replacement from the bottom list (1), and click the [b]Replace tree[/b] button to apply the change. Note that buildings that have a custom per-building replacement are untouched by this feature.
+Vanilla trees that have a global replacement applied to them are indicated in the list with a *. To see what replacement tree you have used, hover the cursor over the vanilla tree item in the list. To undo a replacement, select the tree you want to reset in the top list and click the [b]Reset tree[/b] button. That button will only be available when you have selected a tree in the list that has a replacement applied to it.
+
+[b]NOTE 1[/b]
+Tree replacements will be applied in real-time (when you click the [b]Replace tree[/b]). For as long as the replacement remains active, the replacement is also immediately applied to every new building added to your city.
+[b]NOTE 2[/b]
+If you switch from the [b]Props[/b] or [b]Trees[/b] panel, the selected building is un-selected, and the Building Selection Tool disabled.
+
+
+
+[b]PROPS PANEL[/b]
+In this panel you can replace props on a [u]per-building basis[/u]. This feature is useful when you want to replace building props that you don't like or that just don't fit. For example: I have always been bugged by the unrealistic amounts of table sets on roof tops that certain buildings have, and this mod allows me to replace them with more fitting props like antennas or chimneys.
+To use this feature, first select the building that you want to edit: the Building Selection Tool will open as soon as you open this panel. Once a building is selected, the building's name will be displayed at the top of the panel, and all the building's props will be shown in the top list. To un-select a building, right-click on any building: the building name will disappear. To replace a prop, select it in the top list, then select a replacement from the bottom list (1), and click the [b]Replace prop[/b] button to apply the change.
+After a replacement the name of the replaced prop will be replaced with the name of the replacement prop, so you will always see what props are currently being used by that building. To undo a replacement, select the prop you want to reset in the top list and click the [b]Reset prop[/b] button That button will only be available when you have selected a prop in the list that has a replacement applied to it.
+
+[b]NOTE 1[/b]
+Tree replacements will be applied in real-time (when you click the [b]Replace tree[/b]). For as long as the replacement remains active, the replacement is also immediately applied to every new building of that type added to your city.
+[b]NOTE 2[/b]
+If you switch to the [b]Global[/b] or [b]Building[/b] panel, the currently selected building will be un-selected.
+
+
+
+[b]TREES PANEL[/b]
+In this panel you can do the same as in the Asset Props panel, but instead of props it will let you replace trees on a per-building level.
+
+
+(1) Use the search box above the replacement list to quickly find the tree you are looking for.

@@ -173,6 +173,10 @@ namespace PropItUp
             {
                 allAvailableProps.Clear();
             }
+
+            //// 'No prop' option:
+            //allAvailableProps.Add(null);
+
             //  Loop all props in 'PropCollection':
             int skipped = 0;
             for (uint i = 0; i < PrefabCollection<PropInfo>.PrefabCount(); i++)
@@ -211,6 +215,12 @@ namespace PropItUp
             {
                 allAvailableTrees.Clear();
             }
+
+            //// 'No tree' options:
+            //allVanillaTrees.Add(null);
+            //allCustomTrees.Add(null);
+            //allAvailableTrees.Add(null);
+
             //  Loop all props in 'PropCollection':
             int skipped = 0;
             for (uint i = 0; i < PrefabCollection<TreeInfo>.PrefabCount(); i++)
@@ -253,10 +263,10 @@ namespace PropItUp
         }
 
 
-        //  Global replacements:
-        #region Global replacements:
+        //  Global Tree Replacements:
+        #region Global Tree Replacements:
 
-        //  Apply all global tree/prop replacements (onLoad):
+        //  Apply all global tree replacements (onLoad):
         public static void ReplaceTreesGlobal()
         {
             List<string> allBuildings = config.GetAllBuildings();
@@ -272,7 +282,7 @@ namespace PropItUp
                 }
                 catch (Exception e)
                 {
-                    DebugUtils.Log($"Replacement {treeReplacement.original} with {treeReplacement.replacement_name} failed: ReplaceTreesGlobal()");
+                    DebugUtils.Log($"Global tree replacement {treeReplacement.original} with {treeReplacement.replacement_name} failed: ReplaceTreesGlobal()");
                     DebugUtils.LogException(e);
                     continue;
                 }
@@ -286,85 +296,46 @@ namespace PropItUp
             }
         }
 
-        //  Apply selected global tree/prop replacement (runtime):
+        //  Apply selected global tree replacement (runtime):
         public static void ReplaceTreeGlobal(PrefabReplacement selectedTreeReplacement)
         {
             SimulationManager.instance.AddAction(() =>
             {
                 TreeInfo newTree = PrefabCollection<TreeInfo>.FindLoaded(selectedTreeReplacement.replacement_name);
-                TreeInfo oldTree = PrefabCollection<TreeInfo>.FindLoaded(selectedTreeReplacement.original);
-                //  
-                List<string> allBuildings = config.GetAllBuildings();
-                //  Replace building trees:
-                var buildings = Resources.FindObjectsOfTypeAll<BuildingInfo>();
-                foreach (var building in buildings)
+                //  Null check:
+                if (!newTree)
                 {
-                    //  Skip buildings that have no trees or have custom TreeReplacements:
-                    if (building.m_props == null || allBuildings.Contains(building.name))
+                    if (config.enable_debug)
+                    {
+                        DebugUtils.Log($"Global tree replacement for {selectedTreeReplacement.replacement_name} failed. Reason: replacement tree not found!");
+                    }
+                    //  TODO: remove all replacements featuring not found prefab from config
+                    return;
+                }
+                TreeInfo oldTree = PrefabCollection<TreeInfo>.FindLoaded(selectedTreeReplacement.original);
+                //  Replace freestanding trees:
+                var trees = TreeManager.instance.m_trees.m_buffer;
+                for (uint index = 0; index < trees.Length; index++)
+                {
+                    var tree = trees[index];
+                    if (tree.m_flags == (ushort)TreeInstance.Flags.None)
                     {
                         continue;
                     }
-                    foreach (var tree in building.m_props)
+                    var treeInstance = tree.Info;
+                    if (treeInstance == null)
                     {
-                        var treeInstance = tree.m_finalTree;
-                        if (treeInstance == null)
-                        {
-                            continue;
-                        }
-                        if (treeInstance.name == oldTree.name)
-                        {
-                            tree.m_finalTree = newTree;
-                            tree.m_tree = newTree;
-                        }
+                        continue;
                     }
+                    if (treeInstance.name != oldTree.name)
+                    {
+                        continue;
+                    }
+                    tree.Info = newTree;
+                    trees[index] = tree;
+                    TreeManager.instance.UpdateTreeRenderer(index, true); //that updates LODs
                 }
-                UpdateBuildingsRenderers(); //that should update LODs
-                ReplaceFreeStandingTree(oldTree, newTree);
             });
-        }
-
-
-        private static void UpdateBuildingsRenderers(BuildingInfo buildingInfo = null)
-        {
-            var buildings = BuildingManager.instance.m_buildings.m_buffer;
-            for (ushort index = 0; index < buildings.Length; index++)
-            {
-                var building = buildings[index];
-                if (building.m_flags == Building.Flags.None)
-                {
-                    continue;
-                }
-                if (buildingInfo != null && building.Info != buildingInfo)
-                {
-                    continue;
-                }
-                BuildingManager.instance.UpdateBuildingRenderer(index, true); //that should update LODs
-            }
-        }
-
-        private static void ReplaceFreeStandingTree(TreeInfo oldTree, TreeInfo newTree)
-        {
-            var trees = TreeManager.instance.m_trees.m_buffer;
-            for (uint index = 0; index < trees.Length; index++)
-            {
-                var tree = trees[index];
-                if (tree.m_flags == (ushort) TreeInstance.Flags.None)
-                {
-                    continue;
-                }
-                var treeInstance = tree.Info;
-                if (treeInstance == null)
-                {
-                    continue;
-                }
-                if (treeInstance.name != oldTree.name)
-                {
-                    continue;
-                }
-                tree.Info = newTree;
-                trees[index] = tree;
-                TreeManager.instance.UpdateTreeRenderer(index, true); //that updates LODs
-            }
         }
 
         //  Save/apply selected global tree replacement:
@@ -407,7 +378,7 @@ namespace PropItUp
             //  
             if (config.enable_debug)
             {
-                DebugUtils.Log($"[Configuration] - Global replacement '{newTreeReplacement.original}' with '{newTreeReplacement.replacement_name}' saved.");
+                DebugUtils.Log($"[Configuration] - Global tree replacement '{newTreeReplacement.original}' with '{newTreeReplacement.replacement_name}' saved.");
             }
             //  Replace tree at runtime (if configured as such):
             if (config.enable_runtimereload)
@@ -422,7 +393,7 @@ namespace PropItUp
                 }
                 catch (Exception e)
                 {
-                    DebugUtils.Log($"Replacement '{executableTreeReplacement.original}' with '{executableTreeReplacement.replacement_name}' failed: SaveReplacementGlobal()");
+                    DebugUtils.Log($"Replacing global tree replacement '{executableTreeReplacement.original}' with '{executableTreeReplacement.replacement_name}' failed: SaveReplacementGlobal()");
                     DebugUtils.LogException(e);
                 }
                 //  Output timer data:
@@ -430,7 +401,7 @@ namespace PropItUp
                 //  
                 if (config.enable_debug)
                 {
-                    DebugUtils.Log($"Replacement '{executableTreeReplacement.original}' with '{executableTreeReplacement.replacement_name}' completed (time elapsed: {ReplaceTreeTimer.Elapsed} seconds).");
+                    DebugUtils.Log($"Replacing global tree replacement '{executableTreeReplacement.original}' with '{executableTreeReplacement.replacement_name}' completed (time elapsed: {ReplaceTreeTimer.Elapsed} seconds).");
                 }
             }
         }
@@ -452,7 +423,7 @@ namespace PropItUp
             //  
             if (config.enable_debug)
             {
-                DebugUtils.Log($"[Configuration] - Global replacement of '{selectedTreeReplacement.original}' removed.");
+                DebugUtils.Log($"[Configuration] - Global tree replacement of '{selectedTreeReplacement.original}' removed.");
             }
             //  Reset tree at runtime (if configured as such):
             if (config.enable_runtimereload)
@@ -467,7 +438,7 @@ namespace PropItUp
                 }
                 catch (Exception e)
                 {
-                    DebugUtils.Log($"Resetting '{executableTreeReplacement.original}' to '{originalTree.name}' failed: ResetReplacementGlobal()");
+                    DebugUtils.Log($"Resetting global tree replacement '{executableTreeReplacement.original}' to '{originalTree.name}' failed: ResetReplacementGlobal()");
                     DebugUtils.LogException(e);
                 }
                 //  Output timer data:
@@ -475,7 +446,203 @@ namespace PropItUp
                 //  
                 if (config.enable_debug)
                 {
-                    DebugUtils.Log($"Resetting '{executableTreeReplacement.original}' to '{originalTree.name}' completed (time elapsed: {ResetTreeTimer.Elapsed} seconds).");
+                    DebugUtils.Log($"Resetting global tree replacement '{executableTreeReplacement.original}' to '{originalTree.name}' completed (time elapsed: {ResetTreeTimer.Elapsed} seconds).");
+                }
+            }
+        }
+
+
+        #endregion
+        
+
+        //  Global Building Tree Replacements:
+        #region Global Building Tree Replacements:
+
+        //  Apply all global building tree replacements (onLoad):
+        public static void ReplaceBuildingTreesGlobal()
+        {
+            List<string> allBuildings = config.GetAllBuildings();
+            //  Start timer:
+            Stopwatch ReplaceTreesTimer = new Stopwatch();
+            ReplaceTreesTimer.Start();
+            //  
+            foreach (PrefabReplacement treeReplacement in config.globalTreeReplacements)
+            {
+                try
+                {
+                    ReplaceBuildingTreeGlobal(treeReplacement);
+                }
+                catch (Exception e)
+                {
+                    DebugUtils.Log($"Replacement {treeReplacement.original} with {treeReplacement.replacement_name} failed: ReplaceTreesGlobal()");
+                    DebugUtils.LogException(e);
+                    continue;
+                }
+            }
+            //  Output timer data:
+            ReplaceTreesTimer.Stop();
+            //  
+            if (config.enable_debug)
+            {
+                DebugUtils.Log($"All global tree replacements applied (time elapsed: {ReplaceTreesTimer.Elapsed} seconds).");
+            }
+        }
+
+        //  Apply selected global building tree replacement (runtime):
+        public static void ReplaceBuildingTreeGlobal(PrefabReplacement selectedTreeReplacement)
+        {
+            SimulationManager.instance.AddAction(() =>
+            {
+                TreeInfo newTree = PrefabCollection<TreeInfo>.FindLoaded(selectedTreeReplacement.replacement_name);
+                //  Null check:
+                if (!newTree)
+                {
+                    if (config.enable_debug)
+                    {
+                        DebugUtils.Log($"Global building tree replacement for {selectedTreeReplacement.replacement_name} failed. Reason: replacement tree not found!");
+                    }
+                    //  TODO: remove all replacements featuring not found prefab from config
+                    return;
+                }
+                TreeInfo oldTree = PrefabCollection<TreeInfo>.FindLoaded(selectedTreeReplacement.original);
+                //  
+                List<string> allBuildings = config.GetAllBuildings();
+                //  Replace building trees:
+                var buildings = Resources.FindObjectsOfTypeAll<BuildingInfo>();
+                foreach (var building in buildings)
+                {
+                    //  Skip buildings that have no trees or have custom TreeCustomizations:
+                    if (building.m_props == null || allBuildings.Contains(building.name))
+                    {
+                        continue;
+                    }
+                    foreach (var tree in building.m_props)
+                    {
+                        var treeInstance = tree.m_finalTree;
+                        if (treeInstance == null)
+                        {
+                            continue;
+                        }
+                        if (treeInstance.name == oldTree.name)
+                        {
+                            tree.m_finalTree = newTree;
+                            tree.m_tree = newTree;
+                        }
+                    }
+                }
+                UpdateBuildingRenderers(); //that should update LODs
+            });
+        }
+
+        //  Save/apply selected global building tree replacement:
+        public static void SaveBuildingReplacementGlobal()
+        {
+            int index = BuildingTreeReplacerPanel.instance.selectedTreeOriginalIndex;
+            TreeInfo originalTree = BuildingTreeReplacerPanel.instance.selectedTreeOriginal;
+            TreeInfo replacementTree = BuildingTreeReplacerPanel.instance.selectedTreeReplacement;
+
+            //  New tree replacement object:
+            PrefabReplacement newTreeReplacement = new PrefabReplacement()
+            {
+                index = index,
+                type = "tree",
+                original = originalTree.name,
+                replacement_name = replacementTree.name
+            };
+            //  Temporary tree replacement object to send to replace method (to ensure non-vanilla tree is replaced):
+            PrefabReplacement executableTreeReplacement = newTreeReplacement;
+
+            //  Save tree replacement to config:
+            //  Check if tree has been replaced before: if yes, update; if no, add:
+            PrefabReplacement existingTreeReplacement = config.GetGlobalBuildingReplacementByVanillaTreeName(originalTree.name);
+            if (existingTreeReplacement != null)
+            {
+                //  Yes => find previous tree replacement (now needs to be replaced) and update:
+                string existingTree = existingTreeReplacement.replacement_name;
+                newTreeReplacement = new PrefabReplacement()
+                {
+                    type = existingTreeReplacement.type,
+                    original = existingTreeReplacement.original,
+                    index = index,
+                    replacement_name = replacementTree.name
+                };
+                config.globalBuildingTreeReplacements.Remove(existingTreeReplacement);
+                executableTreeReplacement.original = existingTree;
+            }
+            config.globalBuildingTreeReplacements.Add(newTreeReplacement);
+            SaveConfig();
+            //  
+            if (config.enable_debug)
+            {
+                DebugUtils.Log($"[Configuration] - Global building tree replacement '{newTreeReplacement.original}' with '{newTreeReplacement.replacement_name}' saved.");
+            }
+            //  Replace tree at runtime (if configured as such):
+            if (config.enable_runtimereload)
+            {
+                //  Start timer:
+                Stopwatch ReplaceTreeTimer = new Stopwatch();
+                ReplaceTreeTimer.Start();
+                //  Replace tree:
+                try
+                {
+                    ReplaceTreeGlobal(executableTreeReplacement);
+                }
+                catch (Exception e)
+                {
+                    DebugUtils.Log($"Replacing global building tree replacement '{executableTreeReplacement.original}' with '{executableTreeReplacement.replacement_name}' failed: SaveBuildingReplacementGlobal()");
+                    DebugUtils.LogException(e);
+                }
+                //  Output timer data:
+                ReplaceTreeTimer.Stop();
+                //  
+                if (config.enable_debug)
+                {
+                    DebugUtils.Log($"Replacing global building tree replacement '{executableTreeReplacement.original}' with '{executableTreeReplacement.replacement_name}' completed (time elapsed: {ReplaceTreeTimer.Elapsed} seconds).");
+                }
+            }
+        }
+
+        //  Restore selected global building tree replacement:
+        public static void RestoreBuildingReplacementGlobal()
+        {
+            TreeInfo originalTree = BuildingTreeReplacerPanel.instance.selectedTreeOriginal;
+            PrefabReplacement selectedTreeReplacement = config.GetGlobalBuildingReplacementByVanillaTreeName(originalTree.name);
+            PrefabReplacement executableTreeReplacement = new PrefabReplacement()
+            {
+                index = selectedTreeReplacement.index,
+                type = "tree",
+                original = selectedTreeReplacement.replacement_name,
+                replacement_name = selectedTreeReplacement.original
+            };
+            config.globalBuildingTreeReplacements.Remove(selectedTreeReplacement);
+            SaveConfig();
+            //  
+            if (config.enable_debug)
+            {
+                DebugUtils.Log($"[Configuration] - Global building tree replacement of '{selectedTreeReplacement.original}' removed.");
+            }
+            //  Reset tree at runtime (if configured as such):
+            if (config.enable_runtimereload)
+            {
+                //  Start timer:
+                Stopwatch ResetTreeTimer = new Stopwatch();
+                ResetTreeTimer.Start();
+                //  Replace tree:
+                try
+                {
+                    ReplaceBuildingTreeGlobal(executableTreeReplacement);
+                }
+                catch (Exception e)
+                {
+                    DebugUtils.Log($"Resetting global building tree replacement '{executableTreeReplacement.original}' to '{originalTree.name}' failed: ResetBuildingReplacementGlobal()");
+                    DebugUtils.LogException(e);
+                }
+                //  Output timer data:
+                ResetTreeTimer.Stop();
+                //  
+                if (config.enable_debug)
+                {
+                    DebugUtils.Log($"Resetting global building tree replacement '{executableTreeReplacement.original}' to '{originalTree.name}' completed (time elapsed: {ResetTreeTimer.Elapsed} seconds).");
                 }
             }
         }
@@ -522,8 +689,14 @@ namespace PropItUp
         //  Replace selected tree/prop with replacement for building (runtime):
         public static void ReplacePrefabBuilding(BuildingInfo buildingInfo, PrefabReplacement selectedPrefabReplacement)
         {
+            //  Null check:
             if (buildingInfo == null)
             {
+                if (config.enable_debug)
+                {
+                    DebugUtils.Log($"Per-building prop/tree replacement of prop {selectedPrefabReplacement.replacement_name} failed. Reason: building not found!");
+                }
+                //  TODO: remove all replacements featuring not found buildingInfo from config
                 return;
             }
             SimulationManager.instance.AddAction(() =>
@@ -533,6 +706,16 @@ namespace PropItUp
                 {
                     //  TODO: fix issues with buildings with accented characters in name (causes error);
                     PropInfo newProp = PrefabCollection<PropInfo>.FindLoaded(selectedPrefabReplacement.replacement_name);
+                    //  Null check:
+                    if (!newProp)
+                    {
+                        if (config.enable_debug)
+                        {
+                            DebugUtils.Log($"Per-building prop replacement of prop {selectedPrefabReplacement.replacement_name} for building {buildingInfo.name} failed. Reason: replacement prop not found!");
+                        }
+                        //  TODO: remove all replacements featuring not found prefab from config
+                        return;
+                    }
                     foreach (var prop in buildingInfo.m_props)
                     {
                         if (prop.m_prop != null)
@@ -554,6 +737,16 @@ namespace PropItUp
                 {
                     //  Replacement = tree:
                     TreeInfo newTree = PrefabCollection<TreeInfo>.FindLoaded(selectedPrefabReplacement.replacement_name);
+                    //  Null check:
+                    if (!newTree)
+                    {
+                        if (config.enable_debug)
+                        {
+                            DebugUtils.Log($"Per-building tree replacement of tree {selectedPrefabReplacement.replacement_name} for building {buildingInfo.name} failed. Reason: replacement tree not found!");
+                        }
+                        //  TODO: remove all replacements featuring not found prefab from config
+                        return;
+                    }
                     foreach (var tree in buildingInfo.m_props)
                     {
                         if (tree.m_tree != null)
@@ -571,18 +764,13 @@ namespace PropItUp
                         }
                     }
                 }
-                UpdateBuildingsRenderers(buildingInfo); //that should update LODs
+                UpdateBuildingRenderers(buildingInfo); //that should update LODs
             });
         }
 
         //  Save/apply selected tree/prop replacement for building:
-        public static void SaveReplacementBuilding(string type)
+        public static void SaveReplacementBuilding(int index, string type, PrefabInfo originalPrefab, PrefabInfo replacementPrefab, BuildingInfo affectedBuilding)
         {
-            int index = (type == "prop") ? PropCustomizerPanel.instance.selectedPropOriginalIndex : TreeCustomizerPanel.instance.selectedTreeOriginalIndex;
-            PrefabInfo originalPrefab = (type == "prop") ? (PrefabInfo)PropCustomizerPanel.instance.selectedPropOriginal : TreeCustomizerPanel.instance.selectedTreeOriginal;
-            PrefabInfo replacementPrefab = (type == "prop") ? (PrefabInfo)PropCustomizerPanel.instance.selectedPropReplacement : TreeCustomizerPanel.instance.selectedTreeReplacement;
-            BuildingInfo affectedBuilding = (type == "prop") ? PropCustomizerPanel.instance.selectedBuilding : TreeCustomizerPanel.instance.selectedBuilding;
-
             //  New tree/prop replacement object:
             PrefabReplacement newPrefabReplacement = new PrefabReplacement()
             {
@@ -673,11 +861,8 @@ namespace PropItUp
         }
 
         //  Restore selected global tree replacement:
-        public static void RestoreReplacementBuilding(string type)
+        public static void RestoreReplacementBuilding(int index, string type, BuildingInfo affectedBuilding)
         {
-            int index = (type == "prop") ? PropCustomizerPanel.instance.selectedPropOriginalIndex : TreeCustomizerPanel.instance.selectedTreeOriginalIndex;
-            BuildingInfo affectedBuilding = (type == "prop") ? PropCustomizerPanel.instance.selectedBuilding : TreeCustomizerPanel.instance.selectedBuilding;
-
             //  Remove tree/prop replacement from config:
             Configuration.Building selectedBuilding = config.GetBuilding(affectedBuilding.name);
             PrefabReplacement selectedPrefabReplacement = config.GetBuildingPrefabReplacementByIndex(selectedBuilding, type, index);
@@ -723,6 +908,31 @@ namespace PropItUp
                 {
                     DebugUtils.Log($"Resetting '{executablePrefabReplacement.original}' to '{executablePrefabReplacement.replacement_name}' for building '{affectedBuilding.name}' completed (time elapsed: {ResetTreeTimer.Elapsed} seconds).");
                 }
+            }
+        }
+
+        #endregion
+
+
+        //  Shared methods:
+        #region Shared methods:
+
+        //  Update building renderer to refresh correct building tree LODs:
+        private static void UpdateBuildingRenderers(BuildingInfo buildingInfo = null)
+        {
+            var buildings = BuildingManager.instance.m_buildings.m_buffer;
+            for (ushort index = 0; index < buildings.Length; index++)
+            {
+                var building = buildings[index];
+                if (building.m_flags == Building.Flags.None)
+                {
+                    continue;
+                }
+                if (buildingInfo != null && building.Info != buildingInfo)
+                {
+                    continue;
+                }
+                BuildingManager.instance.UpdateBuildingRenderer(index, true); //that should update LODs
             }
         }
 

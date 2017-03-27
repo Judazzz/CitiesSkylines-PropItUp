@@ -120,12 +120,15 @@ namespace PropItUp.GUI
             {
                 if (PropItUpTool.config.enable_debug)
                 {
-                    DebugUtils.Log($"TreeCustomizerPanel: 'Reset replacement' clicked'.");
+                    DebugUtils.Log($"TreeCustomizerPanel: 'Reset replacement' clicked.");
                 }
-                //  
-                PropItUpTool.RestoreReplacementBuilding("tree");
-                _resetReplacementButton.isEnabled = false;
+                //  Get original tree:
+                Configuration.Building building = PropItUpTool.config.GetBuilding(_selectedBuilding.name);
+                Configuration.PrefabReplacement replacement = PropItUpTool.config.GetBuildingPrefabReplacementByIndex(building, "tree", _originalTreeFastList.selectedIndex);
+                //  Restore replacement:
+                PropItUpTool.RestoreReplacementBuilding(_selectedTreeOriginalIndex, "tree", _selectedBuilding);
                 //  Repopulate/reset OriginalTreeFastList:
+                _selectedTreeReplacement = PrefabCollection<TreeInfo>.FindLoaded(replacement.original);
                 PopulateIncludedTreesFastList();
                 _selectedTreeOriginal = _originalTreeFastList.rowsData[_selectedTreeOriginalIndex] as TreeInfo;
                 _resetReplacementButton.isEnabled = false;
@@ -222,7 +225,8 @@ namespace PropItUp.GUI
                 {
                     DebugUtils.Log($"TreeCustomizerPanel: 'Replace tree' clicked'.");
                 }
-                PropItUpTool.SaveReplacementBuilding("tree");
+                //  Replace tree:
+                PropItUpTool.SaveReplacementBuilding(_selectedTreeOriginalIndex, "tree", _selectedTreeOriginal, _selectedTreeReplacement, _selectedBuilding);
                 //  Repopulate/reset OriginalTreeFastList:
                 PopulateIncludedTreesFastList();
                 _selectedTreeOriginal = _selectedTreeReplacement;
@@ -250,18 +254,22 @@ namespace PropItUp.GUI
             //  List all trees in selected building:
             listIsUpdating = true;
             List<TreeInfo> selectedBuildingTreeList = new List<TreeInfo>();
+            //  TODO: POPULATE PROP LIST BASED ON ACTUAL, CURRENT PROPS
             foreach (var prop in _selectedBuilding.m_props)
             {
                 if (prop.m_tree != null)
                 {
-                    //  Temporary 'Extreme Mode' feature:
-                    //  TODO: verify if this is still an issue!
-                    //  Exclude props with double quotes in name (causes infinite 'Array index is out of range' error loops):
+                    //  'Extreme Mode':
+                    //  TODO: verify if this is still an issue: Exclude props with double quotes in name (causes infinite 'Array index is out of range' error loops):
                     if (PropItUpTool.config.enable_extrememode == false && prop.m_tree.name.Contains("\""))
                     {
                         continue;
                     }
-                    //  TODO: list each tree (instance) individually (with index), so they can be replaced separately (if possible):
+                    //  TODO? list each tree (instance) individually (with index), so they can be replaced separately (if possible):
+                    if (prop.m_tree == _selectedTreeOriginal)
+                    {
+                        prop.m_tree = _selectedTreeReplacement;
+                    }
                     if (!selectedBuildingTreeList.Contains(prop.m_tree))
                     {
                         selectedBuildingTreeList.Add(prop.m_tree);
@@ -409,10 +417,10 @@ namespace PropItUp.GUI
             _resetReplacementButton.isEnabled = false;
             if (_originalTreeFastList.rowsData.m_size > 0)
             {
+                _originalTreeFastList.Clear();
                 _selectedTreeOriginalIndex = 0;
                 _originalTreeFastList.selectedIndex = -1;
             }
-            _originalTreeFastList.Clear();
             searchQuery = string.Empty;
             _replacementTreeFastListSearchBox.text = string.Empty;
             if (_replacementTreeFastList.rowsData.m_size > 0)

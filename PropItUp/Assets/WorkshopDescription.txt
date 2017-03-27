@@ -6,33 +6,37 @@
 
 [h1]Notes (really, read this)[/h1]
 [quote]I have tried to make this mod as flexible and robust as possible, but there are a few things you'll need to keep in mind when using this mod:
-- this mod can only replace props and trees that are present in-game: this means that dependencies that you have not subscribed to are out of reach of this mod;
-- certain props have special properties, such as seating area's (benches) or are decal props: these props can only be replaced by props with those same properties. This is the reason why sometimes you will find just a few replacement options;
-- the Extreme Mode option gives the player unrestricted access to every prop and tree installed, including markers and effects. [b]Extreme Mode is still experimental and therefore unsupported: use is strictly at your own risk!!![/b];
-- unless you know what you are doing, it is not recommended to replace two or more different props or trees with the same replacement. The reason for this can best be illustrated with an example: imagine a building containing two trees (A and B), and you replace both those trees with tree C. From that moment on, the mod forgets that the building used to contain 2 separate trees, and will one detect tree C. All further replacements will apply to every tree in that building;
- - to get the most out of this mod, I highly recommend players apply all desired global tree replacements first, and add per-building replacements afterwards. The reason for this is that when a city is being loaded, per-building replacements are applied first, and global replacements afterwards;
-- due to the realtime application of replacements, per-building and global replacements can override each other;
+- this mod can only replace props and trees that are present in-game: dependencies that you have not subscribed to are out of reach of this mod;
+- certain props have special properties, such as seating area's (benches) or decal props. These props can only be replaced by props with those same properties, which is why sometimes you may find just a few available replacement options;
+- the Extreme Mode option gives the player unrestricted access to every prop and tree installed, including decals, markers and effects. [b]Extreme Mode is still experimental and therefore unsupported: use is strictly at your own risk![/b];
+- I strongly recommend against replacing two or more different props or trees with the same replacement prop or tree. The reason for this can best be illustrated with an example: imagine a building contains two trees (A and B), and you replace both those trees with tree C. From that moment on, the mod no longer 'knows' that the building used to contain 2 separate trees, and will only detect tree C;
+ - I strongly recommend players apply all desired global free-standing and building replacements first and only add per-building replacements afterwards, especially when starting a new city. The reason for this is that when a city is being loaded, per-building replacements are applied first, and global replacements afterwards;
+- due to the real-time application of replacements, per-building and global replacements can override each other;
 - this mod only affects free-standing trees and props and trees embedded within buildings. If you want to customize roadside trees, use Boformer's awesome [url=http://steamcommunity.com/sharedfiles/filedetails/?id=543722850]Network Skins[/url] mod;
 - as of version 1.6, Cities: Skylines' Asset Editor supports prop randomization: I have not specifically tested this mod with that feature, but I don't expect any unusual behavior;
-- the above list of limits and peculiarities are the result of either the way the game itself works, or design choices made by me. By subscribing to this mod, you acknowledge you have read and are familiar with the above list, and accept that mod support is not applicable to these issues.[/quote]
+- using this mod implies that you have taken notice of all of the above.[/quote]
 
 [h1]Compatibility[/h1]
-[quote]This mod should be compatible with all other mods.
-I have not done compatibility tests for every mod available in the Workshop for obvious reasons, but I have not found any incompatibilities between this mod and the ones I am subscribed to.[/quote]
+[quote]This mod should be compatible with all other mods, as in should not clash on a technical level.
+However, you should keep in mind that any other mod that touches building or free-standing props and trees [b]might[/b] interfere with the working of this mod.[/quote]
 
-[h1]Wish List (not to be confused with to-do list)[/h1]
-[quote]- replacing a prop or tree with nothing ('soft removal');
-- config files per save game or city;
-- per-building replacements on instance level instead of asset level: this would allow players to customize each and every building in their cities individually.[/quote]
 
 [h1]Updates[/h1]
-[quote][b]March 17th, 2017 - v1.1.2[/b]
-- Fixed broken BuildingSelectionTool issue and all accompanying errors \o/
+[quote][b]March 28th, 2017 - v1.2.0[/b]
+- The global replacement feature is now broken up in two wholly separate features: one for free-standing trees, and one for building trees;
+- Added option to disable global free-standing tree replacement feature;
+- Changed option to disable applying global building tree replacements when loading your city;
+- Changed option to disable applying per-building prop and tree replacements when loading your city;
+- The BuildingSelection Tool now highlights potentially incompatible buildings (with accented characters in the name, like à,é,ö,û,ç) in red: applying replacements to these buildings can cause config file xml corruption and errors;
+- Added additional null checks so that replacements involving removed/un-subbed props or trees should not causes any problems or errors.
+
+[b]March 17th, 2017 - v1.1.2[/b]
+- Fixed broken BuildingSelection Tool issue and all accompanying errors \o/
 
 [b]March 12th, 2017 - v1.1.1[/b]
 - Added Extreme Mode option, an experimental, [b]unsupported[/b] feature that gives access to all props and trees;
 - [url=http://steamcommunity.com/sharedfiles/filedetails/?id=793489846]Aedificium[/url] prop/tree hot-loading support;
-- Various bugfixes (mostly related to reset and search features).
+- Various bug-fixes (mostly related to reset and search features).
 
 [b]March 11th, 2017 - v1.1.0[/b]
 - Global tree placements now also include free-standing trees (full credit to BloodyPenguin);

@@ -1,4 +1,5 @@
 ﻿using PropItUp.GUI;
+using System.Text;
 using UnityEngine;
 
 namespace PropItUp
@@ -39,15 +40,13 @@ namespace PropItUp
 
         protected override void OnEnable()
         {
-            //base.OnEnable();
+            //  Set BuildingSelectionTool InfoModes:
             InfoManager.InfoMode infoMode = InfoManager.instance.CurrentMode;
             InfoManager.SubInfoMode subInfoMode = InfoManager.instance.CurrentSubMode;
-
+            //  Set ToolController to BuildingSelectionTool:
             m_prevRenderZones = TerrainManager.instance.RenderZones;
             m_prevTool = m_toolController.CurrentTool;
-
             m_toolController.CurrentTool = this;
-
             InfoManager.instance.SetCurrentMode(infoMode, subInfoMode);
             TerrainManager.instance.RenderZones = true;
             DebugUtils.Log("Building selection tool engaged.");
@@ -55,6 +54,13 @@ namespace PropItUp
 
         protected override void OnDisable()
         {
+            //  Reset customizer panels:
+            toolLocked = false;
+            m_hoverInstance = null;
+            m_selectedBuilding = null;
+            PropCustomizerPanel.instance.ResetPanel();
+            TreeCustomizerPanel.instance.ResetPanel();
+            //  Reset ToolController to default:
             TerrainManager.instance.RenderZones = m_prevRenderZones;
             if (m_toolController.NextTool == null && m_prevTool != null && m_prevTool != this)
             {
@@ -152,8 +158,17 @@ namespace PropItUp
         {
             if (m_hoverInstance != null && m_hoverInstance.isValid)
             {
-                m_cameraInfo = cameraInfo;
-                m_hoverInstance.RenderOverlay(cameraInfo, m_hoverSelectableColor);
+                string buildingName = BuildingManager.instance.m_buildings.m_buffer[m_hoverInstance.id.Building].Info.name;
+                //  Check building name for diacritics (currently incompatible, causing config xml corruption):
+                if (buildingName != buildingName.Normalize(NormalizationForm.FormD))
+                {
+                    m_hoverInstance.RenderOverlay(cameraInfo, m_hoverUnselectableColor);
+                }
+                else
+                {
+                    m_cameraInfo = cameraInfo;
+                    m_hoverInstance.RenderOverlay(cameraInfo, m_hoverSelectableColor);
+                }
             }
             base.RenderOverlay(cameraInfo);
         }
