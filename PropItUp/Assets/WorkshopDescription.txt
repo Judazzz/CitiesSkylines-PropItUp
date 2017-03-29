@@ -22,7 +22,10 @@ However, you should keep in mind that any other mod that touches building or fre
 
 
 [h1]Updates[/h1]
-[quote][b]March 28th, 2017 - v1.2.0[/b]
+[quote][b]March 29th, 2017 - v1.2.1[/b]
+- Various bug-fixes.
+
+[b]March 28th, 2017 - v1.2.0[/b]
 - The global replacement feature is now broken up in two wholly separate features: one for free-standing trees, and one for building trees;
 - Added option to disable global free-standing tree replacement feature;
 - Changed option to disable applying global building tree replacements when loading your city;

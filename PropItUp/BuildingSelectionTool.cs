@@ -1,4 +1,5 @@
 ﻿using PropItUp.GUI;
+using System;
 using System.Text;
 using UnityEngine;
 
@@ -54,20 +55,27 @@ namespace PropItUp
 
         protected override void OnDisable()
         {
-            //  Reset customizer panels:
-            toolLocked = false;
-            m_hoverInstance = null;
-            m_selectedBuilding = null;
-            PropCustomizerPanel.instance.ResetPanel();
-            TreeCustomizerPanel.instance.ResetPanel();
-            //  Reset ToolController to default:
-            TerrainManager.instance.RenderZones = m_prevRenderZones;
-            if (m_toolController.NextTool == null && m_prevTool != null && m_prevTool != this)
+            try
             {
-                m_prevTool.enabled = true;
+                //  Reset customizer panels:
+                toolLocked = false;
+                m_hoverInstance = null;
+                m_selectedBuilding = null;
+                PropCustomizerPanel.instance.ResetPanel();
+                TreeCustomizerPanel.instance.ResetPanel();
+                //  Reset ToolController to default:
+                TerrainManager.instance.RenderZones = m_prevRenderZones;
+                if (m_toolController.NextTool == null && m_prevTool != null && m_prevTool != this)
+                {
+                    m_prevTool.enabled = true;
+                }
+                m_prevTool = null;
+                DebugUtils.Log("Building selection tool disengaged.");
             }
-            m_prevTool = null;
-            DebugUtils.Log("Building selection tool disengaged.");
+            catch (Exception e)
+            {
+
+            }
         }
 
         protected override void OnToolUpdate()

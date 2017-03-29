@@ -258,7 +258,7 @@ namespace PropItUp
             //  
             if (config.enable_debug)
             {
-                DebugUtils.Log($"Finished listing all trees: {allAvailableProps.Count} trees found ({skipped} potentially incompatible trees skipped - Extreme Mode enabled: {config.enable_extrememode}).");
+                DebugUtils.Log($"Finished listing all trees: {allAvailableTrees.Count} trees found ({skipped} potentially incompatible trees skipped - Extreme Mode enabled: {config.enable_extrememode}).");
             }
         }
 
@@ -466,7 +466,7 @@ namespace PropItUp
             Stopwatch ReplaceTreesTimer = new Stopwatch();
             ReplaceTreesTimer.Start();
             //  
-            foreach (PrefabReplacement treeReplacement in config.globalTreeReplacements)
+            foreach (PrefabReplacement treeReplacement in config.globalBuildingTreeReplacements)
             {
                 try
                 {
@@ -585,7 +585,7 @@ namespace PropItUp
                 //  Replace tree:
                 try
                 {
-                    ReplaceTreeGlobal(executableTreeReplacement);
+                    ReplaceBuildingTreeGlobal(executableTreeReplacement);
                 }
                 catch (Exception e)
                 {
