@@ -40,7 +40,7 @@ namespace PropItUp.GUI
             get { return _saveTreeReplacementButton; }
         }
 
-        private int _selectedTreeOriginalIndex;
+        private int _selectedTreeOriginalIndex = 0;
         public int selectedTreeOriginalIndex
         {
             get { return _selectedTreeOriginalIndex; }
@@ -66,6 +66,7 @@ namespace PropItUp.GUI
             get { return _instance; }
         }
 
+        private static bool listIsUpdating = false;
         private string searchQuery = string.Empty;
 
         public override void Start()
@@ -107,7 +108,7 @@ namespace PropItUp.GUI
                 _introLabel.text = "THIS FEATURE IS UNAVAILABLE!\n\nReason: feature disabled by player";
                 return;
             }
-            _introLabel.text = "Global replacement";
+            _introLabel.text = "Global tree replacement";
             //  Source:
             _originalTreeLabel = originalContainer.AddUIComponent<UILabel>();
             _originalTreeLabel.text = "Vanilla trees";
@@ -132,13 +133,24 @@ namespace PropItUp.GUI
                 {
                     DebugUtils.Log($"TreeReplacerPanel: 'Reset replacement' clicked'.");
                 }
-                //  
+                //  Get original tree:
+                Configuration.PrefabReplacement replacement = PropItUpTool.config.GetGlobalReplacementByIndex(_selectedTreeOriginalIndex);
+                //  Restore replacement:
                 PropItUpTool.RestoreReplacementGlobal();
-                //  Repopulate originalTreeFastList:
+                //  Repopulate/reset OriginalTreeFastList:
+                _selectedTreeReplacement = PrefabCollection<TreeInfo>.FindLoaded(replacement.original);
                 //  TODO: stay at selected index:
                 PopulateVanillaTreesFastList();
                 _selectedTreeOriginal = _originalTreeFastList.rowsData[_selectedTreeOriginalIndex] as TreeInfo;
                 _resetReplacementButton.isEnabled = false;
+
+                
+                //PropItUpTool.RestoreReplacementGlobal();
+                ////  Repopulate originalTreeFastList:
+                ////  TODO: stay at selected index:
+                //PopulateVanillaTreesFastList();
+                //_selectedTreeOriginal = _originalTreeFastList.rowsData[_selectedTreeOriginalIndex] as TreeInfo;
+                //_resetReplacementButton.isEnabled = false;
             };
             _resetReplacementButton.isEnabled = false;
             // FastList
@@ -246,16 +258,23 @@ namespace PropItUp.GUI
         public void PopulateVanillaTreesFastList()
         {
             //  
-            if (_originalTreeFastList.rowsData.m_size > 0) {
+            if (_originalTreeFastList.rowsData.m_size > 0)
+            {
                 _originalTreeFastList.Clear();
             }
             //  
+            listIsUpdating = true;
             foreach (var tree in PropItUpTool.allVanillaTrees)
             {
                 _originalTreeFastList.rowsData.Add(tree);
             }
             _originalTreeFastList.rowHeight = 26f;
-            _originalTreeFastList.DisplayAt(0);
+            listIsUpdating = false;
+            //  Preset FastList:
+            _originalTreeFastList.selectedIndex = _selectedTreeOriginalIndex;
+            DebugUtils.Log($"[DEBUG] - TreeReplacerPanel: _originalTreeFastList.selectedIndex = {_selectedTreeOriginalIndex}.");
+            _originalTreeFastList.DisplayAt(_selectedTreeOriginalIndex);
+            DebugUtils.Log($"[DEBUG] - TreeReplacerPanel: _originalTreeFastList.DisplayAt({_selectedTreeOriginalIndex}).");
             //  
             if (PropItUpTool.config.enable_debug)
             {
@@ -264,6 +283,10 @@ namespace PropItUp.GUI
         }
         protected void OnSelectedVanillaChanged(UIComponent component, int i)
         {
+            if (listIsUpdating)
+            {
+                return;
+            }
             _selectedTreeOriginal = _originalTreeFastList.rowsData[i] as TreeInfo;
             _selectedTreeOriginalIndex = i;
             //  Enable Reset Button if global replacement is set for selected tree:
@@ -366,10 +389,13 @@ namespace PropItUp.GUI
         public void ResetPanel()
         {
             _resetReplacementButton.isEnabled = false;
-            replacementTreeFastList.DisplayAt(0);
-            replacementTreeFastList.selectedIndex = -1;
-            selectedTreeOriginal = null;
-            selectedTreeReplacement = null;
+            searchQuery = string.Empty;
+            _replacementTreeFastListSearchBox.text = string.Empty;
+            _replacementTreeFastList.DisplayAt(0);
+            _replacementTreeFastList.selectedIndex = -1;
+            _selectedTreeOriginal = null;
+            _selectedTreeReplacement = null;
+            listIsUpdating = false;
         }
     }
 }

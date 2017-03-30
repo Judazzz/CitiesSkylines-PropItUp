@@ -40,7 +40,7 @@ namespace PropItUp.GUI
             get { return _saveTreeReplacementButton; }
         }
 
-        private int _selectedTreeOriginalIndex;
+        private int _selectedTreeOriginalIndex = 0;
         public int selectedTreeOriginalIndex
         {
             get { return _selectedTreeOriginalIndex; }
@@ -66,6 +66,7 @@ namespace PropItUp.GUI
             get { return _instance; }
         }
 
+        private static bool listIsUpdating = false;
         private string searchQuery = string.Empty;
 
         public override void Start()
@@ -125,13 +126,24 @@ namespace PropItUp.GUI
                 {
                     DebugUtils.Log($"BuildingTreeReplacerPanel: 'Reset replacement' clicked'.");
                 }
-                //  
+                //  Get original tree:
+                Configuration.PrefabReplacement replacement = PropItUpTool.config.GetGlobalBuildingReplacementByIndex(_selectedTreeOriginalIndex);
+                //  Restore replacement:
                 PropItUpTool.RestoreBuildingReplacementGlobal();
-                //  Repopulate originalTreeFastList:
+                //  Repopulate/reset OriginalTreeFastList:
+                _selectedTreeReplacement = PrefabCollection<TreeInfo>.FindLoaded(replacement.original);
                 //  TODO: stay at selected index:
                 PopulateVanillaTreesFastList();
                 _selectedTreeOriginal = _originalTreeFastList.rowsData[_selectedTreeOriginalIndex] as TreeInfo;
                 _resetReplacementButton.isEnabled = false;
+
+
+                //PropItUpTool.RestoreBuildingReplacementGlobal();
+                ////  Repopulate originalTreeFastList:
+                ////  TODO: stay at selected index:
+                //PopulateVanillaTreesFastList();
+                //_selectedTreeOriginal = _originalTreeFastList.rowsData[_selectedTreeOriginalIndex] as TreeInfo;
+                //_resetReplacementButton.isEnabled = false;
             };
             _resetReplacementButton.isEnabled = false;
             // FastList
@@ -239,6 +251,7 @@ namespace PropItUp.GUI
         public void PopulateVanillaTreesFastList()
         {
             //  
+            listIsUpdating = true;
             if (_originalTreeFastList.rowsData.m_size > 0)
             {
                 _originalTreeFastList.Clear();
@@ -249,7 +262,14 @@ namespace PropItUp.GUI
                 _originalTreeFastList.rowsData.Add(tree);
             }
             _originalTreeFastList.rowHeight = 26f;
-            _originalTreeFastList.DisplayAt(0);
+            //  Preset FastList: (temporary try-catch: fix whatever is causing that fucking error):
+            try
+            {
+                _originalTreeFastList.selectedIndex = _selectedTreeOriginalIndex;
+                _originalTreeFastList.DisplayAt(_selectedTreeOriginalIndex);
+            }
+            catch { }
+            listIsUpdating = false;
             //  
             if (PropItUpTool.config.enable_debug)
             {
@@ -258,6 +278,10 @@ namespace PropItUp.GUI
         }
         protected void OnSelectedVanillaChanged(UIComponent component, int i)
         {
+            if (listIsUpdating)
+            {
+                return;
+            }
             _selectedTreeOriginal = _originalTreeFastList.rowsData[i] as TreeInfo;
             _selectedTreeOriginalIndex = i;
             //  Enable Reset Button if global replacement is set for selected tree:
@@ -361,10 +385,13 @@ namespace PropItUp.GUI
         public void ResetPanel()
         {
             _resetReplacementButton.isEnabled = false;
-            replacementTreeFastList.DisplayAt(0);
-            replacementTreeFastList.selectedIndex = -1;
-            selectedTreeOriginal = null;
-            selectedTreeReplacement = null;
+            searchQuery = string.Empty;
+            _replacementTreeFastListSearchBox.text = string.Empty;
+            _replacementTreeFastList.DisplayAt(0);
+            _replacementTreeFastList.selectedIndex = -1;
+            _selectedTreeOriginal = null;
+            _selectedTreeReplacement = null;
+            listIsUpdating = false;
         }
     }
 }

@@ -30,6 +30,17 @@ namespace PropItUp
         [XmlArrayItem(ElementName = "TreeReplacement")]
         public List<PrefabReplacement> globalBuildingTreeReplacements = new List<PrefabReplacement>();
 
+        public PrefabReplacement GetGlobalReplacementByIndex(int index)
+        {
+            foreach (PrefabReplacement prefabReplacement in globalTreeReplacements)
+            {
+                if (prefabReplacement.index == index)
+                {
+                    return prefabReplacement;
+                }
+            }
+            return null;
+        }
         public PrefabReplacement GetGlobalReplacementByVanillaTreeName(string vanillaPrefabName)
         {
             foreach (PrefabReplacement prefabReplacement in globalTreeReplacements)
@@ -42,6 +53,17 @@ namespace PropItUp
             return null;
         }
 
+        public PrefabReplacement GetGlobalBuildingReplacementByIndex(int index)
+        {
+            foreach (PrefabReplacement prefabReplacement in globalBuildingTreeReplacements)
+            {
+                if (prefabReplacement.index == index)
+                {
+                    return prefabReplacement;
+                }
+            }
+            return null;
+        }
         public PrefabReplacement GetGlobalBuildingReplacementByVanillaTreeName(string vanillaPrefabName)
         {
             foreach (PrefabReplacement prefabReplacement in globalBuildingTreeReplacements)
