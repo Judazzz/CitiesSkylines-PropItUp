@@ -40,7 +40,7 @@ namespace PropItUp.GUI
             get { return _saveTreeReplacementButton; }
         }
 
-        private int _selectedTreeOriginalIndex = 0;
+        private int _selectedTreeOriginalIndex = -1;
         public int selectedTreeOriginalIndex
         {
             get { return _selectedTreeOriginalIndex; }
@@ -271,10 +271,15 @@ namespace PropItUp.GUI
             _originalTreeFastList.rowHeight = 26f;
             listIsUpdating = false;
             //  Preset FastList:
-            _originalTreeFastList.selectedIndex = _selectedTreeOriginalIndex;
-            DebugUtils.Log($"[DEBUG] - TreeReplacerPanel: _originalTreeFastList.selectedIndex = {_selectedTreeOriginalIndex}.");
-            _originalTreeFastList.DisplayAt(_selectedTreeOriginalIndex);
-            DebugUtils.Log($"[DEBUG] - TreeReplacerPanel: _originalTreeFastList.DisplayAt({_selectedTreeOriginalIndex}).");
+            if (selectedTreeOriginalIndex == -1)
+            {
+                _originalTreeFastList.DisplayAt(0);
+            }
+            else
+            {
+                _originalTreeFastList.selectedIndex = _selectedTreeOriginalIndex;
+                _originalTreeFastList.DisplayAt(_selectedTreeOriginalIndex);
+            }
             //  
             if (PropItUpTool.config.enable_debug)
             {

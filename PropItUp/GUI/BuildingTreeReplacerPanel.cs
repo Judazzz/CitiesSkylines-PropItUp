@@ -40,7 +40,7 @@ namespace PropItUp.GUI
             get { return _saveTreeReplacementButton; }
         }
 
-        private int _selectedTreeOriginalIndex = 0;
+        private int _selectedTreeOriginalIndex = -1;
         public int selectedTreeOriginalIndex
         {
             get { return _selectedTreeOriginalIndex; }
@@ -262,14 +262,17 @@ namespace PropItUp.GUI
                 _originalTreeFastList.rowsData.Add(tree);
             }
             _originalTreeFastList.rowHeight = 26f;
-            //  Preset FastList: (temporary try-catch: fix whatever is causing that fucking error):
-            try
+            listIsUpdating = false;
+            //  Preset FastList:
+            if (selectedTreeOriginalIndex == -1)
+            {
+                _originalTreeFastList.DisplayAt(0);
+            }
+            else
             {
                 _originalTreeFastList.selectedIndex = _selectedTreeOriginalIndex;
                 _originalTreeFastList.DisplayAt(_selectedTreeOriginalIndex);
             }
-            catch { }
-            listIsUpdating = false;
             //  
             if (PropItUpTool.config.enable_debug)
             {
