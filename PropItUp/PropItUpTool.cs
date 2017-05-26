@@ -198,8 +198,6 @@ namespace PropItUp
                 //  Add to list:
                 allAvailableProps.Add(prop);
             }
-            //  Sort list alphabetically:
-            allAvailableProps.Sort((x, y) => x.name.CompareTo(y.name));
             //  
             if (config.enable_debug)
             {
@@ -253,8 +251,6 @@ namespace PropItUp
                     }
                 }
             }
-            //  Sort list alphabetically:
-            allAvailableTrees.Sort((x, y) => x.name.CompareTo(y.name));
             //  
             if (config.enable_debug)
             {
@@ -313,6 +309,16 @@ namespace PropItUp
                     return;
                 }
                 TreeInfo oldTree = PrefabCollection<TreeInfo>.FindLoaded(selectedTreeReplacement.original);
+                //  Null check:
+                if (!oldTree)
+                {
+                    if (config.enable_debug)
+                    {
+                        DebugUtils.Log($"Global tree replacement for {selectedTreeReplacement.replacement_name} failed. Reason: original tree not found!");
+                    }
+                    //  TODO: remove all replacements featuring not found prefab from config
+                    return;
+                }
                 //  Replace freestanding trees:
                 var trees = TreeManager.instance.m_trees.m_buffer;
                 for (uint index = 0; index < trees.Length; index++)
@@ -505,6 +511,16 @@ namespace PropItUp
                     return;
                 }
                 TreeInfo oldTree = PrefabCollection<TreeInfo>.FindLoaded(selectedTreeReplacement.original);
+                //  Null check:
+                if (!oldTree)
+                {
+                    if (config.enable_debug)
+                    {
+                        DebugUtils.Log($"Global building tree replacement for {selectedTreeReplacement.replacement_name} failed. Reason: original tree not found!");
+                    }
+                    //  TODO: remove all replacements featuring not found prefab from config
+                    return;
+                }
                 //  
                 List<string> allBuildings = config.GetAllBuildings();
                 //  Replace building trees:
