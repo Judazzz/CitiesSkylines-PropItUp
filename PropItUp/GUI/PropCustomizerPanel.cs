@@ -258,12 +258,12 @@ namespace PropItUp.GUI
             {
                 if (prop.m_prop != null)
                 {
-                    //  'Extreme Mode':
-                    //  TODO: verify if this is still an issue: Exclude props without LOD/with double quotes in name (causes infinite 'Array index is out of range' error loops):
-                    if (PropItUpTool.config.enable_extrememode == false && (prop.m_prop.name.Contains("\"") || prop.m_prop.m_lodMesh == null || prop.m_prop.m_lodObject == null))
+                    //  Skip 'Blacklisted' props:
+                    if (!PropItUpTool.allAvailableProps.Contains(prop.m_prop))
                     {
                         continue;
                     }
+
                     //  TODO? list each prop (instance) individually (with index), so they can be replaced separately (if possible):
                     if (prop.m_prop == _selectedPropOriginal)
                     {
@@ -294,7 +294,7 @@ namespace PropItUp.GUI
                 return;
             }
             //  
-            if (_originalPropFastList.rowsData.m_size > (_selectedPropOriginalIndex + 1))
+            if (_originalPropFastList.rowsData.m_size >= (_selectedPropOriginalIndex + 1))
             {
                 _selectedPropOriginal = _originalPropFastList.rowsData[i] as PropInfo;
                 _selectedPropOriginalIndex = i;
@@ -363,7 +363,7 @@ namespace PropItUp.GUI
                 _replacementPropFastList.Clear();
 
                 //  Search Query set?
-                if (searchQuery != string.Empty)
+                if (!string.IsNullOrEmpty(searchQuery))
                 {
                     Search();
                 }
@@ -371,6 +371,16 @@ namespace PropItUp.GUI
                 {
                     foreach (var prop in PropItUpTool.allAvailableProps)
                     {
+                        //  Skip 'Blacklisted' props:
+                        if (!PropItUpTool.allAvailableProps.Contains(prop))
+                        {
+                            continue;
+                        }
+                        //  Prop Type Match Filters:
+                        if (prop.m_doorType != _selectedPropOriginal.m_doorType)
+                        {
+                            continue;
+                        }
                         if (prop.m_isDecal != _selectedPropOriginal.m_isDecal)
                         {
                             continue;
@@ -413,24 +423,40 @@ namespace PropItUp.GUI
             {
                 return;
             }
-            //  Deselect and clear FastList:
+            //  Deselect FastList:
             _replacementPropFastList.selectedIndex = -1;
-            _replacementPropFastList.Clear();
             _selectedPropReplacement = null;
-            //  Create temporary list for search results:
-            List<PropInfo> tmpItemList = new List<PropInfo>();
+
+            //  Search Box cleared?
             if (string.IsNullOrEmpty(searchQuery))
-            {
-                tmpItemList = PropItUpTool.allAvailableProps;
+            {   //  Yes
+                //tmpItemList = PropItUpTool.allAvailableProps;
+                listIsUpdating = false;
+                FilterAvailablePropsFastList();
+                return;
             }
             else
-            {
+            {   //  No
+                //  Clear FastList:
+                _replacementPropFastList.Clear();
+                //  Create temporary list for search results:
+                List<PropInfo> tmpItemList = new List<PropInfo>();
                 foreach (PropInfo result in PropItUpTool.allAvailableProps)
                 {
                     if (result.name.ToLower().Contains(searchQuery.ToLower()))
                     {
                         if (_selectedPropOriginal != null)
                         {
+                            //  Skip 'Blacklisted' props:
+                            if (!PropItUpTool.allAvailableProps.Contains(result))
+                            {
+                                continue;
+                            }
+                            //  Prop Type Match Filters:
+                            if (result.m_doorType != _selectedPropOriginal.m_doorType)
+                            {
+                                continue;
+                            }
                             if (result.m_isDecal != _selectedPropOriginal.m_isDecal)
                             {
                                 continue;
@@ -443,23 +469,24 @@ namespace PropItUp.GUI
                         tmpItemList.Add(result);
                     }
                 }
-            }
-            //  Repopulate with search results, and show at first item if results are found:
-            for (int i = 0; i < tmpItemList.Count; i++)
-            {
-                if (tmpItemList[i] != null)
+
+                //  Repopulate with search results, and show at first item if results are found:
+                for (int i = 0; i < tmpItemList.Count; i++)
                 {
-                    _replacementPropFastList.rowsData.Add(tmpItemList[i]);
+                    if (tmpItemList[i] != null)
+                    {
+                        _replacementPropFastList.rowsData.Add(tmpItemList[i]);
+                    }
                 }
-            }
-            if (tmpItemList.Count > 0)
-            {
-                _replacementPropFastList.DisplayAt(0);
-            }
-            //  
-            if (PropItUpTool.config.enable_debug)
-            {
-                DebugUtils.Log($"PropCustomizerPanel: search query '{searchQuery}' returned {tmpItemList.Count} results.");
+                if (tmpItemList.Count > 0)
+                {
+                    _replacementPropFastList.DisplayAt(0);
+                }
+                //  
+                if (PropItUpTool.config.enable_debug)
+                {
+                    DebugUtils.Log($"PropCustomizerPanel: search query '{searchQuery}' returned {tmpItemList.Count} results.");
+                }
             }
         }
 

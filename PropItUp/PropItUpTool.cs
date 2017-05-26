@@ -185,6 +185,13 @@ namespace PropItUp
                 //  Null check:
                 if (prop == null)
                 {
+                    skipped++;
+                    continue;
+                }
+                //  Skip Markers:
+                if (prop.name.Contains("Hang Around Marker") || prop.name.Contains("Helipad Marker") || prop.name.Contains("Nautical Marker") || prop.name.Contains("Door Marker"))
+                {
+                    skipped++;
                     continue;
                 }
                 //  Temporary 'Extreme Mode' feature:

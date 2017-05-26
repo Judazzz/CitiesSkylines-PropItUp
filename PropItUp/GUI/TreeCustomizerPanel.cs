@@ -59,7 +59,7 @@ namespace PropItUp.GUI
             get { return _selectedTreeReplacement; }
             set { _selectedTreeReplacement = value; }
         }
-
+        
         private BuildingInfo _selectedBuilding;
         public BuildingInfo selectedBuilding
         {
