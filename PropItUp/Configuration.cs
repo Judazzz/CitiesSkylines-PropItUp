@@ -41,17 +41,30 @@ namespace PropItUp
             }
             return null;
         }
-        public PrefabReplacement GetGlobalReplacementByVanillaTreeName(string vanillaPrefabName)
+
+        public PrefabReplacement GetGlobalReplacementByTreeName(string prefabName)
         {
             foreach (PrefabReplacement prefabReplacement in globalTreeReplacements)
             {
-                if (prefabReplacement.original == vanillaPrefabName)
+                if (prefabReplacement.original == prefabName)
                 {
                     return prefabReplacement;
                 }
             }
             return null;
         }
+
+        //public PrefabReplacement GetGlobalReplacementByVanillaTreeName(string vanillaPrefabName)
+        //{
+        //    foreach (PrefabReplacement prefabReplacement in globalTreeReplacements)
+        //    {
+        //        if (prefabReplacement.original == vanillaPrefabName)
+        //        {
+        //            return prefabReplacement;
+        //        }
+        //    }
+        //    return null;
+        //}
 
         public PrefabReplacement GetGlobalBuildingReplacementByIndex(int index)
         {
@@ -64,17 +77,30 @@ namespace PropItUp
             }
             return null;
         }
-        public PrefabReplacement GetGlobalBuildingReplacementByVanillaTreeName(string vanillaPrefabName)
+
+        public PrefabReplacement GetGlobalBuildingReplacementByTreeName(string prefabName)
         {
             foreach (PrefabReplacement prefabReplacement in globalBuildingTreeReplacements)
             {
-                if (prefabReplacement.original == vanillaPrefabName)
+                if (prefabReplacement.original == prefabName)
                 {
                     return prefabReplacement;
                 }
             }
             return null;
         }
+
+        //public PrefabReplacement GetGlobalBuildingReplacementByVanillaTreeName(string vanillaPrefabName)
+        //{
+        //    foreach (PrefabReplacement prefabReplacement in globalBuildingTreeReplacements)
+        //    {
+        //        if (prefabReplacement.original == vanillaPrefabName)
+        //        {
+        //            return prefabReplacement;
+        //        }
+        //    }
+        //    return null;
+        //}
 
         public static void Save()
         {

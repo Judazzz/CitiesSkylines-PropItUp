@@ -5,7 +5,7 @@ namespace PropItUp
 {
     public class Mod : IUserMod
     {
-        public const string version = "1.2.4";
+        public const string version = "1.2.5";
 
         public string Name
         {
@@ -14,7 +14,7 @@ namespace PropItUp
 
         public string Description
         {
-            get { return "Customize trees and props in C:SL buildings."; }
+            get { return "Change the appearance of your city by customizing props and trees."; }
         }
 
         //  Keyboard Shortcut:

@@ -1,12 +1,13 @@
-﻿using PropItUp.GUI;
-using ColossalFramework.Plugins;
+﻿using ColossalFramework.Plugins;
 using ColossalFramework.UI;
+using static PropItUp.Configuration;
+using PropItUp.GUI;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using UnityEngine;
-using static PropItUp.Configuration;
 
 namespace PropItUp
 {
@@ -205,6 +206,8 @@ namespace PropItUp
                 //  Add to list:
                 allAvailableProps.Add(prop);
             }
+            //  Sort list by alphabet:
+            allAvailableProps = allAvailableProps.OrderBy(x => GUI.UIUtils.GenerateBeautifiedPrefabName(x)).ToList();
             //  
             if (config.enable_debug)
             {
@@ -258,6 +261,11 @@ namespace PropItUp
                     }
                 }
             }
+            //  Sort lists by alphabet:
+            allVanillaTrees = allVanillaTrees.OrderBy(x => GUI.UIUtils.GenerateBeautifiedPrefabName(x)).ToList();
+            allCustomTrees = allCustomTrees.OrderBy(x => GUI.UIUtils.GenerateBeautifiedPrefabName(x)).ToList();
+            allAvailableTrees = allAvailableTrees.OrderBy(x => GUI.UIUtils.GenerateBeautifiedPrefabName(x)).ToList();
+
             //  
             if (config.enable_debug)
             {
@@ -371,7 +379,7 @@ namespace PropItUp
 
             //  Save tree replacement to config:
             //  Check if tree has been replaced before: if yes, update; if no, add:
-            PrefabReplacement existingTreeReplacement = config.GetGlobalReplacementByVanillaTreeName(originalTree.name);
+            PrefabReplacement existingTreeReplacement = config.GetGlobalReplacementByTreeName(originalTree.name);
             if (existingTreeReplacement != null)
             {
                 //  Yes => find previous tree replacement (now needs to be replaced) and update:
@@ -423,7 +431,7 @@ namespace PropItUp
         public static void RestoreReplacementGlobal()
         {
             TreeInfo originalTree = TreeReplacerPanel.instance.selectedTreeOriginal;
-            PrefabReplacement selectedTreeReplacement = config.GetGlobalReplacementByVanillaTreeName(originalTree.name);
+            PrefabReplacement selectedTreeReplacement = config.GetGlobalReplacementByTreeName(originalTree.name);
             PrefabReplacement executableTreeReplacement = new PrefabReplacement()
             {
                 index = selectedTreeReplacement.index,
@@ -577,7 +585,7 @@ namespace PropItUp
 
             //  Save tree replacement to config:
             //  Check if tree has been replaced before: if yes, update; if no, add:
-            PrefabReplacement existingTreeReplacement = config.GetGlobalBuildingReplacementByVanillaTreeName(originalTree.name);
+            PrefabReplacement existingTreeReplacement = config.GetGlobalBuildingReplacementByTreeName(originalTree.name);
             if (existingTreeReplacement != null)
             {
                 //  Yes => find previous tree replacement (now needs to be replaced) and update:
@@ -629,7 +637,7 @@ namespace PropItUp
         public static void RestoreBuildingReplacementGlobal()
         {
             TreeInfo originalTree = BuildingTreeReplacerPanel.instance.selectedTreeOriginal;
-            PrefabReplacement selectedTreeReplacement = config.GetGlobalBuildingReplacementByVanillaTreeName(originalTree.name);
+            PrefabReplacement selectedTreeReplacement = config.GetGlobalBuildingReplacementByTreeName(originalTree.name);
             PrefabReplacement executableTreeReplacement = new PrefabReplacement()
             {
                 index = selectedTreeReplacement.index,

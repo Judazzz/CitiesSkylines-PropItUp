@@ -57,7 +57,9 @@ namespace PropItUp.GUI
             SetupControls();
 
             _tree = data as TreeInfo;
-            PrefabReplacement replacement = (TreeReplacerPanel.instance.isVisible) ? PropItUpTool.config.GetGlobalReplacementByVanillaTreeName(_tree.name) : PropItUpTool.config.GetGlobalBuildingReplacementByVanillaTreeName(_tree.name);
+
+            PrefabReplacement replacement = (TreeReplacerPanel.instance.isVisible) ? PropItUpTool.config.GetGlobalReplacementByTreeName(_tree.name) : PropItUpTool.config.GetGlobalBuildingReplacementByTreeName(_tree.name);
+
             if (replacement == null)
             {
                 _name.text = UIUtils.GenerateBeautifiedPrefabName(_tree);
