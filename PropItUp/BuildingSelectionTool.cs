@@ -168,13 +168,13 @@ namespace PropItUp
             {
                 string buildingName = BuildingManager.instance.m_buildings.m_buffer[m_hoverInstance.id.Building].Info.name;
                 //  Check building name for diacritics (currently incompatible, causing config xml corruption):
+                m_cameraInfo = cameraInfo;
                 if (buildingName != buildingName.Normalize(NormalizationForm.FormD))
                 {
                     m_hoverInstance.RenderOverlay(cameraInfo, m_hoverUnselectableColor);
                 }
                 else
                 {
-                    m_cameraInfo = cameraInfo;
                     m_hoverInstance.RenderOverlay(cameraInfo, m_hoverSelectableColor);
                 }
             }

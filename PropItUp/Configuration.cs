@@ -54,18 +54,6 @@ namespace PropItUp
             return null;
         }
 
-        //public PrefabReplacement GetGlobalReplacementByVanillaTreeName(string vanillaPrefabName)
-        //{
-        //    foreach (PrefabReplacement prefabReplacement in globalTreeReplacements)
-        //    {
-        //        if (prefabReplacement.original == vanillaPrefabName)
-        //        {
-        //            return prefabReplacement;
-        //        }
-        //    }
-        //    return null;
-        //}
-
         public PrefabReplacement GetGlobalBuildingReplacementByIndex(int index)
         {
             foreach (PrefabReplacement prefabReplacement in globalBuildingTreeReplacements)
@@ -89,18 +77,6 @@ namespace PropItUp
             }
             return null;
         }
-
-        //public PrefabReplacement GetGlobalBuildingReplacementByVanillaTreeName(string vanillaPrefabName)
-        //{
-        //    foreach (PrefabReplacement prefabReplacement in globalBuildingTreeReplacements)
-        //    {
-        //        if (prefabReplacement.original == vanillaPrefabName)
-        //        {
-        //            return prefabReplacement;
-        //        }
-        //    }
-        //    return null;
-        //}
 
         public static void Save()
         {
@@ -225,14 +201,34 @@ namespace PropItUp
 
         public PrefabReplacement GetBuildingPrefabReplacementByIndex(Building building, string type, int index)
         {
-            //DebugUtils.Log($"[DEBUG] - building = {building} ({building.prefabReplacements.Count})");
-            //DebugUtils.Log($"[DEBUG] - type = {type}");
-            //DebugUtils.Log($"[DEBUG] - index = {index}");
             foreach (PrefabReplacement prefabReplacement in building.prefabReplacements)
             {
                 if (prefabReplacement.type == type && prefabReplacement.index == index)
                 {
-                    //DebugUtils.Log($"[DEBUG]: selected buildingReplacement = {prefabReplacement.original} / {prefabReplacement.replacement_name}");
+                    return prefabReplacement;
+                }
+            }
+            return null;
+        }
+
+        public PrefabReplacement GetBuildingReplacementByOriginalPrefabName(Building building, string prefabName)
+        {
+            foreach (PrefabReplacement prefabReplacement in building.prefabReplacements)
+            {
+                if (prefabReplacement.original == prefabName)
+                {
+                    return prefabReplacement;
+                }
+            }
+            return null;
+        }
+
+        public PrefabReplacement GetBuildingReplacementByReplacementPrefabName(Building building, string prefabName)
+        {
+            foreach (PrefabReplacement prefabReplacement in building.prefabReplacements)
+            {
+                if (prefabReplacement.replacement_name == prefabName)
+                {
                     return prefabReplacement;
                 }
             }

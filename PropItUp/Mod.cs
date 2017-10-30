@@ -5,7 +5,7 @@ namespace PropItUp
 {
     public class Mod : IUserMod
     {
-        public const string version = "1.2.5";
+        public const string version = "1.3.0";
 
         public string Name
         {

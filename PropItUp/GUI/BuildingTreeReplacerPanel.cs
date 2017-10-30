@@ -77,7 +77,7 @@ namespace PropItUp.GUI
             isInteractive = true;
             //  
             SetupControls();
-            if (PropItUpTool.allCustomTrees.Count > 0)
+            if (PropItUpTool.allAvailableTrees.Count > 0)
             {
                 PopulateOriginalTreesFastList();
                 PopulateCustomTreesFastList();
@@ -89,31 +89,26 @@ namespace PropItUp.GUI
             // Original Container:
             var originalContainer = UIUtils.CreateFormElement(this, "top");
             originalContainer.name = "originalContainer";
+            originalContainer.size = new Vector2(UIUtils.c_tabPanelWidth, UIUtils.c_tabPanelHeight);
             //  Label:
             _introLabel = originalContainer.AddUIComponent<UILabel>();
+            _introLabel.name = "introLabel";
             _introLabel.textColor = new Color(187, 187, 187, 255);
-            _introLabel.textScale = 0.8f;
-            _introLabel.padding = new RectOffset(0, 0, 0, 5);
-            //  No custom trees: hide UI:
-            if (PropItUpTool.allCustomTrees.Count == 0)
-            {
-                _introLabel.width = parent.width;
-                _introLabel.text = "THIS FEATURE IS UNAVAILABLE!\n\nReason: no custom trees found";
-                return;
-            }
+            _introLabel.textScale = 0.9f;
             _introLabel.text = "Global building replacement";
             //  Source:
             _originalTreeLabel = originalContainer.AddUIComponent<UILabel>();
+            _originalTreeLabel.name = "originalTreeLabel";
             _originalTreeLabel.text = "Original trees";
-            _originalTreeLabel.textScale = 0.8f;
-            _originalTreeLabel.padding = new RectOffset(0, 0, 0, 5);
+            _originalTreeLabel.textScale = 0.9f;
+            _originalTreeLabel.padding = new RectOffset(0, 0, 15, 5);
             //  'Reset replacement' Button
             _resetReplacementButton = UIUtils.CreateButton(_originalTreeLabel);
             _resetReplacementButton.text = "(reset selected)";
-            _resetReplacementButton.relativePosition = new Vector3(149f, -1.25f);
-            _resetReplacementButton.textScale = 0.65f;
-            _resetReplacementButton.width = 100;
-            _resetReplacementButton.height = 16;
+            _resetReplacementButton.relativePosition = new Vector3(UIUtils.c_resetButtonPosX, UIUtils.c_resetButtonPosY);
+            _resetReplacementButton.width = UIUtils.c_resetButtonWidth;
+            _resetReplacementButton.height = UIUtils.c_resetButtonHeight;
+            _resetReplacementButton.textScale = 0.75f;
             _resetReplacementButton.normalBgSprite = null;
             _resetReplacementButton.hoveredBgSprite = null;
             _resetReplacementButton.pressedBgSprite = null;
@@ -149,31 +144,33 @@ namespace PropItUp.GUI
             // FastList
             _originalTreeFastList = UIFastList.Create<UIVanillaTreeItem>(originalContainer);
             _originalTreeFastList.backgroundSprite = "UnlockingPanel";
-            _originalTreeFastList.width = parent.width - (3 * PropItUpTool.SPACING) - 12;
-            _originalTreeFastList.height = 90;
+            _originalTreeFastList.relativePosition = new Vector3(0, 15);
+            _originalTreeFastList.width = UIUtils.c_fastListWidth;
+            _originalTreeFastList.height = UIUtils.c_fastListHeight;
             _originalTreeFastList.canSelect = true;
             _originalTreeFastList.eventSelectedIndexChanged += OnSelectedOriginalChanged;
 
             // Replacement Label Container:
             var replacementContainer = UIUtils.CreateFormElement(this, "center");
             replacementContainer.name = "replacementContainer";
-            replacementContainer.relativePosition = new Vector3(0, 165);
+            replacementContainer.relativePosition = new Vector3(0, 275);
             //  Label:
             _replacementTreeLabel = originalContainer.AddUIComponent<UILabel>();
+            _replacementTreeLabel.name = "replacementTreeLabel";
             _replacementTreeLabel.text = "Select custom tree";
-            _replacementTreeLabel.textScale = 0.8f;
-            _replacementTreeLabel.padding = new RectOffset(0, 0, 15, 5);
+            _replacementTreeLabel.textScale = 0.9f;
+            _replacementTreeLabel.padding = new RectOffset(0, 0, 20, 5);
 
             // Search Box Container:
             var searchboxContainer = UIUtils.CreateFormElement(this, "center");
             searchboxContainer.name = "searchboxContainer";
-            searchboxContainer.relativePosition = new Vector3(0, 182);
+            searchboxContainer.relativePosition = new Vector3(0, 292);
             //  Search Box:
             _replacementTreeFastListSearchBox = UIUtils.CreateTextField(searchboxContainer);
-            _replacementTreeFastListSearchBox.position = new Vector3(_introLabel.relativePosition.x, 205);
-            _replacementTreeFastListSearchBox.width = parent.width - (3 * PropItUpTool.SPACING) - 10;
-            _replacementTreeFastListSearchBox.height = 25;
-            _replacementTreeFastListSearchBox.padding = new RectOffset(6, 6, 6, 6);
+            _replacementTreeFastListSearchBox.position = new Vector3(_introLabel.relativePosition.x, 315);
+            _replacementTreeFastListSearchBox.width = UIUtils.c_searchBoxWidth;
+            _replacementTreeFastListSearchBox.height = UIUtils.c_searchBoxHeight;
+            _replacementTreeFastListSearchBox.padding = new RectOffset(6, 6, 8, 6);
             _replacementTreeFastListSearchBox.normalBgSprite = "TextFieldUnderline";
             _replacementTreeFastListSearchBox.hoveredBgSprite = "TextFieldUnderline";
             _replacementTreeFastListSearchBox.disabledBgSprite = "TextFieldUnderline";
@@ -207,12 +204,12 @@ namespace PropItUp.GUI
             // FastList Container:
             var fastlistContainer = UIUtils.CreateFormElement(this, "center");
             fastlistContainer.name = "fastlistContainer";
-            fastlistContainer.relativePosition = new Vector3(0, 205);
+            fastlistContainer.relativePosition = new Vector3(0, 320);
             // FastList:
             _replacementTreeFastList = UIFastList.Create<UITreeItem>(fastlistContainer);
-            _replacementTreeFastList.position = new Vector3(_introLabel.relativePosition.x, 233);
-            _replacementTreeFastList.width = parent.width - (3 * PropItUpTool.SPACING) - 12;
-            _replacementTreeFastList.height = 90;
+            _replacementTreeFastList.position = new Vector3(_introLabel.relativePosition.x, 350);
+            _replacementTreeFastList.width = UIUtils.c_fastListWidth;
+            _replacementTreeFastList.height = UIUtils.c_fastListHeight;
             _replacementTreeFastList.backgroundSprite = "UnlockingPanel";
             _replacementTreeFastList.canSelect = true;
             _replacementTreeFastList.eventSelectedIndexChanged += OnSelectedCustomChanged;
@@ -261,7 +258,7 @@ namespace PropItUp.GUI
             {
                 _originalTreeFastList.rowsData.Add(tree);
             }
-            _originalTreeFastList.rowHeight = 26f;
+            _originalTreeFastList.rowHeight = UIUtils.c_fastListRowHeight;
             listIsUpdating = false;
             //  Preset FastList:
             if (selectedTreeOriginalIndex == -1)
@@ -314,16 +311,16 @@ namespace PropItUp.GUI
             //  TODO: Add 'No replacement' option:
 
             //  Add all available custom trees:
-            foreach (var tree in PropItUpTool.allCustomTrees)
+            foreach (var tree in PropItUpTool.allAvailableTrees)
             {
                 _replacementTreeFastList.rowsData.Add(tree);
             }
-            _replacementTreeFastList.rowHeight = 26f;
+            _replacementTreeFastList.rowHeight = UIUtils.c_fastListRowHeight;
             _replacementTreeFastList.DisplayAt(0);
             //  
             if (PropItUpTool.config.enable_debug)
             {
-                DebugUtils.Log($"BuildingTreeReplacerPanel: replacementTreeFastList populated with {PropItUpTool.allCustomTrees.Count} trees.");
+                DebugUtils.Log($"BuildingTreeReplacerPanel: replacementTreeFastList populated with {PropItUpTool.allAvailableTrees.Count} trees.");
             }
         }
         protected void OnSelectedCustomChanged(UIComponent component, int i)
@@ -354,11 +351,11 @@ namespace PropItUp.GUI
             List<TreeInfo> tmpItemList = new List<TreeInfo>();
             if (string.IsNullOrEmpty(searchQuery))
             {
-                tmpItemList = PropItUpTool.allCustomTrees;
+                tmpItemList = PropItUpTool.allAvailableTrees;
             }
             else
             {
-                foreach (TreeInfo result in PropItUpTool.allCustomTrees)
+                foreach (TreeInfo result in PropItUpTool.allAvailableTrees)
                 {
                     if (result.name.ToLower().Contains(searchQuery.ToLower()))
                     {

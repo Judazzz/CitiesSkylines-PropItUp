@@ -229,7 +229,7 @@ namespace PropItUp
             //allCustomTrees.Add(null);
             //allAvailableTrees.Add(null);
 
-            //  Loop all props in 'PropCollection':
+            //  Loop all trees in 'TreeCollection':
             int skipped = 0;
             for (uint i = 0; i < PrefabCollection<TreeInfo>.PrefabCount(); i++)
             {

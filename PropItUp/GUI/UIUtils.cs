@@ -12,6 +12,40 @@ namespace PropItUp.GUI
         // So if your are using it for your mod consider thanking me (SamsamTS)
         // Extended Public Transport UI's code helped me a lot so thanks a lot AcidFire
 
+        //  Size constants:
+        public static float c_modPanelWidth = 400f;
+        public static float c_modPanelHeight = 625f;
+
+        public static float c_modPanelInnerWidth = 390f;
+        public static float c_modPanelInnerHeight = 555f;
+
+        public static float c_titleBarWidth = 400f;
+        public static float c_titleBarHeight = 36f;
+        public static float c_titleBarLabelWidth = 360f;
+        public static float c_titleBarLabelHeight = 36f;
+        public static float c_titleBarLabelXPos = 15f;
+        public static float c_titleBarCloseButtonXPos = 370f;
+
+        public static float c_tabButtonWidth = 97.25f;
+        public static float c_tabButtonHeight = 28f;
+        public static float c_tabPanelWidth = 390f;
+        public static float c_tabPanelHeight = 555f;
+
+        public static float c_resetButtonWidth = 110f;
+        public static float c_resetButtonHeight = 20f;
+        public static float c_resetButtonPosX = 272f;
+        public static float c_resetButtonPosY = 14f;
+
+        public static float c_searchBoxWidth = 380f;
+        public static float c_searchBoxHeight = 30f;
+
+        public static float c_fastListWidth = 388f;
+        public static float c_fastListHeight = 180f;
+        public static float c_fastListRowHeight = 30f;
+
+        public static float c_spacing = 5;
+
+
         public static UIButton CreateButton(UIComponent parent)
         {
             UIButton button = parent.AddUIComponent<UIButton>();
@@ -345,7 +379,7 @@ namespace PropItUp.GUI
             {
                 panel.height = 40;
                 panel.AlignTo(parent, UIAlignAnchor.BottomLeft);
-                panel.relativePosition = new Vector3(0, 305);
+                panel.relativePosition = new Vector3(0, c_modPanelInnerHeight - 40);
             }
             else
             {
@@ -480,7 +514,10 @@ namespace PropItUp.GUI
                 // replace spaces at start and end
                 itemName = itemName.Trim();
                 // replace multiple spaces with one
-                itemName = Regex.Replace(itemName, " {2,}", " ");
+                try {
+                    itemName = Regex.Replace(itemName, " {2,}", " ");
+                }
+                catch {}
             }
 
             return itemName;

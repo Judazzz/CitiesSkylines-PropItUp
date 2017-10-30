@@ -55,6 +55,7 @@
     <Compile Include="GUI\TreeCustomizerPanel.cs" />
     <Compile Include="GUI\TreeReplacerPanel.cs" />
     <Compile Include="GUI\UIFastList.cs" />
+    <Compile Include="GUI\UIBuildingPrefabItem.cs" />
     <Compile Include="GUI\UIVanillaTreeItem.cs" />
     <Compile Include="GUI\UIMainButton.cs" />
     <Compile Include="GUI\UIMainPanel.cs" />

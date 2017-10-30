@@ -529,7 +529,7 @@ namespace PropItUp.GUI
 
             // Panel 
             m_panel = AddUIComponent<UIPanel>();
-            m_panel.width = width - 10f;
+            m_panel.width = width - 8f;
             m_panel.height = height;
             m_panel.padding = new RectOffset(2, 2, 2, 2);
             m_panel.backgroundSprite = "LevelBarBackground";

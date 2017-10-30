@@ -1,5 +1,6 @@
 ﻿using ColossalFramework.UI;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace PropItUp.GUI
@@ -91,25 +92,26 @@ namespace PropItUp.GUI
         {
             var originalContainer = UIUtils.CreateFormElement(this, "top");
             originalContainer.name = "originalContainer";
-
+            originalContainer.size = new Vector2(UIUtils.c_tabPanelWidth, UIUtils.c_tabPanelHeight);
             //  Source Container:
             _selectedBuildingLabel = originalContainer.AddUIComponent<UILabel>();
+            _selectedBuildingLabel.name = "selectedBuildingLabel";
             _selectedBuildingLabel.text = "No building selected";
             _selectedBuildingLabel.textColor = new Color(187, 187, 187, 255);
-            _selectedBuildingLabel.textScale = 0.8f;
-            _selectedBuildingLabel.padding = new RectOffset(0, 0, 0, 5);
+            _selectedBuildingLabel.textScale = 0.9f;
             //  Label:
             _originalPropLabel = originalContainer.AddUIComponent<UILabel>();
+            _originalPropLabel.name = "originalPropLabel";
             _originalPropLabel.text = "Included props";
-            _originalPropLabel.textScale = 0.8f;
-            _originalPropLabel.padding = new RectOffset(0, 0, 0, 5);
+            _originalPropLabel.textScale = 0.9f;
+            _originalPropLabel.padding = new RectOffset(0, 0, 15, 5);
             //  'Reset replacement' Button
             _resetReplacementButton = UIUtils.CreateButton(_originalPropLabel);
             _resetReplacementButton.text = "(reset selected)";
-            _resetReplacementButton.relativePosition = new Vector3(149f, -1.25f);
-            _resetReplacementButton.textScale = 0.65f;
-            _resetReplacementButton.width = 100;
-            _resetReplacementButton.height = 16;
+            _resetReplacementButton.relativePosition = new Vector3(UIUtils.c_resetButtonPosX, UIUtils.c_resetButtonPosY);
+            _resetReplacementButton.width = UIUtils.c_resetButtonWidth;
+            _resetReplacementButton.height = UIUtils.c_resetButtonHeight;
+            _resetReplacementButton.textScale = 0.75f;
             _resetReplacementButton.normalBgSprite = null;
             _resetReplacementButton.hoveredBgSprite = null;
             _resetReplacementButton.pressedBgSprite = null;
@@ -135,32 +137,34 @@ namespace PropItUp.GUI
             };
             _resetReplacementButton.isEnabled = false;
             // FastList
-            _originalPropFastList = UIFastList.Create<UIPropItem>(originalContainer);
+            _originalPropFastList = UIFastList.Create<UIBuildingPrefabItem>(originalContainer);
             _originalPropFastList.backgroundSprite = "UnlockingPanel";
-            _originalPropFastList.width = parent.width - (3 * PropItUpTool.SPACING) - 12;
-            _originalPropFastList.height = 90;
+            _originalPropFastList.relativePosition = new Vector3(0, 15);
+            _originalPropFastList.width = UIUtils.c_fastListWidth;
+            _originalPropFastList.height = UIUtils.c_fastListHeight;
             _originalPropFastList.canSelect = true;
             _originalPropFastList.eventSelectedIndexChanged += OnSelectedOriginalChanged;
 
             // Replacement Label Container:
             var replacementContainer = UIUtils.CreateFormElement(this, "center");
             replacementContainer.name = "replacementContainer";
-            replacementContainer.relativePosition = new Vector3(0, 165);
+            replacementContainer.relativePosition = new Vector3(0, 275);
             //  Label:
             _replacementPropLabel = originalContainer.AddUIComponent<UILabel>();
+            _replacementPropLabel.name = "replacementPropLabel";
             _replacementPropLabel.text = "Select replacement prop";
-            _replacementPropLabel.textScale = 0.8f;
-            _replacementPropLabel.padding = new RectOffset(0, 0, 15, 5);
+            _replacementPropLabel.textScale = 0.9f;
+            _replacementPropLabel.padding = new RectOffset(0, 0, 20, 5);
             // Search Box Container:
             var searchboxContainer = UIUtils.CreateFormElement(this, "center");
             searchboxContainer.name = "searchboxContainer";
-            searchboxContainer.relativePosition = new Vector3(0, 182);
+            searchboxContainer.relativePosition = new Vector3(0, 292);
             //  Search Box:
             _replacementPropFastListSearchBox = UIUtils.CreateTextField(searchboxContainer);
-            _replacementPropFastListSearchBox.position = new Vector3(_selectedBuildingLabel.relativePosition.x, 205);
-            _replacementPropFastListSearchBox.width = parent.width - (3 * PropItUpTool.SPACING) - 10;
-            _replacementPropFastListSearchBox.height = 25;
-            _replacementPropFastListSearchBox.padding = new RectOffset(6, 6, 6, 6);
+            _replacementPropFastListSearchBox.position = new Vector3(_selectedBuildingLabel.relativePosition.x, 315);
+            _replacementPropFastListSearchBox.width = UIUtils.c_searchBoxWidth;
+            _replacementPropFastListSearchBox.height = UIUtils.c_searchBoxHeight;
+            _replacementPropFastListSearchBox.padding = new RectOffset(6, 6, 8, 6);
             _replacementPropFastListSearchBox.normalBgSprite = "TextFieldUnderline";
             _replacementPropFastListSearchBox.hoveredBgSprite = "TextFieldUnderline";
             _replacementPropFastListSearchBox.disabledBgSprite = "TextFieldUnderline";
@@ -168,7 +172,7 @@ namespace PropItUp.GUI
             _replacementPropFastListSearchBox.horizontalAlignment = UIHorizontalAlignment.Left;
             _replacementPropFastListSearchBox.text = searchboxPlaceholder;
             _replacementPropFastListSearchBox.textColor = new Color32(187, 187, 187, 255);
-            _replacementPropFastListSearchBox.textScale = 0.75f;
+            _replacementPropFastListSearchBox.textScale = 0.85f;
             //  Search Box Events:
             _replacementPropFastListSearchBox.eventTextChanged += (c, p) =>
             {
@@ -177,7 +181,6 @@ namespace PropItUp.GUI
             };
             _replacementPropFastListSearchBox.eventGotFocus += (c, p) =>
             {
-                //_replacementPropFastList.selectedIndex = -1;
                 if (_replacementPropFastListSearchBox.text == searchboxPlaceholder)
                 {
                     _replacementPropFastListSearchBox.text = string.Empty;
@@ -194,12 +197,12 @@ namespace PropItUp.GUI
             // FastList Container:
             var fastlistContainer = UIUtils.CreateFormElement(this, "center");
             fastlistContainer.name = "fastlistContainer";
-            fastlistContainer.relativePosition = new Vector3(0, 205);
+            fastlistContainer.relativePosition = new Vector3(0, 320);
             //  FastList:
             _replacementPropFastList = UIFastList.Create<UIPropItem>(fastlistContainer);
-            _replacementPropFastList.position = new Vector3(_selectedBuildingLabel.relativePosition.x, 233);
-            _replacementPropFastList.width = parent.width - (3 * PropItUpTool.SPACING) - 12;
-            _replacementPropFastList.height = 90;
+            _replacementPropFastList.position = new Vector3(_selectedBuildingLabel.relativePosition.x, 350);
+            _replacementPropFastList.width = UIUtils.c_fastListWidth;
+            _replacementPropFastList.height = UIUtils.c_fastListHeight;
             _replacementPropFastList.backgroundSprite = "UnlockingPanel";
             _replacementPropFastList.canSelect = true;
             _replacementPropFastList.eventSelectedIndexChanged += OnSelectedReplacementChanged;
@@ -252,9 +255,11 @@ namespace PropItUp.GUI
             }
             //  List all props in selected building:
             listIsUpdating = true;
-            List<PropInfo> selectedBuildingPropList = new List<PropInfo>();
+            List<BuildingInfo.Prop> allBuildingProps = _selectedBuilding.m_props.Where(x => x.m_prop != null).ToList();
+            allBuildingProps = allBuildingProps.OrderBy(x => UIUtils.GenerateBeautifiedPrefabName(x.m_prop)).ToList();
+            List<PropInfo> availableBuildingPropList = new List<PropInfo>();
             //  TODO: POPULATE PROP LIST BASED ON ACTUAL, CURRENT PROPS
-            foreach (var prop in _selectedBuilding.m_props)
+            foreach (var prop in allBuildingProps)
             {
                 if (prop.m_prop != null)
                 {
@@ -269,14 +274,14 @@ namespace PropItUp.GUI
                     {
                         prop.m_prop = _selectedPropReplacement;
                     }
-                    if (!selectedBuildingPropList.Contains(prop.m_prop))
+                    if (!availableBuildingPropList.Contains(prop.m_prop))
                     {
-                        selectedBuildingPropList.Add(prop.m_prop);
+                        availableBuildingPropList.Add(prop.m_prop);
                         _originalPropFastList.rowsData.Add(prop.m_prop);
                     }
                 }
             }
-            _originalPropFastList.rowHeight = 26f;
+            _originalPropFastList.rowHeight = UIUtils.c_fastListRowHeight;
             listIsUpdating = false;
             //  Preset FastList:
             _originalPropFastList.selectedIndex = _selectedPropOriginalIndex;
@@ -284,7 +289,7 @@ namespace PropItUp.GUI
             //  
             if (PropItUpTool.config.enable_debug)
             {
-                DebugUtils.Log($"PropCustomizerPanel: OriginalFastList populated with {selectedBuildingPropList.Count} props for building '{_selectedBuilding.name}'.");
+                DebugUtils.Log($"PropCustomizerPanel: OriginalFastList populated with {availableBuildingPropList.Count} props for building '{_selectedBuilding.name}'.");
             }
         }
         protected void OnSelectedOriginalChanged(UIComponent component, int i)
@@ -343,7 +348,7 @@ namespace PropItUp.GUI
                 {
                     _replacementPropFastList.rowsData.Add(prop);
                 }
-                _replacementPropFastList.rowHeight = 26f;
+                _replacementPropFastList.rowHeight = UIUtils.c_fastListRowHeight;
                 _replacementPropFastList.DisplayAt(0);
                 //  
                 if (PropItUpTool.config.enable_debug)

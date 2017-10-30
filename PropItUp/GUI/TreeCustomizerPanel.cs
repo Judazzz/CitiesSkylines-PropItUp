@@ -1,5 +1,6 @@
 ﻿using ColossalFramework.UI;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace PropItUp.GUI
@@ -91,25 +92,26 @@ namespace PropItUp.GUI
         {
             var originalContainer = UIUtils.CreateFormElement(this, "top");
             originalContainer.name = "originalContainer";
-
+            originalContainer.size = new Vector2(UIUtils.c_tabPanelWidth, UIUtils.c_tabPanelHeight);
             //  Source Container:
             _selectedBuildingLabel = originalContainer.AddUIComponent<UILabel>();
+            _selectedBuildingLabel.name = "selectedBuildingLabel";
             _selectedBuildingLabel.text = "No building selected";
             _selectedBuildingLabel.textColor = new Color(187, 187, 187, 255);
-            _selectedBuildingLabel.textScale = 0.8f;
-            _selectedBuildingLabel.padding = new RectOffset(0, 0, 0, 5);
+            _selectedBuildingLabel.textScale = 0.9f;
             //  Label:
             _originalTreeLabel = originalContainer.AddUIComponent<UILabel>();
+            _originalTreeLabel.name = "originalTreeLabel";
             _originalTreeLabel.text = "Included trees";
-            _originalTreeLabel.textScale = 0.8f;
-            _originalTreeLabel.padding = new RectOffset(0, 0, 0, 5);
+            _originalTreeLabel.textScale = 0.9f;
+            _originalTreeLabel.padding = new RectOffset(0, 0, 15, 5);
             //  'Reset replacement' Button
             _resetReplacementButton = UIUtils.CreateButton(_originalTreeLabel);
             _resetReplacementButton.text = "(reset selected)";
-            _resetReplacementButton.relativePosition = new Vector3(149f, -1.25f);
-            _resetReplacementButton.textScale = 0.65f;
-            _resetReplacementButton.width = 100;
-            _resetReplacementButton.height = 16;
+            _resetReplacementButton.relativePosition = new Vector3(UIUtils.c_resetButtonPosX, UIUtils.c_resetButtonPosY);
+            _resetReplacementButton.width = UIUtils.c_resetButtonWidth;
+            _resetReplacementButton.height = UIUtils.c_resetButtonHeight;
+            _resetReplacementButton.textScale = 0.75f;
             _resetReplacementButton.normalBgSprite = null;
             _resetReplacementButton.hoveredBgSprite = null;
             _resetReplacementButton.pressedBgSprite = null;
@@ -135,32 +137,34 @@ namespace PropItUp.GUI
             };
             _resetReplacementButton.isEnabled = false;
             // FastList
-            _originalTreeFastList = UIFastList.Create<UITreeItem>(originalContainer);
+            _originalTreeFastList = UIFastList.Create<UIBuildingPrefabItem>(originalContainer);
             _originalTreeFastList.backgroundSprite = "UnlockingPanel";
-            _originalTreeFastList.width = parent.width - (3 * PropItUpTool.SPACING) - 12;
-            _originalTreeFastList.height = 90;
+            _originalTreeFastList.relativePosition = new Vector3(0, 15);
+            _originalTreeFastList.width = UIUtils.c_fastListWidth;
+            _originalTreeFastList.height = UIUtils.c_fastListHeight;
             _originalTreeFastList.canSelect = true;
             _originalTreeFastList.eventSelectedIndexChanged += OnSelectedOriginalChanged;
 
             // Replacement Label Container:
             var replacementContainer = UIUtils.CreateFormElement(this, "center");
             replacementContainer.name = "replacementContainer";
-            replacementContainer.relativePosition = new Vector3(0, 165);
+            replacementContainer.relativePosition = new Vector3(0, 275);
             //  Label:
             _replacementTreeLabel = originalContainer.AddUIComponent<UILabel>();
+            _replacementTreeLabel.name = "replacementTreeLabel";
             _replacementTreeLabel.text = "Select replacement tree";
-            _replacementTreeLabel.textScale = 0.8f;
-            _replacementTreeLabel.padding = new RectOffset(0, 0, 15, 5);
+            _replacementTreeLabel.textScale = 0.9f;
+            _replacementTreeLabel.padding = new RectOffset(0, 0, 20, 5);
             // Search Box Container:
             var searchboxContainer = UIUtils.CreateFormElement(this, "center");
             searchboxContainer.name = "searchboxContainer";
-            searchboxContainer.relativePosition = new Vector3(0, 182);
+            searchboxContainer.relativePosition = new Vector3(0, 292);
             //  Search Box:
             _replacementTreeFastListSearchBox = UIUtils.CreateTextField(searchboxContainer);
-            _replacementTreeFastListSearchBox.position = new Vector3(_selectedBuildingLabel.relativePosition.x, 205);
-            _replacementTreeFastListSearchBox.width = parent.width - (3 * PropItUpTool.SPACING) - 10;
-            _replacementTreeFastListSearchBox.height = 25;
-            _replacementTreeFastListSearchBox.padding = new RectOffset(6, 6, 6, 6);
+            _replacementTreeFastListSearchBox.position = new Vector3(_selectedBuildingLabel.relativePosition.x, 315);
+            _replacementTreeFastListSearchBox.width = UIUtils.c_searchBoxWidth;
+            _replacementTreeFastListSearchBox.height = UIUtils.c_searchBoxHeight;
+            _replacementTreeFastListSearchBox.padding = new RectOffset(6, 6, 8, 6);
             _replacementTreeFastListSearchBox.normalBgSprite = "TextFieldUnderline";
             _replacementTreeFastListSearchBox.hoveredBgSprite = "TextFieldUnderline";
             _replacementTreeFastListSearchBox.disabledBgSprite = "TextFieldUnderline";
@@ -168,7 +172,7 @@ namespace PropItUp.GUI
             _replacementTreeFastListSearchBox.horizontalAlignment = UIHorizontalAlignment.Left;
             _replacementTreeFastListSearchBox.text = searchboxPlaceholder;
             _replacementTreeFastListSearchBox.textColor = new Color32(187, 187, 187, 255);
-            _replacementTreeFastListSearchBox.textScale = 0.75f;
+            _replacementTreeFastListSearchBox.textScale = 0.85f;
             //  Search Box Events:
             _replacementTreeFastListSearchBox.eventTextChanged += (c, p) =>
             {
@@ -177,7 +181,6 @@ namespace PropItUp.GUI
             };
             _replacementTreeFastListSearchBox.eventGotFocus += (c, p) =>
             {
-                //_replacementTreeFastList.selectedIndex = -1;
                 if (_replacementTreeFastListSearchBox.text == searchboxPlaceholder)
                 {
                     _replacementTreeFastListSearchBox.text = string.Empty;
@@ -194,12 +197,12 @@ namespace PropItUp.GUI
             // FastList Container:
             var fastlistContainer = UIUtils.CreateFormElement(this, "center");
             fastlistContainer.name = "fastlistContainer";
-            fastlistContainer.relativePosition = new Vector3(0, 205);
+            fastlistContainer.relativePosition = new Vector3(0, 320);
             //  FastList:
             _replacementTreeFastList = UIFastList.Create<UITreeItem>(fastlistContainer);
-            _replacementTreeFastList.position = new Vector3(_selectedBuildingLabel.relativePosition.x, 233);
-            _replacementTreeFastList.width = parent.width - (3 * PropItUpTool.SPACING) - 12;
-            _replacementTreeFastList.height = 90;
+            _replacementTreeFastList.position = new Vector3(_selectedBuildingLabel.relativePosition.x, 350);
+            _replacementTreeFastList.width = UIUtils.c_fastListWidth;
+            _replacementTreeFastList.height = UIUtils.c_fastListHeight;
             _replacementTreeFastList.backgroundSprite = "UnlockingPanel";
             _replacementTreeFastList.canSelect = true;
             _replacementTreeFastList.eventSelectedIndexChanged += OnSelectedReplacementChanged;
@@ -248,14 +251,15 @@ namespace PropItUp.GUI
             //  Clear FastList:
             if (_originalTreeFastList.rowsData.m_size > 0)
             {
-                //_originalTreeFastList.selectedIndex = -1;
                 _originalTreeFastList.Clear();
             }
             //  List all trees in selected building:
             listIsUpdating = true;
-            List<TreeInfo> selectedBuildingTreeList = new List<TreeInfo>();
+            List<BuildingInfo.Prop> allBuildingTrees = _selectedBuilding.m_props.Where(x => x.m_tree != null).ToList();
+            allBuildingTrees = allBuildingTrees.OrderBy(x => UIUtils.GenerateBeautifiedPrefabName(x.m_tree)).ToList();
+            List<TreeInfo> availableBuildingTreeList = new List<TreeInfo>();
             //  TODO: POPULATE PROP LIST BASED ON ACTUAL, CURRENT PROPS
-            foreach (var prop in _selectedBuilding.m_props)
+            foreach (var prop in allBuildingTrees)
             {
                 if (prop.m_tree != null)
                 {
@@ -270,14 +274,14 @@ namespace PropItUp.GUI
                     {
                         prop.m_tree = _selectedTreeReplacement;
                     }
-                    if (!selectedBuildingTreeList.Contains(prop.m_tree))
+                    if (!availableBuildingTreeList.Contains(prop.m_tree))
                     {
-                        selectedBuildingTreeList.Add(prop.m_tree);
+                        availableBuildingTreeList.Add(prop.m_tree);
                         _originalTreeFastList.rowsData.Add(prop.m_tree);
                     }
                 }
             }
-            _originalTreeFastList.rowHeight = 26f;
+            _originalTreeFastList.rowHeight = UIUtils.c_fastListRowHeight;
             listIsUpdating = false;
             //  Preset FastList:
             _originalTreeFastList.selectedIndex = _selectedTreeOriginalIndex;
@@ -285,7 +289,7 @@ namespace PropItUp.GUI
             //  
             if (PropItUpTool.config.enable_debug)
             {
-                DebugUtils.Log($"TreeCustomizerPanel: OriginalFastList populated with {selectedBuildingTreeList.Count} trees for building '{_selectedBuilding.name}'.");
+                DebugUtils.Log($"TreeCustomizerPanel: OriginalFastList populated with {availableBuildingTreeList.Count} trees for building '{_selectedBuilding.name}'.");
             }
         }
         protected void OnSelectedOriginalChanged(UIComponent component, int i)
@@ -340,7 +344,7 @@ namespace PropItUp.GUI
                 {
                     _replacementTreeFastList.rowsData.Add(tree);
                 }
-                _replacementTreeFastList.rowHeight = 26f;
+                _replacementTreeFastList.rowHeight = UIUtils.c_fastListRowHeight;
                 _replacementTreeFastList.DisplayAt(0);
                 //  
                 if (PropItUpTool.config.enable_debug)

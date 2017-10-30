@@ -43,8 +43,8 @@ namespace PropItUp.GUI
             isInteractive = true;
             name = "modMainPanel";
             padding = new RectOffset(10, 10, 4, 4);
-            width = PropItUpTool.SPACING + PropItUpTool.WIDTH;
-            height = PropItUpTool.TITLE_HEIGHT + PropItUpTool.TABS_HEIGHT + PropItUpTool.HEIGHT + PropItUpTool.SPACING;
+            width = UIUtils.c_modPanelWidth;
+            height = UIUtils.c_modPanelHeight;
             relativePosition = new Vector3(width + 25, 60);
             //  
             SetupControls();
@@ -60,38 +60,38 @@ namespace PropItUp.GUI
 
             //  Tabs:
             panelTabs = AddUIComponent<UITabstrip>();
-            panelTabs.relativePosition = new Vector2(10, PropItUpTool.TITLE_HEIGHT + PropItUpTool.SPACING);
-            panelTabs.size = new Vector2(PropItUpTool.WIDTH - (3 * PropItUpTool.SPACING), PropItUpTool.TABS_HEIGHT);
+            panelTabs.size = new Vector2(UIUtils.c_modPanelInnerWidth, UIUtils.c_tabButtonHeight);
+            panelTabs.relativePosition = new Vector2(UIUtils.c_spacing, UIUtils.c_titleBarHeight + UIUtils.c_spacing);
 
             //  Tab Buttons:
             //  Global Tree Replacer Button:
             treeReplacerButton = UIUtils.CreateTab(panelTabs, "Global");
             treeReplacerButton.name = "treeReplacerButton";
             treeReplacerButton.tooltip = "Replace free-standing trees globally";
-            treeReplacerButton.textScale = 0.8f;
-            //treeReplacerButton.width = 60f;
-            treeReplacerButton.width = 64f;
+            treeReplacerButton.textScale = 0.9f;
+            treeReplacerButton.width = UIUtils.c_tabButtonWidth;
+            treeReplacerButton.height = UIUtils.c_tabButtonHeight;
             //  Global BuildingTree Replacer Button:
             buildingTreeReplacerButton = UIUtils.CreateTab(panelTabs, "Building");
             buildingTreeReplacerButton.name = "buildingTreeReplacerButton";
             buildingTreeReplacerButton.tooltip = "Replace building trees globally";
-            buildingTreeReplacerButton.textScale = 0.8f;
-            //buildingTreeReplacerButton.width = 60f;
-            buildingTreeReplacerButton.width = 64f;
+            buildingTreeReplacerButton.textScale = 0.9f;
+            buildingTreeReplacerButton.width = UIUtils.c_tabButtonWidth;
+            buildingTreeReplacerButton.height = UIUtils.c_tabButtonHeight;
             //  Prop Customizer Button:
             propCustomizerButton = UIUtils.CreateTab(panelTabs, "Props");
             propCustomizerButton.name = "propCustomizerButton";
             propCustomizerButton.tooltip = "Replace props per building";
-            propCustomizerButton.textScale = 0.8f;
-            //propCustomizerButton.width = 100f;
-            propCustomizerButton.width = 64f;
+            propCustomizerButton.textScale = 0.9f;
+            propCustomizerButton.width = UIUtils.c_tabButtonWidth;
+            propCustomizerButton.height = UIUtils.c_tabButtonHeight;
             //  Tree Customizer Button:
             treeCustomizerButton = UIUtils.CreateTab(panelTabs, "Trees");
             treeCustomizerButton.name = "treeCustomizerButton";
             treeCustomizerButton.tooltip = "Replace trees per building";
-            treeCustomizerButton.textScale = 0.8f;
-            //treeCustomizerButton.width = 100f;
-            treeCustomizerButton.width = 64f;
+            treeCustomizerButton.textScale = 0.9f;
+            treeCustomizerButton.width = UIUtils.c_tabButtonWidth;
+            treeCustomizerButton.height = UIUtils.c_tabButtonHeight;
             //  Tab Button Events:
             treeReplacerButton.eventClick += (c, e) => TabClicked(c, e);
             buildingTreeReplacerButton.eventClick += (c, e) => TabClicked(c, e);
@@ -100,8 +100,9 @@ namespace PropItUp.GUI
 
             //  Main Panel:
             UIPanel body = AddUIComponent<UIPanel>();
-            body.width = PropItUpTool.WIDTH;
-            body.height = PropItUpTool.HEIGHT;
+            body.name = "modPanelContainer";
+            body.width = UIUtils.c_modPanelInnerWidth;
+            body.height = UIUtils.c_modPanelInnerHeight;
             //  ScrollRect
             body.relativePosition = new Vector3(5, 36 + 28 + 5);
 
@@ -109,30 +110,30 @@ namespace PropItUp.GUI
             //  Global Tree Replacer Panel:
             treeReplacerPanel = body.AddUIComponent<TreeReplacerPanel>();
             treeReplacerPanel.name = "treeReplacerPanel";
-            treeReplacerPanel.width = PropItUpTool.WIDTH - (3 * PropItUpTool.SPACING);
-            treeReplacerPanel.height = PropItUpTool.HEIGHT;
-            treeReplacerPanel.relativePosition = new Vector3(5, 0);
+            treeReplacerPanel.width = UIUtils.c_modPanelInnerWidth;
+            treeReplacerPanel.height = UIUtils.c_modPanelInnerHeight;
+            treeReplacerPanel.relativePosition = Vector3.zero;
             treeReplacerPanel.isVisible = true;
             //  Global Building Tree Replacer Panel:
             buildingTreeReplacerPanel = body.AddUIComponent<BuildingTreeReplacerPanel>();
             buildingTreeReplacerPanel.name = "buildingTreeReplacerPanel";
-            buildingTreeReplacerPanel.width = PropItUpTool.WIDTH - (3 * PropItUpTool.SPACING);
-            buildingTreeReplacerPanel.height = PropItUpTool.HEIGHT;
-            buildingTreeReplacerPanel.relativePosition = new Vector3(5, 0);
+            buildingTreeReplacerPanel.width = UIUtils.c_modPanelInnerWidth;
+            buildingTreeReplacerPanel.height = UIUtils.c_modPanelInnerHeight;
+            buildingTreeReplacerPanel.relativePosition = Vector3.zero;
             buildingTreeReplacerPanel.isVisible = false;
             //  Prefab Tree Customizer Panel:
             propCustomizerPanel = body.AddUIComponent<PropCustomizerPanel>();
             propCustomizerPanel.name = "propCustomizerPanel";
-            propCustomizerPanel.width = PropItUpTool.WIDTH - (3 * PropItUpTool.SPACING);
-            propCustomizerPanel.height = PropItUpTool.HEIGHT;
-            propCustomizerPanel.relativePosition = new Vector3(5, 0);
+            propCustomizerPanel.width = UIUtils.c_modPanelInnerWidth;
+            propCustomizerPanel.height = UIUtils.c_modPanelInnerHeight;
+            propCustomizerPanel.relativePosition = Vector3.zero;
             propCustomizerPanel.isVisible = false;
             //  Prefab Prop Customizer Panel:
             treeCustomizerPanel = body.AddUIComponent<TreeCustomizerPanel>();
             treeCustomizerPanel.name = "treeCustomizerPanel";
-            treeCustomizerPanel.width = PropItUpTool.WIDTH - (3 * PropItUpTool.SPACING);
-            treeCustomizerPanel.height = PropItUpTool.HEIGHT;
-            treeCustomizerPanel.relativePosition = new Vector3(5, 0);
+            treeCustomizerPanel.width = UIUtils.c_modPanelInnerWidth;
+            treeCustomizerPanel.height = UIUtils.c_modPanelInnerHeight;
+            treeCustomizerPanel.relativePosition = Vector3.zero;
             treeCustomizerPanel.isVisible = false;
         }
 
@@ -189,7 +190,7 @@ namespace PropItUp.GUI
         //  Toggle main panel and update button state:
         public void Toggle()
         {
-            //  TODO: canel BuildingSelectionTool's selected building + building highlight:
+            //  TODO: cancel BuildingSelectionTool's selected building + building highlight:
             //  Reset ModPanels:
             TreeReplacerPanel.instance.Reset();
             BuildingTreeReplacerPanel.instance.Reset();
