@@ -6,23 +6,29 @@ namespace PropItUp.GUI
 {
     public class TreeReplacerPanel : UIPanel
     {
-        private UILabel _introLabel;
+        private UILabel _titleLabel;
         private UILabel _originalTreeLabel;
         private UIButton _resetReplacementButton;
+        private UITextField _originalTreeFastListSearchBox;
         private UIFastList _originalTreeFastList;
         private UILabel _replacementTreeLabel;
         private UITextField _replacementTreeFastListSearchBox;
         private UIFastList _replacementTreeFastList;
         private UIButton _saveTreeReplacementButton;
 
-        private string searchboxPlaceholder = "Find a tree";
+        private string originalSearchBoxPlaceholder = "Find a tree";
+        private string replacementSearchBoxPlaceholder = "Find a replacement tree";
 
-        public UILabel introLabel
+        public UILabel titleLabel
         {
-            get { return _introLabel; }
-            set { _introLabel = value; }
+            get { return _titleLabel; }
+            set { _titleLabel = value; }
         }
 
+        public UITextField originalTreeFastListSearchBox
+        {
+            get { return _originalTreeFastListSearchBox; }
+        }
         public UIFastList originalTreeFastList
         {
             get { return _originalTreeFastList; }
@@ -67,7 +73,8 @@ namespace PropItUp.GUI
         }
 
         private static bool listIsUpdating = false;
-        private string searchQuery = string.Empty;
+        private string originalSearchQuery = string.Empty;
+        private string replacementSearchQuery = string.Empty;
 
         public override void Start()
         {
@@ -86,30 +93,37 @@ namespace PropItUp.GUI
 
         private void SetupControls()
         {
-            // Original Container:
-            var originalContainer = UIUtils.CreateFormElement(this, "top");
-            originalContainer.name = "originalContainer";
-            originalContainer.size = new Vector2(UIUtils.c_tabPanelWidth, UIUtils.c_tabPanelHeight);
-            //  Label:
-            _introLabel = originalContainer.AddUIComponent<UILabel>();
-            _introLabel.name = "introLabel";
-            _introLabel.textColor = new Color(187, 187, 187, 255);
-            _introLabel.textScale = 0.9f;
-            //  Feature disabled: hide UI:
+            // TITLE:
+            // Title Container:
+            var titleContainer = UIUtils.CreateFormElement(this, "top");
+            titleContainer.name = "titleContainer";
+            titleContainer.size = new Vector2(UIUtils.c_tabPanelWidth, UIUtils.c_tabPanelHeight);
+            // Title Label (selected asset name):
+            _titleLabel = titleContainer.AddUIComponent<UILabel>();
+            _titleLabel.name = "titleLabel";
+            _titleLabel.textColor = new Color(187, 187, 187, 255);
+            _titleLabel.textScale = 0.9f;
+            // Feature disabled: hide UI:
             if (!PropItUpTool.config.enable_globalfreestanding)
             {
-                _introLabel.width = parent.width;
-                _introLabel.text = "THIS FEATURE IS UNAVAILABLE!\n\nReason: feature was disabled by player";
+                _titleLabel.width = parent.width;
+                _titleLabel.text = "THIS FEATURE IS UNAVAILABLE!\n\nReason: feature was disabled by player";
                 return;
             }
-            _introLabel.text = "Global tree replacement";
-            //  Source:
-            _originalTreeLabel = originalContainer.AddUIComponent<UILabel>();
+            _titleLabel.text = "Global tree replacement";
+
+
+            // ORIGINAL:
+            var originalLabelContainer = UIUtils.CreateFormElement(this, "center");
+            originalLabelContainer.name = "originalLabelContainer";
+            originalLabelContainer.relativePosition = new Vector3(0, 36);
+            // Original Label Container:
+            _originalTreeLabel = originalLabelContainer.AddUIComponent<UILabel>();
             _originalTreeLabel.name = "originalTreeLabel";
-            _originalTreeLabel.text = "Original trees";
+            _originalTreeLabel.text = "Select original tree";
             _originalTreeLabel.textScale = 0.9f;
             _originalTreeLabel.padding = new RectOffset(0, 0, 15, 5);
-            //  'Reset replacement' Button
+            // 'Reset replacement' Button
             _resetReplacementButton = UIUtils.CreateButton(_originalTreeLabel);
             _resetReplacementButton.text = "(reset selected)";
             _resetReplacementButton.relativePosition = new Vector3(UIUtils.c_resetButtonPosX, UIUtils.c_resetButtonPosY);
@@ -129,52 +143,87 @@ namespace PropItUp.GUI
                     DebugUtils.Log($"TreeReplacerPanel: 'Reset replacement' clicked'.");
                 }
                 //  Get original tree:
-                Configuration.PrefabReplacement replacement = PropItUpTool.config.GetGlobalReplacementByIndex(_selectedTreeOriginalIndex);
+                //  TODO => TEST: Get tree by name instead of index (property obsolete due to alphabetized list)
+                //Configuration.PrefabReplacement replacement = PropItUpTool.config.GetGlobalReplacementByIndex(_selectedTreeOriginalIndex);
+                Configuration.PrefabReplacement replacement = PropItUpTool.config.GetGlobalReplacementByTreeName(_selectedTreeOriginal.name);
                 //  Restore replacement:
                 PropItUpTool.RestoreReplacementGlobal();
                 //  Repopulate/reset OriginalTreeFastList:
                 _selectedTreeReplacement = PrefabCollection<TreeInfo>.FindLoaded(replacement.original);
-                //  TODO: stay at selected index:
+                //  TODO: update selected item (may have changed position in alphabetized list due to updated name)
                 PopulateOriginalTreesFastList();
                 _selectedTreeOriginal = _originalTreeFastList.rowsData[_selectedTreeOriginalIndex] as TreeInfo;
                 _resetReplacementButton.isEnabled = false;
-
-                
-                //PropItUpTool.RestoreReplacementGlobal();
-                ////  Repopulate originalTreeFastList:
-                ////  TODO: stay at selected index:
-                //PopulateOriginalTreesFastList();
-                //_selectedTreeOriginal = _originalTreeFastList.rowsData[_selectedTreeOriginalIndex] as TreeInfo;
-                //_resetReplacementButton.isEnabled = false;
             };
             _resetReplacementButton.isEnabled = false;
-            // FastList
-            _originalTreeFastList = UIFastList.Create<UIVanillaTreeItem>(originalContainer);
+            // Original Search Box Container:
+            var originalTreeSearchBoxContainer = UIUtils.CreateFormElement(this, "center");
+            originalTreeSearchBoxContainer.name = "originalTreeSearchBoxContainer";
+            originalTreeSearchBoxContainer.relativePosition = new Vector3(0, 74);
+            // Original Search Original :
+            _originalTreeFastListSearchBox = UIUtils.CreateTextField(originalTreeSearchBoxContainer);
+            _originalTreeFastListSearchBox.width = UIUtils.c_searchBoxWidth;
+            _originalTreeFastListSearchBox.height = UIUtils.c_searchBoxHeight;
+            _originalTreeFastListSearchBox.padding = new RectOffset(6, 6, 8, 6);
+            _originalTreeFastListSearchBox.normalBgSprite = "TextFieldUnderline";
+            _originalTreeFastListSearchBox.hoveredBgSprite = "TextFieldUnderline";
+            _originalTreeFastListSearchBox.disabledBgSprite = "TextFieldUnderline";
+            _originalTreeFastListSearchBox.focusedBgSprite = "LevelBarBackground";
+            _originalTreeFastListSearchBox.horizontalAlignment = UIHorizontalAlignment.Left;
+            _originalTreeFastListSearchBox.text = originalSearchBoxPlaceholder;
+            _originalTreeFastListSearchBox.textColor = new Color32(187, 187, 187, 255);
+            _originalTreeFastListSearchBox.textScale = 0.75f;
+            // Original Search Box Events:
+            _originalTreeFastListSearchBox.eventTextChanged += (c, p) =>
+            {
+                originalSearchQuery = p;
+                SearchOriginal();
+            };
+            _originalTreeFastListSearchBox.eventGotFocus += (c, p) =>
+            {
+                if (_originalTreeFastListSearchBox.text == originalSearchBoxPlaceholder)
+                {
+                    _originalTreeFastListSearchBox.text = string.Empty;
+                }
+            };
+            _originalTreeFastListSearchBox.eventLostFocus += (c, p) =>
+            {
+                if (_originalTreeFastListSearchBox.text == string.Empty)
+                {
+                    _originalTreeFastListSearchBox.text = originalSearchBoxPlaceholder;
+                }
+            };
+            // Original FastList Container:
+            var originalTreeFastListContainer = UIUtils.CreateFormElement(this, "center");
+            originalTreeFastListContainer.name = "originalTreeFastListContainer";
+            originalTreeFastListContainer.relativePosition = new Vector3(0, 102);
+            // Original FastList
+            _originalTreeFastList = UIFastList.Create<UIVanillaTreeItem>(originalTreeFastListContainer);
             _originalTreeFastList.backgroundSprite = "UnlockingPanel";
             _originalTreeFastList.relativePosition = new Vector3(0, 15);
             _originalTreeFastList.width = UIUtils.c_fastListWidth;
-            _originalTreeFastList.height = UIUtils.c_fastListHeight;
+            _originalTreeFastList.height = UIUtils.c_fastListHeight - 20;
             _originalTreeFastList.canSelect = true;
             _originalTreeFastList.eventSelectedIndexChanged += OnSelectedOriginalChanged;
 
+
+            // REPLACEMENT:
             // Replacement Label Container:
-            var replacementContainer = UIUtils.CreateFormElement(this, "center");
-            replacementContainer.name = "replacementContainer";
-            replacementContainer.relativePosition = new Vector3(0, 275);
-            //  Label:
-            _replacementTreeLabel = originalContainer.AddUIComponent<UILabel>();
+            var replacementLabelContainer = UIUtils.CreateFormElement(this, "center");
+            replacementLabelContainer.name = "replacementLabelContainer";
+            replacementLabelContainer.relativePosition = new Vector3(0, 270);
+            // Replacement Label:
+            _replacementTreeLabel = replacementLabelContainer.AddUIComponent<UILabel>();
             _replacementTreeLabel.name = "replacementTreeLabel";
             _replacementTreeLabel.text = "Select custom tree";
             _replacementTreeLabel.textScale = 0.9f;
             _replacementTreeLabel.padding = new RectOffset(0, 0, 20, 5);
-
-            // Search Box Container:
-            var searchboxContainer = UIUtils.CreateFormElement(this, "center");
-            searchboxContainer.name = "searchboxContainer";
-            searchboxContainer.relativePosition = new Vector3(0, 292);
-            //  Search Box:
-            _replacementTreeFastListSearchBox = UIUtils.CreateTextField(searchboxContainer);
-            _replacementTreeFastListSearchBox.position = new Vector3(_introLabel.relativePosition.x, 315);
+            // Replacement Search Box Container:
+            var replacementTreeSearchBoxContainer = UIUtils.CreateFormElement(this, "center");
+            replacementTreeSearchBoxContainer.name = "replacementTreeSearchBoxContainer";
+            replacementTreeSearchBoxContainer.relativePosition = new Vector3(0, 312);
+            // Replacement Search Box:
+            _replacementTreeFastListSearchBox = UIUtils.CreateTextField(replacementTreeSearchBoxContainer);
             _replacementTreeFastListSearchBox.width = UIUtils.c_searchBoxWidth;
             _replacementTreeFastListSearchBox.height = UIUtils.c_searchBoxHeight;
             _replacementTreeFastListSearchBox.padding = new RectOffset(6, 6, 8, 6);
@@ -183,19 +232,18 @@ namespace PropItUp.GUI
             _replacementTreeFastListSearchBox.disabledBgSprite = "TextFieldUnderline";
             _replacementTreeFastListSearchBox.focusedBgSprite = "LevelBarBackground";
             _replacementTreeFastListSearchBox.horizontalAlignment = UIHorizontalAlignment.Left;
-            _replacementTreeFastListSearchBox.text = searchboxPlaceholder;
+            _replacementTreeFastListSearchBox.text = replacementSearchBoxPlaceholder;
             _replacementTreeFastListSearchBox.textColor = new Color32(187, 187, 187, 255);
             _replacementTreeFastListSearchBox.textScale = 0.75f;
-            //  Search Box Events:
+            // Replacement Search Box Events:
             _replacementTreeFastListSearchBox.eventTextChanged += (c, p) =>
             {
-                searchQuery = p;
-                Search();
+                replacementSearchQuery = p;
+                SearchReplacement();
             };
             _replacementTreeFastListSearchBox.eventGotFocus += (c, p) =>
             {
-                //_replacementTreeFastList.selectedIndex = -1;
-                if (_replacementTreeFastListSearchBox.text == searchboxPlaceholder)
+                if (_replacementTreeFastListSearchBox.text == replacementSearchBoxPlaceholder)
                 {
                     _replacementTreeFastListSearchBox.text = string.Empty;
                 }
@@ -204,27 +252,26 @@ namespace PropItUp.GUI
             {
                 if (_replacementTreeFastListSearchBox.text == string.Empty)
                 {
-                    _replacementTreeFastListSearchBox.text = searchboxPlaceholder;
+                    _replacementTreeFastListSearchBox.text = replacementSearchBoxPlaceholder;
                 }
             };
-
-            // FastList Container:
-            var fastlistContainer = UIUtils.CreateFormElement(this, "center");
-            fastlistContainer.name = "fastlistContainer";
-            fastlistContainer.relativePosition = new Vector3(0, 320);
-            // FastList:
-            _replacementTreeFastList = UIFastList.Create<UITreeItem>(fastlistContainer);
-            _replacementTreeFastList.position = new Vector3(_introLabel.relativePosition.x, 350);
+            // Replacement FastList Container:
+            var replacementTreeFastListContainer = UIUtils.CreateFormElement(this, "center");
+            replacementTreeFastListContainer.name = "replacementTreeFastListContainer";
+            replacementTreeFastListContainer.relativePosition = new Vector3(0, 340);
+            // Replacement FastList:
+            _replacementTreeFastList = UIFastList.Create<UITreeItem>(replacementTreeFastListContainer);
             _replacementTreeFastList.width = UIUtils.c_fastListWidth;
-            _replacementTreeFastList.height = UIUtils.c_fastListHeight;
+            _replacementTreeFastList.height = UIUtils.c_fastListHeight -20;
             _replacementTreeFastList.backgroundSprite = "UnlockingPanel";
             _replacementTreeFastList.canSelect = true;
             _replacementTreeFastList.eventSelectedIndexChanged += OnSelectedCustomChanged;
 
-            //  Button Container:
-            var buttonContainer = UIUtils.CreateFormElement(this, "bottom");
 
-            //  Buttons:
+            // BUTTONS:
+            // Button Container:
+            var buttonContainer = UIUtils.CreateFormElement(this, "bottom");
+            // Buttons:
             _saveTreeReplacementButton = UIUtils.CreateButton(buttonContainer);
             _saveTreeReplacementButton.relativePosition = new Vector3(5, 10);
             _saveTreeReplacementButton.width = 110;
@@ -245,7 +292,7 @@ namespace PropItUp.GUI
                 }
                 PropItUpTool.SaveReplacementGlobal();
                 //  Repopulate originalTreeFastList:
-                //  TODO: stay at selected index:
+                //  TODO: update selected item (may have changed position in alphabetized list due to updated name)
                 PopulateOriginalTreesFastList();
                 _selectedTreeOriginal = _selectedTreeReplacement;
                 _resetReplacementButton.isEnabled = true;
@@ -254,13 +301,19 @@ namespace PropItUp.GUI
 
         public void PopulateOriginalTreesFastList()
         {
+            //  Search Query set?
+            if (!string.IsNullOrEmpty(originalSearchQuery) && originalSearchQuery != originalSearchBoxPlaceholder)
+            {
+                SearchOriginal();
+                return;
+            }
             //  
+            listIsUpdating = true;
             if (_originalTreeFastList.rowsData.m_size > 0)
             {
                 _originalTreeFastList.Clear();
             }
             //  
-            listIsUpdating = true;
             foreach (var tree in PropItUpTool.allAvailableTrees)
             {
                 _originalTreeFastList.rowsData.Add(tree);
@@ -309,9 +362,9 @@ namespace PropItUp.GUI
         public void PopulateCustomTreesFastList()
         {   
             //  Search Query set?
-            if (!string.IsNullOrEmpty(searchQuery) && searchQuery != searchboxPlaceholder)
+            if (!string.IsNullOrEmpty(replacementSearchQuery) && replacementSearchQuery != replacementSearchBoxPlaceholder)
             {
-                Search();
+                SearchReplacement();
                 return;
             }
             //  TODO: Add 'No replacement' option:
@@ -342,10 +395,55 @@ namespace PropItUp.GUI
             }
         }
 
-        public void Search()
+        public void SearchOriginal()
         {
             //  
-            if (searchQuery == searchboxPlaceholder)
+            if (originalSearchQuery == originalSearchBoxPlaceholder)
+            {
+                return;
+            }
+            //  Deselect and clear FastList:
+            _originalTreeFastList.selectedIndex = -1;
+            _originalTreeFastList.Clear();
+            //  Create temporary list for search results:
+            List<TreeInfo> tmpItemList = new List<TreeInfo>();
+            if (string.IsNullOrEmpty(replacementSearchQuery))
+            {
+                tmpItemList = PropItUpTool.allAvailableTrees;
+            }
+            else
+            {
+                foreach (TreeInfo result in PropItUpTool.allAvailableTrees)
+                {
+                    if (result.name.ToLower().Contains(originalSearchQuery.ToLower()))
+                    {
+                        tmpItemList.Add(result);
+                    }
+                }
+            }
+            //  Repopulate with search results, and show at first item if results are found:
+            for (int i = 0; i < tmpItemList.Count; i++)
+            {
+                if (tmpItemList[i] != null)
+                {
+                    _originalTreeFastList.rowsData.Add(tmpItemList[i]);
+                }
+            }
+            if (tmpItemList.Count > 0)
+            {
+                _originalTreeFastList.DisplayAt(0);
+            }
+            //  
+            if (PropItUpTool.config.enable_debug)
+            {
+                DebugUtils.Log($"TreeReplacerPanel: originalFastList search query '{originalSearchQuery}' returned {tmpItemList.Count} results.");
+            }
+        }
+
+        public void SearchReplacement()
+        {
+            //  
+            if (replacementSearchQuery == replacementSearchBoxPlaceholder)
             {
                 return;
             }
@@ -355,7 +453,7 @@ namespace PropItUp.GUI
             _selectedTreeReplacement = null;
             //  Create temporary list for search results:
             List<TreeInfo> tmpItemList = new List<TreeInfo>();
-            if (string.IsNullOrEmpty(searchQuery))
+            if (string.IsNullOrEmpty(replacementSearchQuery))
             {
                 tmpItemList = PropItUpTool.allAvailableTrees;
             }
@@ -363,7 +461,7 @@ namespace PropItUp.GUI
             {
                 foreach (TreeInfo result in PropItUpTool.allAvailableTrees)
                 {
-                    if (result.name.ToLower().Contains(searchQuery.ToLower()))
+                    if (result.name.ToLower().Contains(replacementSearchQuery.ToLower()))
                     {
                         tmpItemList.Add(result);
                     }
@@ -384,14 +482,15 @@ namespace PropItUp.GUI
             //  
             if (PropItUpTool.config.enable_debug)
             {
-                DebugUtils.Log($"TreeReplacerPanel: search query '{searchQuery}' returned {tmpItemList.Count} results.");
+                DebugUtils.Log($"TreeReplacerPanel: replacementFastList search query '{replacementSearchQuery}' returned {tmpItemList.Count} results.");
             }
         }
 
         public void ResetPanel()
         {
+            originalSearchQuery = string.Empty;
             _resetReplacementButton.isEnabled = false;
-            searchQuery = string.Empty;
+            replacementSearchQuery = string.Empty;
             _replacementTreeFastListSearchBox.text = string.Empty;
             _replacementTreeFastList.DisplayAt(0);
             _replacementTreeFastList.selectedIndex = -1;

@@ -16,7 +16,7 @@ namespace PropItUp.GUI
         private UIFastList _replacementPropFastList;
         private UIButton _savePropReplacementButton;
 
-        private string searchboxPlaceholder = "Find a prop";
+        private string searchboxPlaceholder = "Find a replacement prop";
 
         public UILabel selectedBuildingLabel
         {
@@ -126,9 +126,12 @@ namespace PropItUp.GUI
                 }
                 //  Get original prop:
                 Configuration.Building building = PropItUpTool.config.GetBuilding(_selectedBuilding.name);
-                Configuration.PrefabReplacement replacement = PropItUpTool.config.GetBuildingPrefabReplacementByIndex(building, "prop", _originalPropFastList.selectedIndex);
+                //  TODO => TEST: Get tree by name instead of index (property obsolete due to alphabetized list)
+                //Configuration.PrefabReplacement replacement = PropItUpTool.config.GetBuildingPrefabReplacementByIndex(building, "prop", _originalPropFastList.selectedIndex);
+                Configuration.PrefabReplacement replacement = PropItUpTool.config.GetBuildingReplacementByOriginalPrefabName(building, _selectedPropOriginal.name);
                 //  Restore replacement:
-                PropItUpTool.RestoreReplacementBuilding(_selectedPropOriginalIndex, "prop", _selectedBuilding);
+                //PropItUpTool.RestoreReplacementBuilding(_selectedPropOriginalIndex, "prop", _selectedBuilding);
+                PropItUpTool.RestoreReplacementBuilding(_selectedPropOriginalIndex, "prop", _selectedBuilding, _selectedPropOriginal);
                 //  Repopulate/reset OriginalPropFastList:
                 _selectedPropReplacement = PrefabCollection<PropInfo>.FindLoaded(replacement.original);
                 PopulateIncludedPropsFastList();
@@ -311,7 +314,8 @@ namespace PropItUp.GUI
                 }
                 else
                 {
-                    Configuration.PrefabReplacement selectedReplacement = PropItUpTool.config.GetBuildingPrefabReplacementByIndex(selectedBuilding, "prop", _selectedPropOriginalIndex);
+                    //Configuration.PrefabReplacement selectedReplacement = PropItUpTool.config.GetBuildingPrefabReplacementByIndex(selectedBuilding, "prop", _selectedPropOriginalIndex);
+                    Configuration.PrefabReplacement selectedReplacement = PropItUpTool.config.GetBuildingReplacementByOriginalPrefabName(selectedBuilding, _selectedPropOriginal.name);
                     if (selectedReplacement != null)
                     {
                         _resetReplacementButton.isEnabled = true;

@@ -27,7 +27,7 @@ namespace PropItUp.GUI
 
             _name = AddUIComponent<UILabel>();
             _name.name = "TreeName";
-            _name.relativePosition = new Vector3(5, 10);
+            _name.relativePosition = new Vector3(5, 9);
             _name.textColor = new Color32(238, 238, 238, 255);
             _name.textScale = 0.8f;
         }

@@ -16,7 +16,7 @@ namespace PropItUp.GUI
         private UIFastList _replacementTreeFastList;
         private UIButton _saveTreeReplacementButton;
 
-        private string searchboxPlaceholder = "Find a tree";
+        private string searchboxPlaceholder = "Find a replacement tree";
 
         public UILabel selectedBuildingLabel
         {
@@ -126,9 +126,12 @@ namespace PropItUp.GUI
                 }
                 //  Get original tree:
                 Configuration.Building building = PropItUpTool.config.GetBuilding(_selectedBuilding.name);
-                Configuration.PrefabReplacement replacement = PropItUpTool.config.GetBuildingPrefabReplacementByIndex(building, "tree", _originalTreeFastList.selectedIndex);
+                //  TODO => TEST: Get tree by name instead of index (property obsolete due to alphabetized list)
+                //Configuration.PrefabReplacement replacement = PropItUpTool.config.GetBuildingPrefabReplacementByIndex(building, "tree", _originalTreeFastList.selectedIndex);
+                Configuration.PrefabReplacement replacement = PropItUpTool.config.GetBuildingReplacementByOriginalPrefabName(building, _selectedTreeOriginal.name);
                 //  Restore replacement:
-                PropItUpTool.RestoreReplacementBuilding(_selectedTreeOriginalIndex, "tree", _selectedBuilding);
+                //PropItUpTool.RestoreReplacementBuilding(_selectedTreeOriginalIndex, "tree", _selectedBuilding);
+                PropItUpTool.RestoreReplacementBuilding(_selectedTreeOriginalIndex, "tree", _selectedBuilding, _selectedTreeOriginal);
                 //  Repopulate/reset OriginalTreeFastList:
                 _selectedTreeReplacement = PrefabCollection<TreeInfo>.FindLoaded(replacement.original);
                 PopulateIncludedTreesFastList();
@@ -309,7 +312,8 @@ namespace PropItUp.GUI
             }
             else
             {
-                Configuration.PrefabReplacement selectedReplacement = PropItUpTool.config.GetBuildingPrefabReplacementByIndex(selectedBuilding, "tree", _selectedTreeOriginalIndex);
+                //Configuration.PrefabReplacement selectedReplacement = PropItUpTool.config.GetBuildingPrefabReplacementByIndex(selectedBuilding, "tree", _originalTreeFastList.selectedIndex);
+                Configuration.PrefabReplacement selectedReplacement = PropItUpTool.config.GetBuildingReplacementByOriginalPrefabName(selectedBuilding, _selectedTreeOriginal.name);
                 if (selectedReplacement != null)
                 {
                     _resetReplacementButton.isEnabled = true;

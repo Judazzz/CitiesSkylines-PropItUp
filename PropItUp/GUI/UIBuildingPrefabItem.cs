@@ -36,7 +36,7 @@ namespace PropItUp.GUI
 
             _name = AddUIComponent<UILabel>();
             _name.name = "TreeName";
-            _name.relativePosition = new Vector3(5, 10);
+            _name.relativePosition = new Vector3(5, 9);
             _name.textColor = new Color32(238, 238, 238, 255);
             _name.textScale = 0.8f;
         }
@@ -107,7 +107,7 @@ namespace PropItUp.GUI
                         else
                         {
                             PropInfo replacementProp = PrefabCollection<PropInfo>.FindLoaded(replacement.original);
-                            _name.text = $"{UIUtils.GenerateBeautifiedPrefabName(_prop)}  [{UIUtils.GenerateBeautifiedPrefabName(replacementProp)}]";
+                            _name.text = $"{UIUtils.GenerateBeautifiedPrefabName(replacementProp)}  [replaced with: {UIUtils.GenerateBeautifiedPrefabName(_prop)}]";
                         }
                     }
                     else
@@ -120,7 +120,7 @@ namespace PropItUp.GUI
                         else
                         {
                             TreeInfo replacementTree = PrefabCollection<TreeInfo>.FindLoaded(replacement.original);
-                            _name.text = $"{UIUtils.GenerateBeautifiedPrefabName(_tree)}  [{UIUtils.GenerateBeautifiedPrefabName(replacementTree)}]";
+                            _name.text = $"{UIUtils.GenerateBeautifiedPrefabName(replacementTree)}  [replaced with: {UIUtils.GenerateBeautifiedPrefabName(_tree)}]";
                         }
                     }
                 }

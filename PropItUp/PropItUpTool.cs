@@ -838,7 +838,8 @@ namespace PropItUp
                 //  Yes => update:
                 string existingPrefab = originalPrefab.name;
                 //  Check if tree/prop replacement already exists:
-                PrefabReplacement existingPrefabReplacement = config.GetBuildingPrefabReplacementByIndex(existingBuilding, type, index);
+                //PrefabReplacement existingPrefabReplacement = config.GetBuildingPrefabReplacementByIndex(existingBuilding, type, index);
+                PrefabReplacement existingPrefabReplacement = config.GetBuildingReplacementByOriginalPrefabName(existingBuilding, existingPrefab);
                 if (existingPrefabReplacement != null)
                 {
                     //  Yes => find previous tree/prop replacement (now needs to be replaced) and update:
@@ -892,11 +893,12 @@ namespace PropItUp
         }
 
         //  Restore selected global tree replacement:
-        public static void RestoreReplacementBuilding(int index, string type, BuildingInfo affectedBuilding)
+        public static void RestoreReplacementBuilding(int index, string type, BuildingInfo affectedBuilding, PrefabInfo affectedPrefab)
         {
             //  Remove tree/prop replacement from config:
             Configuration.Building selectedBuilding = config.GetBuilding(affectedBuilding.name);
-            PrefabReplacement selectedPrefabReplacement = config.GetBuildingPrefabReplacementByIndex(selectedBuilding, type, index);
+            //PrefabReplacement selectedPrefabReplacement = config.GetBuildingPrefabReplacementByIndex(selectedBuilding, type, index);
+            PrefabReplacement selectedPrefabReplacement = config.GetBuildingReplacementByOriginalPrefabName(selectedBuilding, affectedPrefab.name);
             PrefabReplacement executablePrefabReplacement = new PrefabReplacement()
             {
                 index = index,
