@@ -22,19 +22,18 @@ However, you should keep in mind that any other mod that touches building or fre
 
 
 [h1]Most recent updates[/h1]
-[quote][b]March 31st, 2017 - v1.2.2[/b]
+[quote][b]November 11th, 2017 - v1.3.0[/b]
+- Mod panel size increased by 50%;
+- The name of replacements is now shown in the original prop/tree list items;
+- All trees are now available for global replacement (Free-standing and Building Tree Replacement Panels);
+- Added search boxes for original lists (Free-standing and Building Tree Replacement Panels);
+- Various bug-fixes and optimizations.
+
+[b]March 31st, 2017 - v1.2.2[/b]
 - More bug-fixes.
 
 [b]March 29th, 2017 - v1.2.1[/b]
 - Various bug-fixes.
-
-[b]March 28th, 2017 - v1.2.0[/b]
-- The global replacement feature is now broken up in two wholly separate features: one for free-standing trees, and one for building trees;
-- Added option to disable global free-standing tree replacement feature;
-- Changed option to disable applying global building tree replacements when loading your city;
-- Changed option to disable applying per-building prop and tree replacements when loading your city;
-- The BuildingSelection Tool now highlights potentially incompatible buildings (with accented characters in the name, like à,é,ö,û,ç) in red: applying replacements to these buildings can cause config file xml corruption and errors;
-- Added additional null checks so that replacements involving removed/un-subbed props or trees should not causes any problems or errors.
 
 [b]Full update history[/b]
 - [url=http://steamcommunity.com/sharedfiles/filedetails/changelog/878991312]Change log[/url]
