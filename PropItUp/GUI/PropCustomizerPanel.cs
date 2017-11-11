@@ -106,18 +106,7 @@ namespace PropItUp.GUI
             _originalPropLabel.textScale = 0.9f;
             _originalPropLabel.padding = new RectOffset(0, 0, 15, 5);
             //  'Reset replacement' Button
-            _resetReplacementButton = UIUtils.CreateButton(_originalPropLabel);
-            _resetReplacementButton.text = "(reset selected)";
-            _resetReplacementButton.relativePosition = new Vector3(UIUtils.c_resetButtonPosX, UIUtils.c_resetButtonPosY);
-            _resetReplacementButton.width = UIUtils.c_resetButtonWidth;
-            _resetReplacementButton.height = UIUtils.c_resetButtonHeight;
-            _resetReplacementButton.textScale = 0.75f;
-            _resetReplacementButton.normalBgSprite = null;
-            _resetReplacementButton.hoveredBgSprite = null;
-            _resetReplacementButton.pressedBgSprite = null;
-            _resetReplacementButton.focusedBgSprite = null;
-            _resetReplacementButton.disabledBgSprite = null;
-            _resetReplacementButton.disabledColor = new Color32(83, 91, 95, 255);
+            _resetReplacementButton = UIUtils.CreateResetButton(_originalPropLabel);
             _resetReplacementButton.eventClicked += (c, e) =>
             {
                 if (PropItUpTool.config.enable_debug)
@@ -126,19 +115,18 @@ namespace PropItUp.GUI
                 }
                 //  Get original prop:
                 Configuration.Building building = PropItUpTool.config.GetBuilding(_selectedBuilding.name);
-                //  TODO => TEST: Get tree by name instead of index (property obsolete due to alphabetized list)
-                //Configuration.PrefabReplacement replacement = PropItUpTool.config.GetBuildingPrefabReplacementByIndex(building, "prop", _originalPropFastList.selectedIndex);
-                Configuration.PrefabReplacement replacement = PropItUpTool.config.GetBuildingReplacementByOriginalPrefabName(building, _selectedPropOriginal.name);
+                Configuration.PrefabReplacement replacement = PropItUpTool.config.GetBuildingReplacementByReplacementPrefabName(building, _selectedPropOriginal.name);
                 //  Restore replacement:
-                //PropItUpTool.RestoreReplacementBuilding(_selectedPropOriginalIndex, "prop", _selectedBuilding);
-                PropItUpTool.RestoreReplacementBuilding(_selectedPropOriginalIndex, "prop", _selectedBuilding, _selectedPropOriginal);
+                PropItUpTool.RestoreReplacementBuilding(_selectedBuilding, building, replacement);
                 //  Repopulate/reset OriginalPropFastList:
                 _selectedPropReplacement = PrefabCollection<PropInfo>.FindLoaded(replacement.original);
-                PopulateIncludedPropsFastList();
+                PopulateOriginalPropsFastList(c);
                 _selectedPropOriginal = _originalPropFastList.rowsData[_selectedPropOriginalIndex] as PropInfo;
                 _resetReplacementButton.isEnabled = false;
+                _resetReplacementButton.isVisible = false;
             };
             _resetReplacementButton.isEnabled = false;
+            _resetReplacementButton.isVisible = false;
             // FastList
             _originalPropFastList = UIFastList.Create<UIBuildingPrefabItem>(originalContainer);
             _originalPropFastList.backgroundSprite = "UnlockingPanel";
@@ -164,18 +152,7 @@ namespace PropItUp.GUI
             searchboxContainer.relativePosition = new Vector3(0, 292);
             //  Search Box:
             _replacementPropFastListSearchBox = UIUtils.CreateTextField(searchboxContainer);
-            _replacementPropFastListSearchBox.position = new Vector3(_selectedBuildingLabel.relativePosition.x, 315);
-            _replacementPropFastListSearchBox.width = UIUtils.c_searchBoxWidth;
-            _replacementPropFastListSearchBox.height = UIUtils.c_searchBoxHeight;
-            _replacementPropFastListSearchBox.padding = new RectOffset(6, 6, 8, 6);
-            _replacementPropFastListSearchBox.normalBgSprite = "TextFieldUnderline";
-            _replacementPropFastListSearchBox.hoveredBgSprite = "TextFieldUnderline";
-            _replacementPropFastListSearchBox.disabledBgSprite = "TextFieldUnderline";
-            _replacementPropFastListSearchBox.focusedBgSprite = "LevelBarBackground";
-            _replacementPropFastListSearchBox.horizontalAlignment = UIHorizontalAlignment.Left;
             _replacementPropFastListSearchBox.text = searchboxPlaceholder;
-            _replacementPropFastListSearchBox.textColor = new Color32(187, 187, 187, 255);
-            _replacementPropFastListSearchBox.textScale = 0.85f;
             //  Search Box Events:
             _replacementPropFastListSearchBox.eventTextChanged += (c, p) =>
             {
@@ -222,7 +199,7 @@ namespace PropItUp.GUI
             _savePropReplacementButton.eventClicked += (c, e) =>
             {
                 //  Only save if original and replacement are selected:
-                if (selectedPropOriginal == null || selectedPropReplacement == null)
+                if (_selectedPropOriginal == null || _selectedPropReplacement == null)
                 {
                     return;
                 }
@@ -232,15 +209,17 @@ namespace PropItUp.GUI
                     DebugUtils.Log($"PropCustomizerPanel: 'Replace prop' clicked'.");
                 }
                 //  Replace prop:
-                PropItUpTool.SaveReplacementBuilding(_selectedPropOriginalIndex, "prop", _selectedPropOriginal, _selectedPropReplacement, _selectedBuilding);
+                PropItUpTool.SaveReplacementBuilding("prop", _selectedPropOriginal, _selectedPropReplacement, _selectedBuilding);
                 //  Repopulate/reset OriginalPropFastList:
-                PopulateIncludedPropsFastList();
+                PopulateOriginalPropsFastList(c);
                 _selectedPropOriginal = _selectedPropReplacement;
                 _resetReplacementButton.isEnabled = true;
+                _resetReplacementButton.isVisible = true;
             };
+            _savePropReplacementButton.isVisible = false;
         }
 
-        public void PopulateIncludedPropsFastList()
+        public void PopulateOriginalPropsFastList(UIComponent trigger = null)
         {
             //  Set selected building label:
             selectedBuildingLabel.text =
@@ -256,23 +235,36 @@ namespace PropItUp.GUI
             {
                 _originalPropFastList.Clear();
             }
-            //  List all props in selected building:
+            //  Get distinct, alphabetized List of all trees for building:
             listIsUpdating = true;
-            List<BuildingInfo.Prop> allBuildingProps = _selectedBuilding.m_props.Where(x => x.m_prop != null).ToList();
+            List<BuildingInfo.Prop> allBuildingProps = new List<BuildingInfo.Prop>();
+            foreach (var prop in _selectedBuilding.m_props.Where(x => x.m_prop != null))
+            {
+                //  'Extreme Mode':
+                //  TODO: verify if this is still an issue: Exclude props with double quotes in name (causes infinite 'Array index is out of range' error loops):
+                if (PropItUpTool.config.enable_extrememode == false && prop.m_prop.name.Contains("\""))
+                {
+                    continue;
+                }
+                if (allBuildingProps.Where(x => x.m_prop.name == prop.m_prop.name).ToList().Count == 0)
+                {
+                    allBuildingProps.Add(prop);
+                }
+            }
             allBuildingProps = allBuildingProps.OrderBy(x => UIUtils.GenerateBeautifiedPrefabName(x.m_prop)).ToList();
+
+            //  
             List<PropInfo> availableBuildingPropList = new List<PropInfo>();
-            //  TODO: POPULATE PROP LIST BASED ON ACTUAL, CURRENT PROPS
+            //  Populate OriginalFastList:
             foreach (var prop in allBuildingProps)
             {
                 if (prop.m_prop != null)
                 {
                     //  Skip 'Blacklisted' props:
-                    if (!PropItUpTool.allAvailableProps.Contains(prop.m_prop))
-                    {
-                        continue;
-                    }
-
-                    //  TODO? list each prop (instance) individually (with index), so they can be replaced separately (if possible):
+                    //if (!PropItUpTool.allAvailableProps.Contains(prop.m_prop))
+                    //{
+                    //    continue;
+                    //}
                     if (prop.m_prop == _selectedPropOriginal)
                     {
                         prop.m_prop = _selectedPropReplacement;
@@ -286,9 +278,43 @@ namespace PropItUp.GUI
             }
             _originalPropFastList.rowHeight = UIUtils.c_fastListRowHeight;
             listIsUpdating = false;
+
             //  Preset FastList:
-            _originalPropFastList.selectedIndex = _selectedPropOriginalIndex;
-            _originalPropFastList.DisplayAt(_selectedPropOriginalIndex);
+            int selectedRow = -1;
+            if (trigger)
+            {
+                PropInfo target = new PropInfo();
+                if (trigger.name == "resetReplacementButton")
+                {
+                    target = _selectedPropReplacement;// _selectedPropOriginal;
+                }
+                else
+                {
+                    target = _selectedPropReplacement;
+                }
+                //  
+                for (int i = 0; i < availableBuildingPropList.Count; i++)
+                {
+                    PropInfo tmp = _originalPropFastList.rowsData[i] as PropInfo;
+                    if (tmp.name == target.name)
+                    {
+                        DebugUtils.Log($"[DEBUG] - Match at iteration '{i}'.");
+                        selectedRow = i;
+                        break;
+                    }
+                }
+            }
+            DebugUtils.Log($"[DEBUG] - SelectedRow: '{selectedRow}'.");
+            if (selectedRow == -1)
+            {
+                _originalPropFastList.selectedIndex = 0;
+                _originalPropFastList.DisplayAt(0);
+            }
+            else
+            {
+                _originalPropFastList.selectedIndex = selectedRow;
+                _originalPropFastList.DisplayAt(selectedRow);
+            }
             //  
             if (PropItUpTool.config.enable_debug)
             {
@@ -314,19 +340,29 @@ namespace PropItUp.GUI
                 }
                 else
                 {
-                    //Configuration.PrefabReplacement selectedReplacement = PropItUpTool.config.GetBuildingPrefabReplacementByIndex(selectedBuilding, "prop", _selectedPropOriginalIndex);
-                    Configuration.PrefabReplacement selectedReplacement = PropItUpTool.config.GetBuildingReplacementByOriginalPrefabName(selectedBuilding, _selectedPropOriginal.name);
+                    Configuration.PrefabReplacement selectedReplacement = PropItUpTool.config.GetBuildingReplacementByReplacementPrefabName(selectedBuilding, _selectedPropOriginal.name);
                     if (selectedReplacement != null)
                     {
                         _resetReplacementButton.isEnabled = true;
+                        _resetReplacementButton.isVisible = true;
                     }
                     else
                     {
                         _resetReplacementButton.isEnabled = false;
+                        _resetReplacementButton.isVisible = false;
                     }
                 }
                 //  Update/filter availablePropsList:
                 FilterAvailablePropsFastList();
+                //  
+                if (_originalPropFastList.selectedIndex >= 0 && _replacementPropFastList.selectedIndex >= 0)
+                {
+                    _savePropReplacementButton.isVisible = true;
+                }
+                else
+                {
+                    _savePropReplacementButton.isVisible = false;
+                }
                 //  
                 if (PropItUpTool.config.enable_debug)
                 {
@@ -420,6 +456,15 @@ namespace PropItUp.GUI
             //  TODO: visually highlight selected prop instance:
             //PropInstance p = PropManager.instance.m_props.m_buffer[_selectedPropOriginal.GetInstanceID()];
             //  
+            if (_originalPropFastList.selectedIndex >= 0 && _replacementPropFastList.selectedIndex >= 0)
+            {
+                _savePropReplacementButton.isVisible = true;
+            }
+            else
+            {
+                _savePropReplacementButton.isVisible = false;
+            }
+            //  
             if (PropItUpTool.config.enable_debug)
             {
                 DebugUtils.Log($"PropCustomizerPanel: ReplacementFastList selected: prop '{UIUtils.GenerateBeautifiedPrefabName(_selectedPropReplacement)}' ('{_selectedPropReplacement.name}').");
@@ -492,6 +537,8 @@ namespace PropItUp.GUI
                     _replacementPropFastList.DisplayAt(0);
                 }
                 //  
+                _savePropReplacementButton.isVisible = false;
+                //  
                 if (PropItUpTool.config.enable_debug)
                 {
                     DebugUtils.Log($"PropCustomizerPanel: search query '{searchQuery}' returned {tmpItemList.Count} results.");
@@ -504,6 +551,7 @@ namespace PropItUp.GUI
             listIsUpdating = true;
             _selectedBuildingLabel.text = "No building selected";
             _resetReplacementButton.isEnabled = false;
+            _resetReplacementButton.isVisible = false;
             if (_originalPropFastList.rowsData.m_size > 0)
             {
                 _originalPropFastList.Clear();

@@ -30,35 +30,11 @@ namespace PropItUp
         [XmlArrayItem(ElementName = "TreeReplacement")]
         public List<PrefabReplacement> globalBuildingTreeReplacements = new List<PrefabReplacement>();
 
-        public PrefabReplacement GetGlobalReplacementByIndex(int index)
-        {
-            foreach (PrefabReplacement prefabReplacement in globalTreeReplacements)
-            {
-                if (prefabReplacement.index == index)
-                {
-                    return prefabReplacement;
-                }
-            }
-            return null;
-        }
-
         public PrefabReplacement GetGlobalReplacementByTreeName(string prefabName)
         {
             foreach (PrefabReplacement prefabReplacement in globalTreeReplacements)
             {
                 if (prefabReplacement.original == prefabName)
-                {
-                    return prefabReplacement;
-                }
-            }
-            return null;
-        }
-
-        public PrefabReplacement GetGlobalBuildingReplacementByIndex(int index)
-        {
-            foreach (PrefabReplacement prefabReplacement in globalBuildingTreeReplacements)
-            {
-                if (prefabReplacement.index == index)
                 {
                     return prefabReplacement;
                 }
@@ -107,7 +83,6 @@ namespace PropItUp
                     {
                         var newPrefabReplacement = new PrefabReplacement
                         {
-                            index = treeReplacement.index,
                             type = "tree",
                             original = treeReplacement.original,
                             replacement_name = treeReplacement.replacement_name
@@ -120,7 +95,6 @@ namespace PropItUp
                     {
                         var newPrefabReplacement = new PrefabReplacement
                         {
-                            index = treeReplacement.index,
                             type = "tree",
                             original = treeReplacement.original,
                             replacement_name = treeReplacement.replacement_name
@@ -135,11 +109,10 @@ namespace PropItUp
                         {
                             name = building.name
                         };
-                        foreach (var prefabReplacement in building.prefabReplacements.OrderBy(x => x.type).ThenBy(x => x.index).ToList())
+                        foreach (var prefabReplacement in building.prefabReplacements.OrderBy(x => x.type).ThenBy(x => x.original).ToList())
                         {
                             var prefabTreeReplacement = new PrefabReplacement
                             {
-                                index = prefabReplacement.index,
                                 type = prefabReplacement.type,
                                 original = prefabReplacement.original,
                                 replacement_name = prefabReplacement.replacement_name
@@ -199,18 +172,6 @@ namespace PropItUp
             return null;
         }
 
-        public PrefabReplacement GetBuildingPrefabReplacementByIndex(Building building, string type, int index)
-        {
-            foreach (PrefabReplacement prefabReplacement in building.prefabReplacements)
-            {
-                if (prefabReplacement.type == type && prefabReplacement.index == index)
-                {
-                    return prefabReplacement;
-                }
-            }
-            return null;
-        }
-
         public PrefabReplacement GetBuildingReplacementByOriginalPrefabName(Building building, string prefabName)
         {
             foreach (PrefabReplacement prefabReplacement in building.prefabReplacements)
@@ -250,8 +211,8 @@ namespace PropItUp
 
         public class PrefabReplacement
         {
-            [XmlAttribute("index")]
-            public int index;
+            //[XmlAttribute("index")]
+            //public int index;
 
             [XmlAttribute("type")]
             public string type;
@@ -266,7 +227,7 @@ namespace PropItUp
             {
                 original = selectedPrefabReplacement.original;
                 type = selectedPrefabReplacement.type;
-                index = selectedPrefabReplacement.index;
+                //index = selectedPrefabReplacement.index;
                 replacement_name = selectedPrefabReplacement.replacement_name;
             }
 

@@ -31,9 +31,9 @@ namespace PropItUp.GUI
         public static float c_tabPanelWidth = 390f;
         public static float c_tabPanelHeight = 555f;
 
-        public static float c_resetButtonWidth = 110f;
+        public static float c_resetButtonWidth = 130f;
         public static float c_resetButtonHeight = 20f;
-        public static float c_resetButtonPosX = 272f;
+        public static float c_resetButtonPosX = 250f;
         public static float c_resetButtonPosY = 14f;
 
         public static float c_searchBoxWidth = 380f;
@@ -71,6 +71,36 @@ namespace PropItUp.GUI
             button.pressedTextColor = new Color32(255, 255, 255, 255);
             button.focusedTextColor = new Color32(255, 255, 255, 255);
             button.disabledTextColor = new Color32(128, 128, 128, 255);
+            button.canFocus = false;
+            //  
+            return button;
+        }
+        
+        public static UIButton CreateResetButton(UIComponent parent)
+        {
+            UIButton button = parent.AddUIComponent<UIButton>();
+
+            button.name = "resetReplacementButton";
+            button.text = "[ reset selected ]";
+            button.relativePosition = new Vector3(c_resetButtonPosX, c_resetButtonPosY);
+            button.width = c_resetButtonWidth;
+            button.height = c_resetButtonHeight;
+            button.normalBgSprite = null;
+            button.hoveredBgSprite = null;
+            button.pressedBgSprite = null;
+            button.focusedBgSprite = null;
+            button.disabledBgSprite = null;
+
+            button.scaleFactor = 0.75f;
+            button.textScale = 0.85f;
+            button.textPadding = new RectOffset(0, 0, 3, 0);
+            button.textHorizontalAlignment = UIHorizontalAlignment.Center;
+
+            button.textColor = new Color32(255, 100, 100, 255);
+            button.hoveredTextColor = new Color32(187, 187, 187, 255);
+            button.pressedTextColor = new Color32(255, 255, 255, 255);
+            button.focusedTextColor = new Color32(255, 255, 255, 255);
+            button.disabledColor = new Color32(83, 91, 95, 255);
             button.canFocus = false;
             //  
             return button;
@@ -210,20 +240,24 @@ namespace PropItUp.GUI
         {
             UITextField textField = parent.AddUIComponent<UITextField>();
 
-            textField.size = new Vector2(90f, 20f);
-            textField.padding = new RectOffset(6, 6, 3, 3);
             textField.builtinKeyNavigation = true;
             textField.isInteractive = true;
             textField.readOnly = false;
-            textField.horizontalAlignment = UIHorizontalAlignment.Center;
+
             textField.selectionSprite = "EmptySprite";
             textField.selectionBackgroundColor = new Color32(0, 172, 234, 255);
-            textField.normalBgSprite = "TextFieldPanelHovered";
-            textField.disabledBgSprite = "TextFieldPanel";
-            textField.textColor = new Color32(0, 0, 0, 255);
-            textField.disabledTextColor = new Color32(0, 0, 0, 128);
-            textField.color = new Color32(255, 255, 255, 255);
 
+            textField.width = c_searchBoxWidth;
+            textField.height = c_searchBoxHeight;
+            textField.padding = new RectOffset(6, 6, 8, 6);
+            textField.normalBgSprite = "TextFieldUnderline";
+            textField.hoveredBgSprite = "TextFieldUnderline";
+            textField.disabledBgSprite = "TextFieldUnderline";
+            textField.focusedBgSprite = "LevelBarBackground";
+            textField.horizontalAlignment = UIHorizontalAlignment.Left;
+            textField.textColor = new Color32(187, 187, 187, 255);
+            textField.textScale = 0.85f;
+            //  
             return textField;
         }
 

@@ -93,8 +93,8 @@ namespace PropItUp
                     {
                         toolLocked = true;
                         //  
-                        PropCustomizerPanel.instance.PopulateIncludedPropsFastList();
-                        TreeCustomizerPanel.instance.PopulateIncludedTreesFastList();
+                        PropCustomizerPanel.instance.PopulateOriginalPropsFastList();
+                        TreeCustomizerPanel.instance.PopulateOriginalTreesFastList();
                     }
                     //  Deselect
                     if (Input.GetMouseButtonDown(1))

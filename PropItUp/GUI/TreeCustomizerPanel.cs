@@ -106,18 +106,7 @@ namespace PropItUp.GUI
             _originalTreeLabel.textScale = 0.9f;
             _originalTreeLabel.padding = new RectOffset(0, 0, 15, 5);
             //  'Reset replacement' Button
-            _resetReplacementButton = UIUtils.CreateButton(_originalTreeLabel);
-            _resetReplacementButton.text = "(reset selected)";
-            _resetReplacementButton.relativePosition = new Vector3(UIUtils.c_resetButtonPosX, UIUtils.c_resetButtonPosY);
-            _resetReplacementButton.width = UIUtils.c_resetButtonWidth;
-            _resetReplacementButton.height = UIUtils.c_resetButtonHeight;
-            _resetReplacementButton.textScale = 0.75f;
-            _resetReplacementButton.normalBgSprite = null;
-            _resetReplacementButton.hoveredBgSprite = null;
-            _resetReplacementButton.pressedBgSprite = null;
-            _resetReplacementButton.focusedBgSprite = null;
-            _resetReplacementButton.disabledBgSprite = null;
-            _resetReplacementButton.disabledColor = new Color32(83, 91, 95, 255);
+            _resetReplacementButton = UIUtils.CreateResetButton(_originalTreeLabel);
             _resetReplacementButton.eventClicked += (c, e) =>
             {
                 if (PropItUpTool.config.enable_debug)
@@ -126,19 +115,18 @@ namespace PropItUp.GUI
                 }
                 //  Get original tree:
                 Configuration.Building building = PropItUpTool.config.GetBuilding(_selectedBuilding.name);
-                //  TODO => TEST: Get tree by name instead of index (property obsolete due to alphabetized list)
-                //Configuration.PrefabReplacement replacement = PropItUpTool.config.GetBuildingPrefabReplacementByIndex(building, "tree", _originalTreeFastList.selectedIndex);
-                Configuration.PrefabReplacement replacement = PropItUpTool.config.GetBuildingReplacementByOriginalPrefabName(building, _selectedTreeOriginal.name);
+                Configuration.PrefabReplacement replacement = PropItUpTool.config.GetBuildingReplacementByReplacementPrefabName(building, _selectedTreeOriginal.name);
                 //  Restore replacement:
-                //PropItUpTool.RestoreReplacementBuilding(_selectedTreeOriginalIndex, "tree", _selectedBuilding);
-                PropItUpTool.RestoreReplacementBuilding(_selectedTreeOriginalIndex, "tree", _selectedBuilding, _selectedTreeOriginal);
+                PropItUpTool.RestoreReplacementBuilding(_selectedBuilding, building, replacement);
                 //  Repopulate/reset OriginalTreeFastList:
                 _selectedTreeReplacement = PrefabCollection<TreeInfo>.FindLoaded(replacement.original);
-                PopulateIncludedTreesFastList();
+                PopulateOriginalTreesFastList(c);
                 _selectedTreeOriginal = _originalTreeFastList.rowsData[_selectedTreeOriginalIndex] as TreeInfo;
                 _resetReplacementButton.isEnabled = false;
+                _resetReplacementButton.isVisible = false;
             };
             _resetReplacementButton.isEnabled = false;
+            _resetReplacementButton.isVisible = false;
             // FastList
             _originalTreeFastList = UIFastList.Create<UIBuildingPrefabItem>(originalContainer);
             _originalTreeFastList.backgroundSprite = "UnlockingPanel";
@@ -164,18 +152,7 @@ namespace PropItUp.GUI
             searchboxContainer.relativePosition = new Vector3(0, 292);
             //  Search Box:
             _replacementTreeFastListSearchBox = UIUtils.CreateTextField(searchboxContainer);
-            _replacementTreeFastListSearchBox.position = new Vector3(_selectedBuildingLabel.relativePosition.x, 315);
-            _replacementTreeFastListSearchBox.width = UIUtils.c_searchBoxWidth;
-            _replacementTreeFastListSearchBox.height = UIUtils.c_searchBoxHeight;
-            _replacementTreeFastListSearchBox.padding = new RectOffset(6, 6, 8, 6);
-            _replacementTreeFastListSearchBox.normalBgSprite = "TextFieldUnderline";
-            _replacementTreeFastListSearchBox.hoveredBgSprite = "TextFieldUnderline";
-            _replacementTreeFastListSearchBox.disabledBgSprite = "TextFieldUnderline";
-            _replacementTreeFastListSearchBox.focusedBgSprite = "LevelBarBackground";
-            _replacementTreeFastListSearchBox.horizontalAlignment = UIHorizontalAlignment.Left;
             _replacementTreeFastListSearchBox.text = searchboxPlaceholder;
-            _replacementTreeFastListSearchBox.textColor = new Color32(187, 187, 187, 255);
-            _replacementTreeFastListSearchBox.textScale = 0.85f;
             //  Search Box Events:
             _replacementTreeFastListSearchBox.eventTextChanged += (c, p) =>
             {
@@ -222,7 +199,7 @@ namespace PropItUp.GUI
             _saveTreeReplacementButton.eventClicked += (c, e) =>
             {
                 //  Only save if original and replacement are selected:
-                if (selectedTreeOriginal == null || selectedTreeReplacement == null)
+                if (_selectedTreeOriginal == null || _selectedTreeReplacement == null)
                 {
                     return;
                 }
@@ -232,15 +209,17 @@ namespace PropItUp.GUI
                     DebugUtils.Log($"TreeCustomizerPanel: 'Replace tree' clicked'.");
                 }
                 //  Replace tree:
-                PropItUpTool.SaveReplacementBuilding(_selectedTreeOriginalIndex, "tree", _selectedTreeOriginal, _selectedTreeReplacement, _selectedBuilding);
+                PropItUpTool.SaveReplacementBuilding("tree", _selectedTreeOriginal, _selectedTreeReplacement, _selectedBuilding);
                 //  Repopulate/reset OriginalTreeFastList:
-                PopulateIncludedTreesFastList();
+                PopulateOriginalTreesFastList(c);
                 _selectedTreeOriginal = _selectedTreeReplacement;
                 _resetReplacementButton.isEnabled = true;
+                _resetReplacementButton.isVisible = true;
             };
+            _saveTreeReplacementButton.isVisible = false;
         }
 
-        public void PopulateIncludedTreesFastList()
+        public void PopulateOriginalTreesFastList(UIComponent trigger = null)
         {
             //  Set selected building label:
             selectedBuildingLabel.text =
@@ -256,23 +235,36 @@ namespace PropItUp.GUI
             {
                 _originalTreeFastList.Clear();
             }
-            //  List all trees in selected building:
+            //  Get distinct, alphabetized List of all trees for building:
             listIsUpdating = true;
-            List<BuildingInfo.Prop> allBuildingTrees = _selectedBuilding.m_props.Where(x => x.m_tree != null).ToList();
+            List<BuildingInfo.Prop> allBuildingTrees = new List<BuildingInfo.Prop>();
+            foreach (var prop in _selectedBuilding.m_props.Where(x => x.m_tree != null))
+            {
+                //  'Extreme Mode':
+                //  TODO: verify if this is still an issue: Exclude props with double quotes in name (causes infinite 'Array index is out of range' error loops):
+                if (PropItUpTool.config.enable_extrememode == false && prop.m_tree.name.Contains("\""))
+                {
+                    continue;
+                }
+                if (allBuildingTrees.Where(x => x.m_tree.name == prop.m_tree.name).ToList().Count == 0)
+                {
+                    allBuildingTrees.Add(prop);
+                }
+            }
             allBuildingTrees = allBuildingTrees.OrderBy(x => UIUtils.GenerateBeautifiedPrefabName(x.m_tree)).ToList();
+
+            //  
             List<TreeInfo> availableBuildingTreeList = new List<TreeInfo>();
-            //  TODO: POPULATE PROP LIST BASED ON ACTUAL, CURRENT PROPS
+            //  Populate OriginalFastList:
             foreach (var prop in allBuildingTrees)
             {
                 if (prop.m_tree != null)
                 {
-                    //  'Extreme Mode':
-                    //  TODO: verify if this is still an issue: Exclude props with double quotes in name (causes infinite 'Array index is out of range' error loops):
-                    if (PropItUpTool.config.enable_extrememode == false && prop.m_tree.name.Contains("\""))
-                    {
-                        continue;
-                    }
-                    //  TODO? list each tree (instance) individually (with index), so they can be replaced separately (if possible):
+                    //  Skip 'Blacklisted' props:
+                    //if (PropItUpTool.config.enable_extrememode == false && prop.m_tree.name.Contains("\""))
+                    //{
+                    //    continue;
+                    //}
                     if (prop.m_tree == _selectedTreeOriginal)
                     {
                         prop.m_tree = _selectedTreeReplacement;
@@ -286,9 +278,43 @@ namespace PropItUp.GUI
             }
             _originalTreeFastList.rowHeight = UIUtils.c_fastListRowHeight;
             listIsUpdating = false;
+
             //  Preset FastList:
-            _originalTreeFastList.selectedIndex = _selectedTreeOriginalIndex;
-            _originalTreeFastList.DisplayAt(_selectedTreeOriginalIndex);
+            int selectedRow = -1;
+            if (trigger)
+            {
+                TreeInfo target = new TreeInfo();
+                if (trigger.name == "resetReplacementButton")
+                {
+                    target = _selectedTreeReplacement;// _selectedTreeOriginal;
+                }
+                else
+                {
+                    target = _selectedTreeReplacement;
+                }
+                //  
+                for (int i = 0; i < availableBuildingTreeList.Count; i++)
+                {
+                    TreeInfo tmp = _originalTreeFastList.rowsData[i] as TreeInfo;
+                    if (tmp.name == target.name)
+                    {
+                        DebugUtils.Log($"[DEBUG] - Match at iteration '{i}'.");
+                        selectedRow = i;
+                        break;
+                    }
+                }
+            }
+            DebugUtils.Log($"[DEBUG] - SelectedRow: '{selectedRow}'.");
+            if (selectedRow == -1)
+            {
+                _originalTreeFastList.selectedIndex = 0;
+                _originalTreeFastList.DisplayAt(0);
+            }
+            else
+            {
+                _originalTreeFastList.selectedIndex = selectedRow;
+                _originalTreeFastList.DisplayAt(selectedRow);
+            }
             //  
             if (PropItUpTool.config.enable_debug)
             {
@@ -312,16 +338,26 @@ namespace PropItUp.GUI
             }
             else
             {
-                //Configuration.PrefabReplacement selectedReplacement = PropItUpTool.config.GetBuildingPrefabReplacementByIndex(selectedBuilding, "tree", _originalTreeFastList.selectedIndex);
-                Configuration.PrefabReplacement selectedReplacement = PropItUpTool.config.GetBuildingReplacementByOriginalPrefabName(selectedBuilding, _selectedTreeOriginal.name);
+                Configuration.PrefabReplacement selectedReplacement = PropItUpTool.config.GetBuildingReplacementByReplacementPrefabName(selectedBuilding, _selectedTreeOriginal.name);
                 if (selectedReplacement != null)
                 {
                     _resetReplacementButton.isEnabled = true;
+                    _resetReplacementButton.isVisible = true;
                 }
                 else
                 {
                     _resetReplacementButton.isEnabled = false;
+                    _resetReplacementButton.isVisible = false;
                 }
+            }
+            //  
+            if (_originalTreeFastList.selectedIndex >= 0 && _replacementTreeFastList.selectedIndex >= 0)
+            {
+                _saveTreeReplacementButton.isVisible = true;
+            }
+            else
+            {
+                _saveTreeReplacementButton.isVisible = false;
             }
             //  
             if (PropItUpTool.config.enable_debug)
@@ -366,6 +402,15 @@ namespace PropItUp.GUI
             _selectedTreeReplacement = _replacementTreeFastList.rowsData[i] as TreeInfo;
             //  TODO: visually highlight selected tree instance:
             //TreeInstance t = TreeManager.instance.m_trees.m_buffer[_selectedTreeOriginal.GetInstanceID()];
+            //  
+            if (_originalTreeFastList.selectedIndex >= 0 && _replacementTreeFastList.selectedIndex >= 0)
+            {
+                _saveTreeReplacementButton.isVisible = true;
+            }
+            else
+            {
+                _saveTreeReplacementButton.isVisible = false;
+            }
             //  
             if (PropItUpTool.config.enable_debug)
             {
@@ -412,6 +457,8 @@ namespace PropItUp.GUI
                 _replacementTreeFastList.DisplayAt(0);
             }
             //  
+            _saveTreeReplacementButton.isVisible = false;
+            //  
             if (PropItUpTool.config.enable_debug)
             {
                 DebugUtils.Log($"TreeCustomizerPanel: search query '{searchQuery}' returned {tmpItemList.Count} results.");
@@ -423,6 +470,7 @@ namespace PropItUp.GUI
             listIsUpdating = true;
             _selectedBuildingLabel.text = "No building selected";
             _resetReplacementButton.isEnabled = false;
+            _resetReplacementButton.isVisible = false;
             if (_originalTreeFastList.rowsData.m_size > 0)
             {
                 _originalTreeFastList.Clear();

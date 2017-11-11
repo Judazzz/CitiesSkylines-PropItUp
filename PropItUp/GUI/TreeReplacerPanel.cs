@@ -124,18 +124,7 @@ namespace PropItUp.GUI
             _originalTreeLabel.textScale = 0.9f;
             _originalTreeLabel.padding = new RectOffset(0, 0, 15, 5);
             // 'Reset replacement' Button
-            _resetReplacementButton = UIUtils.CreateButton(_originalTreeLabel);
-            _resetReplacementButton.text = "(reset selected)";
-            _resetReplacementButton.relativePosition = new Vector3(UIUtils.c_resetButtonPosX, UIUtils.c_resetButtonPosY);
-            _resetReplacementButton.width = UIUtils.c_resetButtonWidth;
-            _resetReplacementButton.height = UIUtils.c_resetButtonHeight;
-            _resetReplacementButton.textScale = 0.75f;
-            _resetReplacementButton.normalBgSprite = null;
-            _resetReplacementButton.hoveredBgSprite = null;
-            _resetReplacementButton.pressedBgSprite = null;
-            _resetReplacementButton.focusedBgSprite = null;
-            _resetReplacementButton.disabledBgSprite = null;
-            _resetReplacementButton.disabledColor = new Color32(83, 91, 95, 255);
+            _resetReplacementButton = UIUtils.CreateResetButton(_originalTreeLabel);
             _resetReplacementButton.eventClicked += (c, e) =>
             {
                 if (PropItUpTool.config.enable_debug)
@@ -144,7 +133,6 @@ namespace PropItUp.GUI
                 }
                 //  Get original tree:
                 //  TODO => TEST: Get tree by name instead of index (property obsolete due to alphabetized list)
-                //Configuration.PrefabReplacement replacement = PropItUpTool.config.GetGlobalReplacementByIndex(_selectedTreeOriginalIndex);
                 Configuration.PrefabReplacement replacement = PropItUpTool.config.GetGlobalReplacementByTreeName(_selectedTreeOriginal.name);
                 //  Restore replacement:
                 PropItUpTool.RestoreReplacementGlobal();
@@ -154,25 +142,17 @@ namespace PropItUp.GUI
                 PopulateOriginalTreesFastList();
                 _selectedTreeOriginal = _originalTreeFastList.rowsData[_selectedTreeOriginalIndex] as TreeInfo;
                 _resetReplacementButton.isEnabled = false;
+                _resetReplacementButton.isVisible = false;
             };
             _resetReplacementButton.isEnabled = false;
+            _resetReplacementButton.isVisible = false;
             // Original Search Box Container:
             var originalTreeSearchBoxContainer = UIUtils.CreateFormElement(this, "center");
             originalTreeSearchBoxContainer.name = "originalTreeSearchBoxContainer";
             originalTreeSearchBoxContainer.relativePosition = new Vector3(0, 74);
             // Original Search Original :
             _originalTreeFastListSearchBox = UIUtils.CreateTextField(originalTreeSearchBoxContainer);
-            _originalTreeFastListSearchBox.width = UIUtils.c_searchBoxWidth;
-            _originalTreeFastListSearchBox.height = UIUtils.c_searchBoxHeight;
-            _originalTreeFastListSearchBox.padding = new RectOffset(6, 6, 8, 6);
-            _originalTreeFastListSearchBox.normalBgSprite = "TextFieldUnderline";
-            _originalTreeFastListSearchBox.hoveredBgSprite = "TextFieldUnderline";
-            _originalTreeFastListSearchBox.disabledBgSprite = "TextFieldUnderline";
-            _originalTreeFastListSearchBox.focusedBgSprite = "LevelBarBackground";
-            _originalTreeFastListSearchBox.horizontalAlignment = UIHorizontalAlignment.Left;
             _originalTreeFastListSearchBox.text = originalSearchBoxPlaceholder;
-            _originalTreeFastListSearchBox.textColor = new Color32(187, 187, 187, 255);
-            _originalTreeFastListSearchBox.textScale = 0.75f;
             // Original Search Box Events:
             _originalTreeFastListSearchBox.eventTextChanged += (c, p) =>
             {
@@ -224,17 +204,7 @@ namespace PropItUp.GUI
             replacementTreeSearchBoxContainer.relativePosition = new Vector3(0, 312);
             // Replacement Search Box:
             _replacementTreeFastListSearchBox = UIUtils.CreateTextField(replacementTreeSearchBoxContainer);
-            _replacementTreeFastListSearchBox.width = UIUtils.c_searchBoxWidth;
-            _replacementTreeFastListSearchBox.height = UIUtils.c_searchBoxHeight;
-            _replacementTreeFastListSearchBox.padding = new RectOffset(6, 6, 8, 6);
-            _replacementTreeFastListSearchBox.normalBgSprite = "TextFieldUnderline";
-            _replacementTreeFastListSearchBox.hoveredBgSprite = "TextFieldUnderline";
-            _replacementTreeFastListSearchBox.disabledBgSprite = "TextFieldUnderline";
-            _replacementTreeFastListSearchBox.focusedBgSprite = "LevelBarBackground";
-            _replacementTreeFastListSearchBox.horizontalAlignment = UIHorizontalAlignment.Left;
             _replacementTreeFastListSearchBox.text = replacementSearchBoxPlaceholder;
-            _replacementTreeFastListSearchBox.textColor = new Color32(187, 187, 187, 255);
-            _replacementTreeFastListSearchBox.textScale = 0.75f;
             // Replacement Search Box Events:
             _replacementTreeFastListSearchBox.eventTextChanged += (c, p) =>
             {
@@ -296,6 +266,7 @@ namespace PropItUp.GUI
                 PopulateOriginalTreesFastList();
                 _selectedTreeOriginal = _selectedTreeReplacement;
                 _resetReplacementButton.isEnabled = true;
+                _resetReplacementButton.isVisible = true;
             };
         }
 
@@ -347,10 +318,12 @@ namespace PropItUp.GUI
             //  Enable Reset Button if global replacement is set for selected tree:
             if (PropItUpTool.config.GetGlobalReplacementByTreeName(_selectedTreeOriginal.name) != null) {
                 _resetReplacementButton.isEnabled = true;
+                _resetReplacementButton.isVisible = true;
             }
             else
             {
                 _resetReplacementButton.isEnabled = false;
+                _resetReplacementButton.isVisible = false;
             }
             //  
             if (PropItUpTool.config.enable_debug)
@@ -490,6 +463,7 @@ namespace PropItUp.GUI
         {
             originalSearchQuery = string.Empty;
             _resetReplacementButton.isEnabled = false;
+            _resetReplacementButton.isVisible = false;
             replacementSearchQuery = string.Empty;
             _replacementTreeFastListSearchBox.text = string.Empty;
             _replacementTreeFastList.DisplayAt(0);

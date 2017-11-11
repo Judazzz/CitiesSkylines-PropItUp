@@ -38,7 +38,7 @@ namespace PropItUp.GUI
             _name.name = "TreeName";
             _name.relativePosition = new Vector3(5, 9);
             _name.textColor = new Color32(238, 238, 238, 255);
-            _name.textScale = 0.8f;
+            _name.textScale = 0.85f;
         }
 
         protected override void OnMouseDown(UIMouseEventParameter p)
@@ -107,7 +107,8 @@ namespace PropItUp.GUI
                         else
                         {
                             PropInfo replacementProp = PrefabCollection<PropInfo>.FindLoaded(replacement.original);
-                            _name.text = $"{UIUtils.GenerateBeautifiedPrefabName(replacementProp)}  [replaced with: {UIUtils.GenerateBeautifiedPrefabName(_prop)}]";
+                            //_name.text = $"{UIUtils.GenerateBeautifiedPrefabName(replacementProp)}  [replacement: {UIUtils.GenerateBeautifiedPrefabName(_prop)}]";
+                            _name.text = $"{UIUtils.GenerateBeautifiedPrefabName(_prop)}  [original: {UIUtils.GenerateBeautifiedPrefabName(replacementProp)}]";
                         }
                     }
                     else
@@ -120,7 +121,8 @@ namespace PropItUp.GUI
                         else
                         {
                             TreeInfo replacementTree = PrefabCollection<TreeInfo>.FindLoaded(replacement.original);
-                            _name.text = $"{UIUtils.GenerateBeautifiedPrefabName(replacementTree)}  [replaced with: {UIUtils.GenerateBeautifiedPrefabName(_tree)}]";
+                            //_name.text = $"{UIUtils.GenerateBeautifiedPrefabName(replacementTree)} [replacement: {UIUtils.GenerateBeautifiedPrefabName(_tree)}]";
+                            _name.text = $"{UIUtils.GenerateBeautifiedPrefabName(_tree)}  [original: {UIUtils.GenerateBeautifiedPrefabName(replacementTree)}]";
                         }
                     }
                 }

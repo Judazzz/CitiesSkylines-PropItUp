@@ -175,7 +175,7 @@ namespace PropItUp
                 allAvailableProps.Clear();
             }
 
-            //// 'No prop' option:
+            // 'No prop' option:
             //allAvailableProps.Add(null);
 
             //  Loop all props in 'PropCollection':
@@ -224,7 +224,7 @@ namespace PropItUp
                 allAvailableTrees.Clear();
             }
 
-            //// 'No tree' options:
+            // 'No tree' options:
             //allVanillaTrees.Add(null);
             //allCustomTrees.Add(null);
             //allAvailableTrees.Add(null);
@@ -354,7 +354,8 @@ namespace PropItUp
                     }
                     tree.Info = newTree;
                     trees[index] = tree;
-                    TreeManager.instance.UpdateTreeRenderer(index, true); //that updates LODs
+                    //  Update LODs:
+                    TreeManager.instance.UpdateTreeRenderer(index, true);
                 }
             });
         }
@@ -362,14 +363,12 @@ namespace PropItUp
         //  Save/apply selected global tree replacement:
         public static void SaveReplacementGlobal()
         {
-            int index = TreeReplacerPanel.instance.selectedTreeOriginalIndex;
             TreeInfo originalTree = TreeReplacerPanel.instance.selectedTreeOriginal;
             TreeInfo replacementTree = TreeReplacerPanel.instance.selectedTreeReplacement;
 
             //  New tree replacement object:
             PrefabReplacement newTreeReplacement = new PrefabReplacement()
             {
-                index = index,
                 type = "tree",
                 original = originalTree.name,
                 replacement_name = replacementTree.name
@@ -388,7 +387,6 @@ namespace PropItUp
                 {
                     type = existingTreeReplacement.type,
                     original = existingTreeReplacement.original,
-                    index = index,
                     replacement_name = replacementTree.name
                 };
                 config.globalTreeReplacements.Remove(existingTreeReplacement);
@@ -434,7 +432,6 @@ namespace PropItUp
             PrefabReplacement selectedTreeReplacement = config.GetGlobalReplacementByTreeName(originalTree.name);
             PrefabReplacement executableTreeReplacement = new PrefabReplacement()
             {
-                index = selectedTreeReplacement.index,
                 type = "tree",
                 original = selectedTreeReplacement.replacement_name,
                 replacement_name = selectedTreeReplacement.original
@@ -568,14 +565,12 @@ namespace PropItUp
         //  Save/apply selected global building tree replacement:
         public static void SaveBuildingReplacementGlobal()
         {
-            int index = BuildingTreeReplacerPanel.instance.selectedTreeOriginalIndex;
             TreeInfo originalTree = BuildingTreeReplacerPanel.instance.selectedTreeOriginal;
             TreeInfo replacementTree = BuildingTreeReplacerPanel.instance.selectedTreeReplacement;
 
             //  New tree replacement object:
             PrefabReplacement newTreeReplacement = new PrefabReplacement()
             {
-                index = index,
                 type = "tree",
                 original = originalTree.name,
                 replacement_name = replacementTree.name
@@ -594,7 +589,6 @@ namespace PropItUp
                 {
                     type = existingTreeReplacement.type,
                     original = existingTreeReplacement.original,
-                    index = index,
                     replacement_name = replacementTree.name
                 };
                 config.globalBuildingTreeReplacements.Remove(existingTreeReplacement);
@@ -640,7 +634,6 @@ namespace PropItUp
             PrefabReplacement selectedTreeReplacement = config.GetGlobalBuildingReplacementByTreeName(originalTree.name);
             PrefabReplacement executableTreeReplacement = new PrefabReplacement()
             {
-                index = selectedTreeReplacement.index,
                 type = "tree",
                 original = selectedTreeReplacement.replacement_name,
                 replacement_name = selectedTreeReplacement.original
@@ -800,12 +793,11 @@ namespace PropItUp
         }
 
         //  Save/apply selected tree/prop replacement for building:
-        public static void SaveReplacementBuilding(int index, string type, PrefabInfo originalPrefab, PrefabInfo replacementPrefab, BuildingInfo affectedBuilding)
+        public static void SaveReplacementBuilding(string type, PrefabInfo originalPrefab, PrefabInfo replacementPrefab, BuildingInfo affectedBuilding)
         {
             //  New tree/prop replacement object:
             PrefabReplacement newPrefabReplacement = new PrefabReplacement()
             {
-                index = index,
                 type = type,
                 original = originalPrefab.name,
                 replacement_name = replacementPrefab.name,
@@ -838,7 +830,6 @@ namespace PropItUp
                 //  Yes => update:
                 string existingPrefab = originalPrefab.name;
                 //  Check if tree/prop replacement already exists:
-                //PrefabReplacement existingPrefabReplacement = config.GetBuildingPrefabReplacementByIndex(existingBuilding, type, index);
                 PrefabReplacement existingPrefabReplacement = config.GetBuildingReplacementByOriginalPrefabName(existingBuilding, existingPrefab);
                 if (existingPrefabReplacement != null)
                 {
@@ -846,7 +837,6 @@ namespace PropItUp
                     existingPrefab = existingPrefabReplacement.replacement_name;
                     newPrefabReplacement = new PrefabReplacement()
                     {
-                        index = existingPrefabReplacement.index,
                         type = existingPrefabReplacement.type,
                         original = existingPrefabReplacement.original,
                         replacement_name = replacementPrefab.name
@@ -855,7 +845,7 @@ namespace PropItUp
                 }
                 else
                 {
-                    //  Yes => ...:
+                    //  No => ...:
                 }
                 existingBuilding.prefabReplacements.Add(newPrefabReplacement);
                 executablePrefabReplacement.original = existingPrefab;
@@ -892,25 +882,21 @@ namespace PropItUp
             }
         }
 
-        //  Restore selected global tree replacement:
-        public static void RestoreReplacementBuilding(int index, string type, BuildingInfo affectedBuilding, PrefabInfo affectedPrefab)
+        //  Restore selected tree/prop replacement for building:
+        public static void RestoreReplacementBuilding(BuildingInfo affectedBuildingInfo, Configuration.Building affectedBuilding, PrefabReplacement affectedReplacement)
         {
             //  Remove tree/prop replacement from config:
-            Configuration.Building selectedBuilding = config.GetBuilding(affectedBuilding.name);
-            //PrefabReplacement selectedPrefabReplacement = config.GetBuildingPrefabReplacementByIndex(selectedBuilding, type, index);
-            PrefabReplacement selectedPrefabReplacement = config.GetBuildingReplacementByOriginalPrefabName(selectedBuilding, affectedPrefab.name);
             PrefabReplacement executablePrefabReplacement = new PrefabReplacement()
             {
-                index = index,
-                type = type,
-                original = selectedPrefabReplacement.replacement_name,
-                replacement_name = selectedPrefabReplacement.original
+                type = affectedReplacement.type,
+                original = affectedReplacement.replacement_name,
+                replacement_name = affectedReplacement.original
             };
-            selectedBuilding.prefabReplacements.Remove(selectedPrefabReplacement);
+            affectedBuilding.prefabReplacements.Remove(affectedReplacement);
             //  Remove building from config if no prefab replacements remain:
-            if (selectedBuilding.prefabReplacements.Count == 0)
+            if (affectedBuilding.prefabReplacements.Count == 0)
             {
-                config.buildings.Remove(selectedBuilding);
+                config.buildings.Remove(affectedBuilding);
             }
             SaveConfig();
             //  
@@ -927,7 +913,7 @@ namespace PropItUp
                 //  Reset tree/prop:
                 try
                 {
-                    ReplacePrefabBuilding(affectedBuilding, executablePrefabReplacement);
+                    ReplacePrefabBuilding(affectedBuildingInfo, executablePrefabReplacement);
                 }
                 catch (Exception e)
                 {

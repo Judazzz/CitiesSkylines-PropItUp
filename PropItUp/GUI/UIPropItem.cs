@@ -29,7 +29,7 @@ namespace PropItUp.GUI
             _name.name = "PropName";
             _name.relativePosition = new Vector3(5, 9);
             _name.textColor = new Color32(238, 238, 238, 255);
-            _name.textScale = 0.8f;
+            _name.textScale = 0.85f;
         }
 
         protected override void OnMouseDown(UIMouseEventParameter p)
