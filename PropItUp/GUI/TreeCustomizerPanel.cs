@@ -261,10 +261,10 @@ namespace PropItUp.GUI
                 if (prop.m_tree != null)
                 {
                     //  Skip 'Blacklisted' props:
-                    //if (PropItUpTool.config.enable_extrememode == false && prop.m_tree.name.Contains("\""))
-                    //{
-                    //    continue;
-                    //}
+                    if (!PropItUpTool.allAvailableTrees.Contains(prop.m_tree))
+                    {
+                        continue;
+                    }
                     if (prop.m_tree == _selectedTreeOriginal)
                     {
                         prop.m_tree = _selectedTreeReplacement;
@@ -286,7 +286,7 @@ namespace PropItUp.GUI
                 TreeInfo target = new TreeInfo();
                 if (trigger.name == "resetReplacementButton")
                 {
-                    target = _selectedTreeReplacement;// _selectedTreeOriginal;
+                    target = _selectedTreeReplacement;
                 }
                 else
                 {
@@ -298,17 +298,18 @@ namespace PropItUp.GUI
                     TreeInfo tmp = _originalTreeFastList.rowsData[i] as TreeInfo;
                     if (tmp.name == target.name)
                     {
-                        DebugUtils.Log($"[DEBUG] - Match at iteration '{i}'.");
                         selectedRow = i;
                         break;
                     }
                 }
             }
-            DebugUtils.Log($"[DEBUG] - SelectedRow: '{selectedRow}'.");
-            if (selectedRow == -1)
+            if (selectedRow == -1 || _originalTreeFastList.rowsData.m_size == 1)
             {
-                _originalTreeFastList.selectedIndex = 0;
+                if (trigger == null) {
+                    _originalTreeFastList.selectedIndex = -1;
+                }
                 _originalTreeFastList.DisplayAt(0);
+                _originalTreeFastList.selectedIndex = 0;
             }
             else
             {
@@ -335,14 +336,23 @@ namespace PropItUp.GUI
             if (selectedBuilding == null)
             {
                 _resetReplacementButton.isEnabled = false;
+                _resetReplacementButton.isVisible = false;
             }
             else
             {
                 Configuration.PrefabReplacement selectedReplacement = PropItUpTool.config.GetBuildingReplacementByReplacementPrefabName(selectedBuilding, _selectedTreeOriginal.name);
                 if (selectedReplacement != null)
                 {
-                    _resetReplacementButton.isEnabled = true;
-                    _resetReplacementButton.isVisible = true;
+                    if (selectedReplacement.is_visible)
+                    {
+                        _resetReplacementButton.isEnabled = true;
+                        _resetReplacementButton.isVisible = true;
+                    }
+                    else
+                    {
+                        _resetReplacementButton.isEnabled = false;
+                        _resetReplacementButton.isVisible = false;
+                    }
                 }
                 else
                 {

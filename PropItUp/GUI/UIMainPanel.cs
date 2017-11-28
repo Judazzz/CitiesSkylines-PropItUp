@@ -45,7 +45,7 @@ namespace PropItUp.GUI
             padding = new RectOffset(10, 10, 4, 4);
             width = UIUtils.c_modPanelWidth;
             height = UIUtils.c_modPanelHeight;
-            relativePosition = new Vector3(width + 25, 60);
+            relativePosition = new Vector3(10, 60);
             //  
             SetupControls();
             //  

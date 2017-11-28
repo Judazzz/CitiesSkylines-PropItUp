@@ -38,7 +38,7 @@ namespace PropItUp
                 ToolsModifierControl.toolController.gameObject.AddComponent<BuildingSelectionTool>();
             }
 
-            //  Building Prop/Tree Replacements:
+            //  Building Prop/Tree Replacements/Removals:
             PropItUpTool.ListPropPrefabs();
             PropItUpTool.ListTreePrefabs();
             if (PropItUpTool.config.enable_applybuildingonload && PropItUpTool.config.buildings.Count > 0)

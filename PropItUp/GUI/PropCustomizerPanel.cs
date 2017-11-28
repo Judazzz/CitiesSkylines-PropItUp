@@ -261,10 +261,10 @@ namespace PropItUp.GUI
                 if (prop.m_prop != null)
                 {
                     //  Skip 'Blacklisted' props:
-                    //if (!PropItUpTool.allAvailableProps.Contains(prop.m_prop))
-                    //{
-                    //    continue;
-                    //}
+                    if (!PropItUpTool.allAvailableProps.Contains(prop.m_prop))
+                    {
+                        continue;
+                    }
                     if (prop.m_prop == _selectedPropOriginal)
                     {
                         prop.m_prop = _selectedPropReplacement;
@@ -286,7 +286,7 @@ namespace PropItUp.GUI
                 PropInfo target = new PropInfo();
                 if (trigger.name == "resetReplacementButton")
                 {
-                    target = _selectedPropReplacement;// _selectedPropOriginal;
+                    target = _selectedPropReplacement;
                 }
                 else
                 {
@@ -298,17 +298,20 @@ namespace PropItUp.GUI
                     PropInfo tmp = _originalPropFastList.rowsData[i] as PropInfo;
                     if (tmp.name == target.name)
                     {
-                        DebugUtils.Log($"[DEBUG] - Match at iteration '{i}'.");
                         selectedRow = i;
                         break;
                     }
                 }
             }
-            DebugUtils.Log($"[DEBUG] - SelectedRow: '{selectedRow}'.");
-            if (selectedRow == -1)
+            if (selectedRow == -1 || _originalPropFastList.rowsData.m_size == 1)
             {
-                _originalPropFastList.selectedIndex = 0;
+                if (trigger == null)
+                {
+                    _originalPropFastList.selectedIndex = -1;
+                }
+                _originalPropFastList.selectedIndex = -1;
                 _originalPropFastList.DisplayAt(0);
+                _originalPropFastList.selectedIndex = 0;
             }
             else
             {
@@ -337,6 +340,7 @@ namespace PropItUp.GUI
                 if (selectedBuilding == null)
                 {
                     _resetReplacementButton.isEnabled = false;
+                    _resetReplacementButton.isVisible = false;
                 }
                 else
                 {

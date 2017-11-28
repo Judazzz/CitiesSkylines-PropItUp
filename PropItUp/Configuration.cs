@@ -211,9 +211,6 @@ namespace PropItUp
 
         public class PrefabReplacement
         {
-            //[XmlAttribute("index")]
-            //public int index;
-
             [XmlAttribute("type")]
             public string type;
 
@@ -223,12 +220,15 @@ namespace PropItUp
             [XmlAttribute("replacement_name")]
             public string replacement_name = string.Empty;
 
+            [XmlAttribute("is_visible")]
+            public bool is_visible = true;
+
             public PrefabReplacement(PrefabReplacement selectedPrefabReplacement)
             {
                 original = selectedPrefabReplacement.original;
                 type = selectedPrefabReplacement.type;
-                //index = selectedPrefabReplacement.index;
                 replacement_name = selectedPrefabReplacement.replacement_name;
+                is_visible = selectedPrefabReplacement.is_visible;
             }
 
             public PrefabReplacement()

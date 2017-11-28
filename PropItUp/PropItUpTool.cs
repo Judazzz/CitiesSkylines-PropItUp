@@ -190,7 +190,7 @@ namespace PropItUp
                     continue;
                 }
                 //  Skip Markers:
-                if (prop.name.Contains("Hang Around Marker") || prop.name.Contains("Helipad Marker") || prop.name.Contains("Nautical Marker") || prop.name.Contains("Door Marker"))
+                if (prop.name.Contains("Door Marker") || prop.name.Contains("Hang Around Marker") || prop.name.Contains("Helipad Marker") || prop.name.Contains("Nautical Marker") || prop.name.Contains("Parking Marker"))
                 {
                     skipped++;
                     continue;
@@ -293,7 +293,7 @@ namespace PropItUp
                 }
                 catch (Exception e)
                 {
-                    DebugUtils.Log($"Global tree replacement {treeReplacement.original} with {treeReplacement.replacement_name} failed: ReplaceTreesGlobal()");
+                    DebugUtils.Log($"[ERROR] - Global tree replacement {treeReplacement.original} with {treeReplacement.replacement_name} failed: ReplaceTreesGlobal()");
                     DebugUtils.LogException(e);
                     continue;
                 }
@@ -318,7 +318,7 @@ namespace PropItUp
                 {
                     if (config.enable_debug)
                     {
-                        DebugUtils.Log($"Global tree replacement for {selectedTreeReplacement.replacement_name} failed. Reason: replacement tree not found!");
+                        DebugUtils.Log($"[ERROR] - Global tree replacement for {selectedTreeReplacement.replacement_name} failed. Reason: replacement tree not found!");
                     }
                     //  TODO: remove all replacements featuring not found prefab from config
                     return;
@@ -329,7 +329,7 @@ namespace PropItUp
                 {
                     if (config.enable_debug)
                     {
-                        DebugUtils.Log($"Global tree replacement for {selectedTreeReplacement.replacement_name} failed. Reason: original tree not found!");
+                        DebugUtils.Log($"[ERROR] - Global tree replacement for {selectedTreeReplacement.replacement_name} failed. Reason: original tree not found!");
                     }
                     //  TODO: remove all replacements featuring not found prefab from config
                     return;
@@ -412,7 +412,7 @@ namespace PropItUp
                 }
                 catch (Exception e)
                 {
-                    DebugUtils.Log($"Replacing global tree replacement '{executableTreeReplacement.original}' with '{executableTreeReplacement.replacement_name}' failed: SaveReplacementGlobal()");
+                    DebugUtils.Log($"[ERROR] - Replacing global tree replacement '{executableTreeReplacement.original}' with '{executableTreeReplacement.replacement_name}' failed: SaveReplacementGlobal()");
                     DebugUtils.LogException(e);
                 }
                 //  Output timer data:
@@ -456,7 +456,7 @@ namespace PropItUp
                 }
                 catch (Exception e)
                 {
-                    DebugUtils.Log($"Resetting global tree replacement '{executableTreeReplacement.original}' to '{originalTree.name}' failed: ResetReplacementGlobal()");
+                    DebugUtils.Log($"[ERROR] - Resetting global tree replacement '{executableTreeReplacement.original}' to '{originalTree.name}' failed: ResetReplacementGlobal()");
                     DebugUtils.LogException(e);
                 }
                 //  Output timer data:
@@ -492,7 +492,7 @@ namespace PropItUp
                 }
                 catch (Exception e)
                 {
-                    DebugUtils.Log($"Replacement {treeReplacement.original} with {treeReplacement.replacement_name} failed: ReplaceTreesGlobal()");
+                    DebugUtils.Log($"[ERROR] - Replacement {treeReplacement.original} with {treeReplacement.replacement_name} failed: ReplaceTreesGlobal()");
                     DebugUtils.LogException(e);
                     continue;
                 }
@@ -517,7 +517,7 @@ namespace PropItUp
                 {
                     if (config.enable_debug)
                     {
-                        DebugUtils.Log($"Global building tree replacement for {selectedTreeReplacement.replacement_name} failed. Reason: replacement tree not found!");
+                        DebugUtils.Log($"[ERROR] - Global building tree replacement for {selectedTreeReplacement.replacement_name} failed. Reason: replacement tree not found!");
                     }
                     //  TODO: remove all replacements featuring not found prefab from config
                     return;
@@ -528,7 +528,7 @@ namespace PropItUp
                 {
                     if (config.enable_debug)
                     {
-                        DebugUtils.Log($"Global building tree replacement for {selectedTreeReplacement.replacement_name} failed. Reason: original tree not found!");
+                        DebugUtils.Log($"[ERROR] - Global building tree replacement for {selectedTreeReplacement.replacement_name} failed. Reason: original tree not found!");
                     }
                     //  TODO: remove all replacements featuring not found prefab from config
                     return;
@@ -614,7 +614,7 @@ namespace PropItUp
                 }
                 catch (Exception e)
                 {
-                    DebugUtils.Log($"Replacing global building tree replacement '{executableTreeReplacement.original}' with '{executableTreeReplacement.replacement_name}' failed: SaveBuildingReplacementGlobal()");
+                    DebugUtils.Log($"[ERROR] - Replacing global building tree replacement '{executableTreeReplacement.original}' with '{executableTreeReplacement.replacement_name}' failed: SaveBuildingReplacementGlobal()");
                     DebugUtils.LogException(e);
                 }
                 //  Output timer data:
@@ -658,7 +658,7 @@ namespace PropItUp
                 }
                 catch (Exception e)
                 {
-                    DebugUtils.Log($"Resetting global building tree replacement '{executableTreeReplacement.original}' to '{originalTree.name}' failed: ResetBuildingReplacementGlobal()");
+                    DebugUtils.Log($"[ERROR] - Resetting global building tree replacement '{executableTreeReplacement.original}' to '{originalTree.name}' failed: ResetBuildingReplacementGlobal()");
                     DebugUtils.LogException(e);
                 }
                 //  Output timer data:
@@ -691,11 +691,32 @@ namespace PropItUp
                 {
                     try
                     {
-                        ReplacePrefabBuilding(PrefabCollection<BuildingInfo>.FindLoaded(building.name), prefabReplacement);
+                        //ReplacePrefabBuilding(PrefabCollection<BuildingInfo>.FindLoaded(building.name), prefabReplacement);
+
+                        //  Replace or remove?
+                        if (prefabReplacement.is_visible)
+                        {
+                            //  Replace prefab:
+                            ReplacePrefabBuilding(PrefabCollection<BuildingInfo>.FindLoaded(building.name), prefabReplacement);
+                        }
+                        else
+                        {
+                            //  Remove:
+                            if (prefabReplacement.type == "prop")
+                            {
+                                PropInfo prop = allAvailableProps.Where(x => x.name == prefabReplacement.original).FirstOrDefault();
+                                RemovePrefabBuilding(PrefabCollection<BuildingInfo>.FindLoaded(building.name), prop, true);
+                            }
+                            else
+                            {
+                                TreeInfo tree = allAvailableTrees.Where(x => x.name == prefabReplacement.original).FirstOrDefault();
+                                RemovePrefabBuilding(PrefabCollection<BuildingInfo>.FindLoaded(building.name), tree, false);
+                            }
+                        }
                     }
                     catch (Exception e)
                     {
-                        DebugUtils.Log($"Replacement '{prefabReplacement.original}' with '{prefabReplacement.replacement_name}' for building '{building.name}' failed: ReplacePrefabsBuilding()");
+                        DebugUtils.Log($"[ERROR] - Replacement '{prefabReplacement.original}' with '{prefabReplacement.replacement_name}' for building '{building.name}' failed: ReplacePrefabsBuilding()");
                         DebugUtils.LogException(e);
                         continue;
                     }
@@ -718,7 +739,7 @@ namespace PropItUp
             {
                 if (config.enable_debug)
                 {
-                    DebugUtils.Log($"Per-building prop/tree replacement of prop {selectedPrefabReplacement.replacement_name} failed. Reason: building not found!");
+                    DebugUtils.Log($"[ERROR] - Per-building prop/tree replacement of prop {selectedPrefabReplacement.replacement_name} failed. Reason: building not found!");
                 }
                 //  TODO: remove all replacements featuring not found buildingInfo from config
                 return;
@@ -735,7 +756,7 @@ namespace PropItUp
                     {
                         if (config.enable_debug)
                         {
-                            DebugUtils.Log($"Per-building prop replacement of prop {selectedPrefabReplacement.replacement_name} for building {buildingInfo.name} failed. Reason: replacement prop not found!");
+                            DebugUtils.Log($"[ERROR] - Per-building prop replacement of prop {selectedPrefabReplacement.replacement_name} for building {buildingInfo.name} failed. Reason: replacement prop not found!");
                         }
                         //  TODO: remove all replacements featuring not found prefab from config
                         return;
@@ -766,9 +787,9 @@ namespace PropItUp
                     {
                         if (config.enable_debug)
                         {
-                            DebugUtils.Log($"Per-building tree replacement of tree {selectedPrefabReplacement.replacement_name} for building {buildingInfo.name} failed. Reason: replacement tree not found!");
+                            //  TODO: delete all replacements featuring missing prefab from config
+                            DebugUtils.Log($"[ERROR] - Per-building tree replacement of tree {selectedPrefabReplacement.replacement_name} for building {buildingInfo.name} failed. Reason: replacement tree not found!");
                         }
-                        //  TODO: remove all replacements featuring not found prefab from config
                         return;
                     }
                     foreach (var tree in buildingInfo.m_props)
@@ -801,6 +822,7 @@ namespace PropItUp
                 type = type,
                 original = originalPrefab.name,
                 replacement_name = replacementPrefab.name,
+                is_visible = true
             };
             //  Temporary tree/prop replacement object to send to replace method (to ensure non-vanilla tree/prop is replaced):
             PrefabReplacement executablePrefabReplacement = newPrefabReplacement;
@@ -839,7 +861,8 @@ namespace PropItUp
                     {
                         type = existingPrefabReplacement.type,
                         original = existingPrefabReplacement.original,
-                        replacement_name = replacementPrefab.name
+                        replacement_name = replacementPrefab.name,
+                        is_visible = existingPrefabReplacement.is_visible
                     };
                     existingBuilding.prefabReplacements.Remove(existingPrefabReplacement);
                 }
@@ -869,7 +892,7 @@ namespace PropItUp
                 }
                 catch (Exception e)
                 {
-                    DebugUtils.Log($"Replacement '{executablePrefabReplacement.original}' with '{executablePrefabReplacement.replacement_name}' for building '{affectedBuilding.name}' failed: SaveReplacementBuilding()");
+                    DebugUtils.Log($"[ERROR] - Replacement '{executablePrefabReplacement.original}' with '{executablePrefabReplacement.replacement_name}' for building '{affectedBuilding.name}' failed: SaveReplacementBuilding()");
                     DebugUtils.LogException(e);
                 }
                 //  Output timer data:
@@ -917,7 +940,7 @@ namespace PropItUp
                 }
                 catch (Exception e)
                 {
-                    DebugUtils.Log($"Resetting '{executablePrefabReplacement.original}' to '{executablePrefabReplacement.replacement_name}' for building '{affectedBuilding.name}' failed: ResetReplacementGlobal()");
+                    DebugUtils.Log($"[ERROR] - Resetting '{executablePrefabReplacement.original}' to '{executablePrefabReplacement.replacement_name}' for building '{affectedBuilding.name}' failed: ResetReplacementGlobal()");
                     DebugUtils.LogException(e);
                 }
                 //  Output timer data:
@@ -929,6 +952,147 @@ namespace PropItUp
                 }
             }
         }
+
+
+        #endregion
+
+
+        //  Asset-based removals:
+        #region Asset-based removals:
+
+
+        //  Remove selected tree/prop for building (runtime):
+        public static void RemovePrefabBuilding(BuildingInfo buildingInfo, PrefabInfo removedPrefab, bool isProp)
+        {
+            //  Null check:
+            if (buildingInfo == null)
+            {
+                if (config.enable_debug)
+                {
+                    DebugUtils.Log($"[ERROR] - Per-building prop/tree removal of prefab {removedPrefab.name} failed. Reason: building not found!");
+                }
+                //  TODO: remove all replacements featuring not found buildingInfo from config
+                return;
+            }
+            SimulationManager.instance.AddAction(() =>
+            {
+                //  Props:
+                FastList<BuildingInfo.Prop> prefabList = new FastList<BuildingInfo.Prop>();
+                foreach (var prop in buildingInfo.m_props.Where(x => x.m_prop != null))
+                {
+                    var propInstance = prop.m_finalProp;
+                    if (propInstance == null)
+                    {
+                        continue;
+                    }
+                    if (propInstance.name == removedPrefab.name)
+                    {
+                        continue;
+                    }
+                    prefabList.Add(prop);
+                }
+                //  Trees:
+                foreach (var tree in buildingInfo.m_props.Where(x => x.m_tree != null))
+                {
+                    var treeInstance = tree.m_finalTree;
+                    if (treeInstance == null)
+                    {
+                        continue;
+                    }
+                    if (treeInstance.name == removedPrefab.name)
+                    {
+                        continue;
+                    }
+                    prefabList.Add(tree);
+                }
+                buildingInfo.m_props = prefabList.ToArray();
+
+                UpdateBuildingRenderers(buildingInfo); //that should update LODs
+            });
+        }
+
+        //  Save/apply selected tree/prop removal for building:
+        public static void SaveRemovalBuilding(BuildingInfo affectedBuildingInfo, PrefabInfo removedPrefab, bool isProp)
+        {
+            PrefabReplacement prefabReplacement = new PrefabReplacement();
+            //  Building exists?
+            Configuration.Building existingBuilding = config.GetBuilding(affectedBuildingInfo.name);
+            if (existingBuilding == null)
+            {
+                //  No => add:
+                Configuration.Building newBuilding = new Configuration.Building()
+                {
+                    name = affectedBuildingInfo.name
+                };
+                config.buildings.Add(newBuilding);
+                existingBuilding = newBuilding;
+
+                prefabReplacement = new PrefabReplacement()
+                {
+                    type = (isProp) ? "prop" : "tree",
+                    original = removedPrefab.name,
+                    replacement_name = "",
+                    is_visible = false
+                };
+                existingBuilding.prefabReplacements.Add(prefabReplacement);
+            }
+            else
+            {
+                //  Yes => update:
+                PrefabReplacement existingReplacement = config.GetBuildingReplacementByOriginalPrefabName(existingBuilding, removedPrefab.name);
+                //  Replacement exists?:
+                if (existingReplacement == null)
+                {
+                    //  No => add:
+                    prefabReplacement = new PrefabReplacement()
+                    {
+                        type = (isProp) ? "prop" : "tree",
+                        original = removedPrefab.name,
+                        replacement_name = "",
+                        is_visible = false
+                    };
+                    existingBuilding.prefabReplacements.Add(prefabReplacement);
+                }
+                else
+                {
+                    //  Yes => update:
+                    existingReplacement.is_visible = false;
+                    removedPrefab = (isProp) ? allAvailableProps.Where(x => x.name == existingReplacement.replacement_name).FirstOrDefault() as PrefabInfo :
+                        allAvailableTrees.Where(x => x.name == existingReplacement.replacement_name).FirstOrDefault();
+                }
+            }
+            //  Save changes to config:
+            SaveConfig();
+            //  
+            if (config.enable_debug)
+            {
+                DebugUtils.Log($"[Configuration] - Removal of '{removedPrefab.name}' for building '{affectedBuildingInfo.name}' saved (SaveRemovalBuilding).");
+            }
+
+            //  
+            //  Start timer:
+            Stopwatch RemoveTreeTimer = new Stopwatch();
+            RemoveTreeTimer.Start();
+            //  Replace tree/prop:
+            try
+            {
+                RemovePrefabBuilding(affectedBuildingInfo, removedPrefab, isProp);
+            }
+            catch (Exception e)
+            {
+                DebugUtils.Log($"[ERROR] - Removal of '{removedPrefab.name}' for building '{affectedBuildingInfo.name}' failed: SaveRemovalBuilding()");
+                DebugUtils.LogException(e);
+            }
+            //  Output timer data:
+            RemoveTreeTimer.Stop();
+
+            //  
+            if (config.enable_debug)
+            {
+                DebugUtils.Log($"Removal of '{removedPrefab.name}' for building '{affectedBuildingInfo.name}' completed (time elapsed: {RemoveTreeTimer.Elapsed} seconds).");
+            }
+        }
+
 
         #endregion
 

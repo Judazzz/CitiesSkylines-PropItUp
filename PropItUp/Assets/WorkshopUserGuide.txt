@@ -7,7 +7,7 @@ When you open the mod panel, you will find four tabs: [b]GLOBAL[/b], [b]BUILDING
 
 [b]GLOBAL PANEL[/b]
 In this panel you can replace free-standing trees with different ones on a [u]global, city-wide level[/u]. This feature is useful when you quickly want to replace all trees of a certain type on a map to create a specific theme for your city, like removing all pine trees with palms.
-To use this feature, select a tree from the top list, select a replacement tree from the bottom list (1), and click the [b]Replace tree[/b] button to apply the change.
+To use this feature, select a tree from the top list (1), select a replacement tree from the bottom list (2), and click the [b]Replace tree[/b] button to apply the change.
 Vanilla trees that have a global replacement applied to them also display the name of the replacement, so you can immedeately see whether a tree has been replaced or not, and if so, with which one. To undo a replacement, select the tree you want to reset in the top list and click the [b]Reset tree[/b] button. That button will only be available when you have selected a tree in the list that has a replacement applied to it.
 
 [b]NOTE 1[/b]
@@ -21,7 +21,7 @@ If you switch from the [b]Props[/b] or [b]Trees[/b] panel, the selected building
 
 [b]BUILDING PANEL[/b]
 In this panel you can replace vanilla trees that are embedded within buildings with different ones on a [u]global, city-wide level[/u]. This feature is useful when you quickly want to replace all building trees of a certain type on a map to create a specific theme for your city, like removing all pine trees with palms. It can also be useful as a work-around for the - as-of-yet still unresolved - problem of flickering trees caused by the Random Tree Rotation mod.
-To use this feature, select a tree from the top list, select a replacement from the bottom list (1), and click the [b]Replace tree[/b] button to apply the change. Note that buildings that have a custom per-building replacement are untouched by this feature.
+To use this feature, select a tree from the top list (1), select a replacement from the bottom list (2), and click the [b]Replace tree[/b] button to apply the change. Note that buildings that have a custom per-building replacement are untouched by this feature.
 Vanilla trees that have a global replacement applied to them also display the name of the replacement, so you can immedeately see whether a tree has been replaced or not, and if so, with which one. To undo a replacement, select the tree you want to reset in the top list and click the [b]Reset tree[/b] button. That button will only be available when you have selected a tree in the list that has a replacement applied to it.
 
 [b]NOTE 1[/b]
@@ -33,13 +33,28 @@ If you switch from the [b]Props[/b] or [b]Trees[/b] panel, the selected building
 
 [b]PROPS PANEL[/b]
 In this panel you can replace props on a [u]per-building basis[/u]. This feature is useful when you want to replace building props that you don't like or that just don't fit. For example: I have always been bugged by the unrealistic amounts of table sets on roof tops that certain buildings have, and this mod allows me to replace them with more fitting props like antennas or chimneys.
-To use this feature, first select the building that you want to edit: the Building Selection Tool will open as soon as you open this panel. Once a building is selected, the building's name will be displayed at the top of the panel, and all the building's props will be shown in the top list. To un-select a building, right-click on any building: the building name will disappear. To replace a prop, select it in the top list, then select a replacement from the bottom list (1), and click the [b]Replace prop[/b] button to apply the change.
+To use this feature, first select the building that you want to edit: the Building Selection Tool will open as soon as you open this panel. Once a building is selected, the building's name will be displayed at the top of the panel, and all the building's props will be shown in the top list. To un-select a building, right-click on any building: the building name will disappear. To replace a prop, select it in the top list (1), then select a replacement from the bottom list (2), and click the [b]Replace prop[/b] button to apply the change.
 After a replacement the name of both the original and replacement prop will be displayed in the list item, so you can immedeately see whether a prop has been replaced or not, and if so, with which one. To undo a replacement, select the prop you want to reset in the top list and click the [b]Reset prop[/b] button That button will only be available when you have selected a prop in the list that has a replacement applied to it.
+As of version 1.4 this mod includes a feature to remove embedded props and trees. To do this, select the prop you want to remove from a building in the top list, and click on the little blue checkbox to get rid of the selected prop. To avoid accidental removals, you'll have to confirm your action before it is actually applied.
 
 [b]NOTE 1[/b]
 Tree replacements will be applied in real-time (when you click the [b]Replace tree[/b]). For as long as the replacement remains active, the replacement is also immediately applied to every new building of that type added to your city.
 [b]NOTE 2[/b]
 If you switch to the [b]Global[/b] or [b]Building[/b] panel, the currently selected building will be un-selected.
+[b]NOTE 3[/b]
+Keep in mind that [b]it is impossible to undo removing an embedded prop from a building from within the game[/b], because the action physically removes the prop from the asset. That means that after removing a prop, it will not be listed again in the top prop list, which makes an in-game "Undo prop removal"-feature impossible. However, removing a prop does not change the parent asset itself: as soon as you disable/uninstall this mod, the removed props will be present again.
+[b]NOTE 4[/b]
+To re-enable a removed prop, you have to manually edit the config file of this mod.
+Below is a snippet of xml code that shows how the mod stores the removal of Prop A and Prop B (replaced by Prop C) for Building X looks like:
+<Building name="Building X">
+---<PrefabReplacements>
+------<PrefabReplacement type="prop" original="Prop A" replacement_name="" is_visible="false" />
+------<PrefabReplacement type="prop" original="Prop B" replacement_name="Prop C" is_visible="false" />
+---</PrefabReplacements>
+</Building>
+Prop A has been removed, Prop B has first been replaced with Prop C, and later removed. As you can see, both props have a property called [b]is_visible="false"[/b], which tells the mod not to load those two props.
+In order to re-enable these props, all you have to do is changing [b]is_visible="false"[/b] to [b]is_visible="true"[/b]. If you now load your city again, you'll see that both props are present again (and that Prop B is still replaced by Prop C).
+Keep in mind that all changes you make to the config file will only come into effect after reloading your city. It is not recommended to edit the config file while the game is running: not only will the changes you make not be applied, it might actually corrupt your config file. SO DON'T!
 
 
 
@@ -47,4 +62,9 @@ If you switch to the [b]Global[/b] or [b]Building[/b] panel, the currently selec
 In this panel you can do the same as in the Asset Props panel, but instead of props it will let you replace trees on a per-building level.
 
 
-(1) Use the search box above the replacement list to quickly find the tree you are looking for.
+(1) Use the search box above the original list to quickly find the prop/tree you want to replace.
+(2) Use the search box above the replacement list to quickly find the replacement prop/tree you are looking for.
+
+
+
+Last updated: Nov. 29th, 2017
