@@ -22,7 +22,12 @@ However, you should keep in mind that any other mod that touches building or fre
 
 
 [h1]Most recent updates[/h1]
-[quote][b]November 29th, 2017 - v1.4.0[/b]
+[quote][b]December 4th, 2017 - v1.4.1[/b]
+- Added option to remove marker props like parking markers (remove-only);
+- Minor UI tweaks;
+- Minor bug fixes.
+
+[b]November 29th, 2017 - v1.4.0[/b]
 - Added option to remove embedded props and trees from buildings (read the '[url=http://steamcommunity.com/workshop/filedetails/discussion/878991312/133259227529823319/]How to use Prop it Up![/url]' before using this feature!);
 - Various minor bug-fixes.
 
@@ -32,9 +37,6 @@ However, you should keep in mind that any other mod that touches building or fre
 - All trees are now available for global replacement (Free-standing and Building Tree Replacement Panels);
 - Added search boxes for original lists (Free-standing and Building Tree Replacement Panels);
 - Various bug-fixes and optimizations.
-
-[b]March 31st, 2017 - v1.2.2[/b]
-- More bug-fixes.
 
 [b]Full update history[/b]
 - [url=http://steamcommunity.com/sharedfiles/filedetails/changelog/878991312]Change log[/url]

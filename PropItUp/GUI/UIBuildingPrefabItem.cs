@@ -9,12 +9,13 @@ namespace PropItUp.GUI
     public class UIBuildingPrefabItem : UIPanel, IUIFastListRow
     {
         private UILabel _name;
-        private UIButton _visible;
+        private UIButton _hidePrefabButton;
 
         private PropInfo _prop;
         public PropInfo prop;
         private TreeInfo _tree;
         public TreeInfo tree;
+        public string _prefabType;
 
         private bool _isProp;
 
@@ -45,19 +46,17 @@ namespace PropItUp.GUI
             _name.textColor = new Color32(238, 238, 238, 255);
             _name.textScale = 0.85f;
 
-            _visible = AddUIComponent<UIButton>();
-            _visible.relativePosition = new Vector3(UIUtils.c_fastListWidth - 30, 8);
-            _visible.size = new Vector2(15, 15);
-            _visible.normalBgSprite = "check-checked";
-            _visible.hoveredBgSprite = "check-unchecked";
-            _visible.pressedBgSprite = "check-unchecked";
-            _visible.isVisible = false;
+            _hidePrefabButton = AddUIComponent<UIButton>();
+            _hidePrefabButton.relativePosition = new Vector3(UIUtils.c_fastListWidth - 30, 8);
+            _hidePrefabButton.size = new Vector2(15, 15);
+            _hidePrefabButton.normalBgSprite = "check-checked";
+            _hidePrefabButton.hoveredBgSprite = "check-unchecked";
+            _hidePrefabButton.pressedBgSprite = "check-unchecked";
+            _hidePrefabButton.isVisible = true;
 
-
-            var prefab = (PropCustomizerPanel.instance.isVisible) ? "prop" : "tree";
-            _visible.eventClick += (component, param) =>
+            _hidePrefabButton.eventClick += (component, param) =>
             {
-                ConfirmPanel.ShowModal("Remove " + prefab, "Are you sure you want to remove this " + prefab + "?\nYou cannot undo this action!", (d, i) => {
+                ConfirmPanel.ShowModal("Remove " + _prefabType, "Are you sure you want to remove " + _prefabType + " '" + _hidePrefabButton.name + "' from asset '" + _buildingInfo.name + "'?\nYou cannot undo this action!", (d, i) => {
                     if (i == 1)
                     {
                         initHidePrefabBuilding();
@@ -99,10 +98,12 @@ namespace PropItUp.GUI
                 if (PropItUpTool.allAvailableProps.Contains(_prefab as PropInfo))
                 {
                     _isProp = true;
+                    _prefabType = "prop";
                 }
                 else if (PropItUpTool.allAvailableTrees.Contains(_prefab as TreeInfo))
                 {
                     _isProp = false;
+                    _prefabType = "tree";
                 }
 
                 //  Find PrefabReplacement (if present):
@@ -120,8 +121,8 @@ namespace PropItUp.GUI
                 _existingBuilding = PropItUpTool.config.GetBuilding(_buildingInfo.name);
                 if (_existingBuilding == null)
                 {
-                    _name.text = (_isProp) ? UIUtils.GenerateBeautifiedPrefabName(_prop) : UIUtils.GenerateBeautifiedPrefabName(_tree);
-                    _visible.name = (_isProp) ? _prop.name : _tree.name;
+                    _name.text = (_isProp) ? _prop.name : _tree.name;
+                    _hidePrefabButton.name = (_isProp) ? _prop.name : _tree.name;
                 }
                 else
                 {
@@ -131,13 +132,13 @@ namespace PropItUp.GUI
                         if (replacement == null)
                         {
                             _name.text = UIUtils.GenerateBeautifiedPrefabName(_prop);
-                            _visible.name = _prop.name;
+                            _hidePrefabButton.name = _prop.name;
                         }
                         else
                         {
                             PropInfo replacementProp = PrefabCollection<PropInfo>.FindLoaded(replacement.original);
                             _name.text = $"{UIUtils.GenerateBeautifiedPrefabName(_prop)}  [original: {UIUtils.GenerateBeautifiedPrefabName(replacementProp)}]";
-                            _visible.name = replacementProp.name;
+                            _hidePrefabButton.name = replacementProp.name;
                         }
                     }
                     else
@@ -146,13 +147,13 @@ namespace PropItUp.GUI
                         if (replacement == null)
                         {
                             _name.text = UIUtils.GenerateBeautifiedPrefabName(_tree);
-                            _visible.name = _tree.name;
+                            _hidePrefabButton.name = _tree.name;
                         }
                         else
                         {
                             TreeInfo replacementTree = PrefabCollection<TreeInfo>.FindLoaded(replacement.original);
                             _name.text = $"{UIUtils.GenerateBeautifiedPrefabName(_tree)}  [original: {UIUtils.GenerateBeautifiedPrefabName(replacementTree)}]";
-                            _visible.name = replacementTree.name;
+                            _hidePrefabButton.name = replacementTree.name;
                         }
                     }
                 }
@@ -166,20 +167,12 @@ namespace PropItUp.GUI
 
         public void Select(bool isRowOdd)
         {
-            if (_visible)
-            {
-                _visible.isVisible = true;
-            }
             backgroundSprite = "ListItemHighlight";
             color = new Color32(255, 255, 255, 255);
         }
 
         public void Deselect(bool isRowOdd)
         {
-            if (_visible)
-            {
-                _visible.isVisible = false;
-            }
             backgroundSprite = null;
         }
 
@@ -190,23 +183,23 @@ namespace PropItUp.GUI
         protected void initHidePrefabBuilding()
         {
             //  Gather all necessary info:
-            if (PropItUpTool.allAvailableProps.Find(x => x.name == _visible.name) != null)
+            if (PropItUpTool.allAvailableProps.Find(x => x.name == _hidePrefabButton.name) != null)
             {
                 _isProp = true;
                 PropCustomizerPanel.instance.originalPropFastList.Clear();
 
                 BuildingInfo buildingInfo = PropCustomizerPanel.instance.selectedBuilding;
-                PropInfo prop = PropItUpTool.allAvailableProps.Find(x => x.name == _visible.name);
+                PropInfo prop = PropItUpTool.allAvailableProps.Find(x => x.name == _hidePrefabButton.name);
                 //  Save Prefab Removal:
                 PropItUpTool.SaveRemovalBuilding(buildingInfo, prop, true);
             }
-            else if (PropItUpTool.allAvailableTrees.Find(x => x.name == _visible.name) != null)
+            else if (PropItUpTool.allAvailableTrees.Find(x => x.name == _hidePrefabButton.name) != null)
             {
                 _isProp = false;
                 TreeCustomizerPanel.instance.originalTreeFastList.Clear();
 
                 BuildingInfo buildingInfo = TreeCustomizerPanel.instance.selectedBuilding;
-                TreeInfo tree = PropItUpTool.allAvailableTrees.Find(x => x.name == _visible.name);
+                TreeInfo tree = PropItUpTool.allAvailableTrees.Find(x => x.name == _hidePrefabButton.name);
                 //  Save Prefab Removal:
                 PropItUpTool.SaveRemovalBuilding(buildingInfo, tree, false);
             }

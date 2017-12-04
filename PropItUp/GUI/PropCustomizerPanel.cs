@@ -411,6 +411,17 @@ namespace PropItUp.GUI
                 //  Add all available props:
                 _replacementPropFastList.Clear();
 
+                //  Keep AvailablePropsFastList empty in case of marker prop (remove-only):
+                if (PropItUpTool.allMarkerprops.Contains(_selectedPropOriginal))
+                {
+                    //  
+                    if (PropItUpTool.config.enable_debug)
+                    {
+                        DebugUtils.Log($"PropCustomizerPanel: selected prop is a marker prop, which is remove-only: ReplacementFastList remains empty (method: FilterAvailablePropsFastList()).");
+                    }
+                    return;
+                }
+
                 //  Search Query set?
                 if (!string.IsNullOrEmpty(searchQuery))
                 {
@@ -497,6 +508,17 @@ namespace PropItUp.GUI
             {   //  No
                 //  Clear FastList:
                 _replacementPropFastList.Clear();
+
+                //  Keep AvailablePropsFastList empty in case of marker prop (remove-only):
+                if (PropItUpTool.allMarkerprops.Contains(_selectedPropOriginal))
+                {
+                    //  
+                    if (PropItUpTool.config.enable_debug)
+                    {
+                        DebugUtils.Log($"PropCustomizerPanel: selected prop is a marker prop, which is remove-only: ReplacementFastList remains empty (method: Search()).");
+                    }
+                    return;
+                }
                 //  Create temporary list for search results:
                 List<PropInfo> tmpItemList = new List<PropInfo>();
                 foreach (PropInfo result in PropItUpTool.allAvailableProps)

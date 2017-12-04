@@ -47,6 +47,8 @@ namespace PropItUp
         //  List all prefabReplacements:
         public static List<PrefabReplacement> allPrefabReplacements = new List<PrefabReplacement>();
 
+        public static List<PropInfo> allMarkerprops = new List<PropInfo>();
+
         //  METHODS:
         public static void Reset()
         {
@@ -189,12 +191,17 @@ namespace PropItUp
                     skipped++;
                     continue;
                 }
-                //  Skip Markers:
-                if (prop.name.Contains("Door Marker") || prop.name.Contains("Hang Around Marker") || prop.name.Contains("Helipad Marker") || prop.name.Contains("Nautical Marker") || prop.name.Contains("Parking Marker"))
+                //  Prop is Marker?
+                if (prop.m_isMarker && (prop.name.ToLower().Contains("marker") || prop.name.ToLower().Contains("parking")))
                 {
-                    skipped++;
-                    continue;
+                    allMarkerprops.Add(prop);
+                    DebugUtils.Log($"MARKER PROPS: prop = {prop.name}.");
                 }
+                //if (prop.name.Contains("Door Marker") || prop.name.Contains("Hang Around Marker") || prop.name.Contains("Helipad Marker") || prop.name.Contains("Nautical Marker") || prop.name.Contains("Parking Marker"))
+                //{
+                //    skipped++;
+                //    continue;
+                //}
                 //  Temporary 'Extreme Mode' feature:
                 //  TODO: verify if this is still an issue (lots of props are now not listed in replacement fastlist)!
                 //  Exclude props without LOD or with double quotes in name (causes infinite 'Array index is out of range' error loops):
