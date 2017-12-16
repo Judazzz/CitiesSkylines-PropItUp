@@ -55,9 +55,6 @@ namespace PropItUp.GUI
             SetupControls();
 
             _tree = data as TreeInfo;
-            bool isVanilla = (PropItUpTool.allVanillaTrees.Contains(_tree)) ? true : false;
-
-
             _name.text = UIUtils.GenerateBeautifiedPrefabName(_tree);
             backgroundSprite = null;
         }

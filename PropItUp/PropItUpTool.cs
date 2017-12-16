@@ -18,6 +18,7 @@ namespace PropItUp
 
         public static Configuration config;
         public static bool isGameLoaded;
+        public static bool isWinterMap;
 
         public static string ConfigFileName;
         public static readonly string ConfigFileNameOnline = "CSL_PropItUp.xml";
@@ -52,14 +53,22 @@ namespace PropItUp
         //  METHODS:
         public static void Reset()
         {
+            if (UIMainPanel._instance.isVisible)
+            {
+                //  Hide MainPanel:
+                UIMainPanel._instance.isVisible = false;
+                ToolsModifierControl.toolController.CurrentTool = ToolsModifierControl.GetTool<DefaultTool>();
+                ToolsModifierControl.SetTool<DefaultTool>();
+            }
+
             var go = FindObjectOfType<PropItUpTool>();
             if (go != null)
             {
                 Destroy(go);
             }
 
-            config = null; // do??
-            isGameLoaded = false;
+            //config = null; // do??
+            //isGameLoaded = false;
         }
 
         public static void Initialize()
@@ -75,6 +84,7 @@ namespace PropItUp
                 DebugUtils.Log("MainPanel created.");
                 //  Set vars:
                 isGameLoaded = true;
+                isWinterMap = LoadingManager.instance.m_loadedEnvironment.ToLower() == "winter";
                 ConfigFileName = (PluginManager.noWorkshop) ? ConfigFileNameLocal : ConfigFileNameOnline;
                 DebugUtils.Log($"Currently used config File: {ConfigFileName}.");
                 //  Get treeReplacements:
@@ -85,7 +95,7 @@ namespace PropItUp
                 DebugUtils.LogException(e);
                 if (go != null)
                 {
-                    Destroy(go);
+                    //Destroy(go);
                 }
             }
         }
@@ -171,14 +181,11 @@ namespace PropItUp
         //  List all available props:
         public static void ListPropPrefabs(bool isRefresh = false)
         {
-            //  Clear prop list for refresh:
-            if (isRefresh)
-            {
-                allAvailableProps.Clear();
-            }
-
-            // 'No prop' option:
-            //allAvailableProps.Add(null);
+            //  Clear prop list on init/for refresh:
+            //if (isRefresh)
+            //{
+            allAvailableProps.Clear();
+            //}
 
             //  Loop all props in 'PropCollection':
             int skipped = 0;
@@ -195,13 +202,7 @@ namespace PropItUp
                 if (prop.m_isMarker && (prop.name.ToLower().Contains("marker") || prop.name.ToLower().Contains("parking")))
                 {
                     allMarkerprops.Add(prop);
-                    DebugUtils.Log($"MARKER PROPS: prop = {prop.name}.");
                 }
-                //if (prop.name.Contains("Door Marker") || prop.name.Contains("Hang Around Marker") || prop.name.Contains("Helipad Marker") || prop.name.Contains("Nautical Marker") || prop.name.Contains("Parking Marker"))
-                //{
-                //    skipped++;
-                //    continue;
-                //}
                 //  Temporary 'Extreme Mode' feature:
                 //  TODO: verify if this is still an issue (lots of props are now not listed in replacement fastlist)!
                 //  Exclude props without LOD or with double quotes in name (causes infinite 'Array index is out of range' error loops):
@@ -225,16 +226,11 @@ namespace PropItUp
         //  List all available, all vanilla, all Workshop trees:
         public static void ListTreePrefabs(bool isRefresh = false)
         {
-            //  Clear tree list for refresh:
-            if (isRefresh)
-            {
+            //  Clear tree list on init/for refresh:
+            //if (isRefresh)
+            //{
                 allAvailableTrees.Clear();
-            }
-
-            // 'No tree' options:
-            //allVanillaTrees.Add(null);
-            //allCustomTrees.Add(null);
-            //allAvailableTrees.Add(null);
+            //}
 
             //  Loop all trees in 'TreeCollection':
             int skipped = 0;
@@ -256,21 +252,8 @@ namespace PropItUp
                 }
                 //  Add to list:
                 allAvailableTrees.Add(tree);
-                if (tree.m_isCustomContent)
-                {
-                    allCustomTrees.Add(tree);
-                }
-                else
-                {
-                    if (!isRefresh)
-                    {
-                        allVanillaTrees.Add(tree);
-                    }
-                }
             }
             //  Sort lists by alphabet:
-            allVanillaTrees = allVanillaTrees.OrderBy(x => GUI.UIUtils.GenerateBeautifiedPrefabName(x)).ToList();
-            allCustomTrees = allCustomTrees.OrderBy(x => GUI.UIUtils.GenerateBeautifiedPrefabName(x)).ToList();
             allAvailableTrees = allAvailableTrees.OrderBy(x => GUI.UIUtils.GenerateBeautifiedPrefabName(x)).ToList();
 
             //  

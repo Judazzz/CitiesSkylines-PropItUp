@@ -238,17 +238,17 @@ namespace PropItUp.GUI
             //  Get distinct, alphabetized List of all trees for building:
             listIsUpdating = true;
             List<BuildingInfo.Prop> allBuildingTrees = new List<BuildingInfo.Prop>();
-            foreach (var prop in _selectedBuilding.m_props.Where(x => x.m_tree != null))
+            foreach (var tree in _selectedBuilding.m_props.Where(x => x.m_tree != null))
             {
                 //  'Extreme Mode':
                 //  TODO: verify if this is still an issue: Exclude props with double quotes in name (causes infinite 'Array index is out of range' error loops):
-                if (PropItUpTool.config.enable_extrememode == false && prop.m_tree.name.Contains("\""))
+                if (PropItUpTool.config.enable_extrememode == false && tree.m_tree.name.Contains("\""))
                 {
                     continue;
                 }
-                if (allBuildingTrees.Where(x => x.m_tree.name == prop.m_tree.name).ToList().Count == 0)
+                if (allBuildingTrees.Where(x => x.m_tree.name == tree.m_tree.name).ToList().Count == 0)
                 {
-                    allBuildingTrees.Add(prop);
+                    allBuildingTrees.Add(tree);
                 }
             }
             allBuildingTrees = allBuildingTrees.OrderBy(x => UIUtils.GenerateBeautifiedPrefabName(x.m_tree)).ToList();
@@ -256,24 +256,46 @@ namespace PropItUp.GUI
             //  
             List<TreeInfo> availableBuildingTreeList = new List<TreeInfo>();
             //  Populate OriginalFastList:
-            foreach (var prop in allBuildingTrees)
+            foreach (var tree in allBuildingTrees)
             {
-                if (prop.m_tree != null)
+                if (tree.m_tree != null)
                 {
-                    //  Skip 'Blacklisted' props:
-                    if (!PropItUpTool.allAvailableTrees.Contains(prop.m_tree))
-                    {
-                        continue;
-                    }
-                    if (prop.m_tree == _selectedTreeOriginal)
-                    {
-                        prop.m_tree = _selectedTreeReplacement;
-                    }
-                    if (!availableBuildingTreeList.Contains(prop.m_tree))
-                    {
-                        availableBuildingTreeList.Add(prop.m_tree);
-                        _originalTreeFastList.rowsData.Add(prop.m_tree);
-                    }
+                    //if (PropItUpTool.isWinterMap)
+                    //{
+                    //    DebugUtils.Log($"TreeCustomizerPanel: building tree {tree.m_tree.name}.");
+                    //    //  Winter map (requires different approach because for winter maps BuildingInfo.prop != TreeInfo):
+                    //    if (PropItUpTool.allAvailableTrees.Contains(tree.m_tree) || PropItUpTool.allAvailableTrees.Where(x => x.m_generatedInfo.name == tree.m_tree.name).ToList().Count > 0)
+                    //    {
+                    //        if (!availableBuildingTreeList.Contains(tree.m_tree))
+                    //        {
+                    //            availableBuildingTreeList.Add(tree.m_tree);
+                    //            _originalTreeFastList.rowsData.Add(tree.m_tree);
+                    //            DebugUtils.Log($"TreeCustomizerPanel: building tree {tree.m_tree.name} included (winter map).");
+                    //        }
+                    //    }
+                    //    else
+                    //    {
+                    //        continue;
+                    //    }
+                    //}
+                    //else
+                    //{
+                        //  Skip 'Blacklisted' props:
+                        if (!PropItUpTool.allAvailableTrees.Contains(tree.m_tree))
+                        {
+                            continue;
+                        }
+                        if (tree.m_tree == _selectedTreeOriginal)
+                        {
+                            tree.m_tree = _selectedTreeReplacement;
+                        }
+                        if (!availableBuildingTreeList.Contains(tree.m_tree))
+                        {
+                            availableBuildingTreeList.Add(tree.m_tree);
+                            _originalTreeFastList.rowsData.Add(tree.m_tree);
+                            DebugUtils.Log($"TreeCustomizerPanel: building tree {tree.m_tree.name} included.");
+                        }
+                    //}
                 }
             }
             _originalTreeFastList.rowHeight = UIUtils.c_fastListRowHeight;
@@ -329,7 +351,16 @@ namespace PropItUp.GUI
                 return;
             }
             //  
-            _selectedTreeOriginal = _originalTreeFastList.rowsData[i] as TreeInfo;
+
+            //if (PropItUpTool.isWinterMap)
+            //{
+            //    _selectedTreeOriginal = _originalTreeFastList.rowsData[i] as TreeInfo;
+            //    _selectedTreeOriginal = _selectedTreeOriginal.m_generatedInfo.m_treeInfo as TreeInfo;
+            //}
+            //else
+            //{
+                _selectedTreeOriginal = _originalTreeFastList.rowsData[i] as TreeInfo;
+            //}
             _selectedTreeOriginalIndex = i;
             //  Enable Reset Button if selected building has tree replacements and tree replacement is set for selected building:
             Configuration.Building selectedBuilding = PropItUpTool.config.GetBuilding(_selectedBuilding.name);
@@ -389,9 +420,9 @@ namespace PropItUp.GUI
                 //  TODO: Add 'No replacement' option:
 
                 //  Add all available trees:
-
                 foreach (var tree in PropItUpTool.allAvailableTrees)
                 {
+                    DebugUtils.Log($"TreeCustomizerPanel: replacement tree added: {tree.name}.");
                     _replacementTreeFastList.rowsData.Add(tree);
                 }
                 _replacementTreeFastList.rowHeight = UIUtils.c_fastListRowHeight;
