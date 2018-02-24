@@ -53,12 +53,15 @@ namespace PropItUp
         //  METHODS:
         public static void Reset()
         {
-            if (UIMainPanel._instance.isVisible)
+            if (UIMainPanel._instance != null)
             {
-                //  Hide MainPanel:
-                UIMainPanel._instance.isVisible = false;
-                ToolsModifierControl.toolController.CurrentTool = ToolsModifierControl.GetTool<DefaultTool>();
-                ToolsModifierControl.SetTool<DefaultTool>();
+                if (UIMainPanel._instance.isVisible)
+                {
+                    //  Hide MainPanel:
+                    UIMainPanel._instance.isVisible = false;
+                    ToolsModifierControl.toolController.CurrentTool = ToolsModifierControl.GetTool<DefaultTool>();
+                    ToolsModifierControl.SetTool<DefaultTool>();
+                }
             }
 
             var go = FindObjectOfType<PropItUpTool>();
@@ -308,7 +311,7 @@ namespace PropItUp
                 {
                     if (config.enable_debug)
                     {
-                        DebugUtils.Log($"[ERROR] - Global tree replacement for {selectedTreeReplacement.replacement_name} failed. Reason: replacement tree not found!");
+                        DebugUtils.Log($"[WARNING] - Global tree replacement for {selectedTreeReplacement.replacement_name} failed. Reason: replacement tree not found!");
                     }
                     //  TODO: remove all replacements featuring not found prefab from config
                     return;
@@ -319,7 +322,7 @@ namespace PropItUp
                 {
                     if (config.enable_debug)
                     {
-                        DebugUtils.Log($"[ERROR] - Global tree replacement for {selectedTreeReplacement.replacement_name} failed. Reason: original tree not found!");
+                        DebugUtils.Log($"[WARNING] - Global tree replacement for {selectedTreeReplacement.replacement_name} failed. Reason: original tree not found!");
                     }
                     //  TODO: remove all replacements featuring not found prefab from config
                     return;
@@ -507,7 +510,7 @@ namespace PropItUp
                 {
                     if (config.enable_debug)
                     {
-                        DebugUtils.Log($"[ERROR] - Global building tree replacement for {selectedTreeReplacement.replacement_name} failed. Reason: replacement tree not found!");
+                        DebugUtils.Log($"[WARNING] - Global building tree replacement for {selectedTreeReplacement.replacement_name} failed. Reason: replacement tree not found!");
                     }
                     //  TODO: remove all replacements featuring not found prefab from config
                     return;
@@ -518,7 +521,7 @@ namespace PropItUp
                 {
                     if (config.enable_debug)
                     {
-                        DebugUtils.Log($"[ERROR] - Global building tree replacement for {selectedTreeReplacement.replacement_name} failed. Reason: original tree not found!");
+                        DebugUtils.Log($"[WARNING] - Global building tree replacement for {selectedTreeReplacement.replacement_name} failed. Reason: original tree not found!");
                     }
                     //  TODO: remove all replacements featuring not found prefab from config
                     return;
@@ -729,7 +732,7 @@ namespace PropItUp
             {
                 if (config.enable_debug)
                 {
-                    DebugUtils.Log($"[ERROR] - Per-building prop/tree replacement of prop {selectedPrefabReplacement.replacement_name} failed. Reason: building not found!");
+                    DebugUtils.Log($"[WARNING] - Per-building prop/tree replacement of prop {selectedPrefabReplacement.replacement_name} failed. Reason: building not found!");
                 }
                 //  TODO: remove all replacements featuring not found buildingInfo from config
                 return;
@@ -746,7 +749,7 @@ namespace PropItUp
                     {
                         if (config.enable_debug)
                         {
-                            DebugUtils.Log($"[ERROR] - Per-building prop replacement of prop {selectedPrefabReplacement.replacement_name} for building {buildingInfo.name} failed. Reason: replacement prop not found!");
+                            DebugUtils.Log($"[WARNING] - Per-building prop replacement of prop {selectedPrefabReplacement.replacement_name} for building {buildingInfo.name} failed. Reason: replacement prop not found!");
                         }
                         //  TODO: remove all replacements featuring not found prefab from config
                         return;
@@ -778,7 +781,7 @@ namespace PropItUp
                         if (config.enable_debug)
                         {
                             //  TODO: delete all replacements featuring missing prefab from config
-                            DebugUtils.Log($"[ERROR] - Per-building tree replacement of tree {selectedPrefabReplacement.replacement_name} for building {buildingInfo.name} failed. Reason: replacement tree not found!");
+                            DebugUtils.Log($"[WARNING] - Per-building tree replacement of tree {selectedPrefabReplacement.replacement_name} for building {buildingInfo.name} failed. Reason: replacement tree not found!");
                         }
                         return;
                     }
@@ -959,7 +962,7 @@ namespace PropItUp
             {
                 if (config.enable_debug)
                 {
-                    DebugUtils.Log($"[ERROR] - Per-building prop/tree removal of prefab {removedPrefab.name} failed. Reason: building not found!");
+                    DebugUtils.Log($"[WARNING] - Per-building prop/tree removal of prefab {removedPrefab.name} failed. Reason: building not found!");
                 }
                 //  TODO: remove all replacements featuring not found buildingInfo from config
                 return;
