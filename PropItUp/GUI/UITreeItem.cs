@@ -55,7 +55,7 @@ namespace PropItUp.GUI
             SetupControls();
 
             _tree = data as TreeInfo;
-            _name.text = UIUtils.GenerateBeautifiedPrefabName(_tree);
+            _name.text = (_tree.m_isCustomContent) ? UIUtils.GenerateBeautifiedPrefabName(_tree) : "[v] " + UIUtils.GenerateBeautifiedPrefabName(_tree);
             backgroundSprite = null;
         }
 

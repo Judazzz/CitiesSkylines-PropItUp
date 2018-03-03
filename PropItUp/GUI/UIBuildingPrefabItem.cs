@@ -121,7 +121,7 @@ namespace PropItUp.GUI
                 _existingBuilding = PropItUpTool.config.GetBuilding(_buildingInfo.name);
                 if (_existingBuilding == null)
                 {
-                    _name.text = (_isProp) ? _prop.name : _tree.name;
+                    _name.text = (_isProp) ? (_prop.m_isCustomContent) ? _prop.name : "[v] " + _prop.name : (_tree.m_isCustomContent) ? _tree.name : "[v] " + _tree.name;
                     _hidePrefabButton.name = (_isProp) ? _prop.name : _tree.name;
                 }
                 else
@@ -131,13 +131,29 @@ namespace PropItUp.GUI
                         PrefabReplacement replacement = PropItUpTool.config.GetBuildingReplacementByReplacementPrefabName(_existingBuilding, _prop.name);
                         if (replacement == null)
                         {
-                            _name.text = UIUtils.GenerateBeautifiedPrefabName(_prop);
+                            _name.text = (_prop.m_isCustomContent) ? UIUtils.GenerateBeautifiedPrefabName(_prop) : "[v] " + UIUtils.GenerateBeautifiedPrefabName(_prop);
                             _hidePrefabButton.name = _prop.name;
                         }
                         else
                         {
                             PropInfo replacementProp = PrefabCollection<PropInfo>.FindLoaded(replacement.original);
-                            _name.text = $"{UIUtils.GenerateBeautifiedPrefabName(_prop)}  [original: {UIUtils.GenerateBeautifiedPrefabName(replacementProp)}]";
+                            //_name.text = $"{UIUtils.GenerateBeautifiedPrefabName(_prop)}  [original: {UIUtils.GenerateBeautifiedPrefabName(replacementProp)}]";
+                            if (_prop.m_isCustomContent && replacementProp.m_isCustomContent)
+                            {
+                                _name.text = $"{UIUtils.GenerateBeautifiedPrefabName(_prop)}  [original: {UIUtils.GenerateBeautifiedPrefabName(replacementProp)}]";
+                            }
+                            else if (!_prop.m_isCustomContent && replacementProp.m_isCustomContent)
+                            {
+                                _name.text = $"[v] {UIUtils.GenerateBeautifiedPrefabName(_prop)}  [original: {UIUtils.GenerateBeautifiedPrefabName(replacementProp)}]";
+                            }
+                            else if (_prop.m_isCustomContent && !replacementProp.m_isCustomContent)
+                            {
+                                _name.text = $"{UIUtils.GenerateBeautifiedPrefabName(_prop)}  [original: [v] {UIUtils.GenerateBeautifiedPrefabName(replacementProp)}]";
+                            }
+                            else
+                            {
+                                _name.text = $"[v] {UIUtils.GenerateBeautifiedPrefabName(_prop)}  [original: [v] {UIUtils.GenerateBeautifiedPrefabName(replacementProp)}]";
+                            }
                             _hidePrefabButton.name = replacementProp.name;
                         }
                     }
@@ -146,13 +162,29 @@ namespace PropItUp.GUI
                         PrefabReplacement replacement = PropItUpTool.config.GetBuildingReplacementByReplacementPrefabName(_existingBuilding, _tree.name);
                         if (replacement == null)
                         {
-                            _name.text = UIUtils.GenerateBeautifiedPrefabName(_tree);
+                            _name.text = (_tree.m_isCustomContent) ? UIUtils.GenerateBeautifiedPrefabName(_tree) : "[v] " + UIUtils.GenerateBeautifiedPrefabName(_tree);
                             _hidePrefabButton.name = _tree.name;
                         }
                         else
                         {
                             TreeInfo replacementTree = PrefabCollection<TreeInfo>.FindLoaded(replacement.original);
-                            _name.text = $"{UIUtils.GenerateBeautifiedPrefabName(_tree)}  [original: {UIUtils.GenerateBeautifiedPrefabName(replacementTree)}]";
+                            //_name.text = $"{UIUtils.GenerateBeautifiedPrefabName(_tree)}  [original: {UIUtils.GenerateBeautifiedPrefabName(replacementTree)}]";
+                            if (_tree.m_isCustomContent && replacementTree.m_isCustomContent)
+                            {
+                                _name.text = $"{UIUtils.GenerateBeautifiedPrefabName(_tree)}  [original: {UIUtils.GenerateBeautifiedPrefabName(replacementTree)}]";
+                            }
+                            else if (!_tree.m_isCustomContent && replacementTree.m_isCustomContent)
+                            {
+                                _name.text = $"[v] {UIUtils.GenerateBeautifiedPrefabName(_tree)}  [original: {UIUtils.GenerateBeautifiedPrefabName(replacementTree)}]";
+                            }
+                            else if (_tree.m_isCustomContent && !replacementTree.m_isCustomContent)
+                            {
+                                _name.text = $"{UIUtils.GenerateBeautifiedPrefabName(_tree)}  [original: [v] {UIUtils.GenerateBeautifiedPrefabName(replacementTree)}]";
+                            }
+                            else
+                            {
+                                _name.text = $"[v] {UIUtils.GenerateBeautifiedPrefabName(_tree)}  [original: [v] {UIUtils.GenerateBeautifiedPrefabName(replacementTree)}]";
+                            }
                             _hidePrefabButton.name = replacementTree.name;
                         }
                     }

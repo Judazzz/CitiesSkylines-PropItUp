@@ -61,12 +61,28 @@ namespace PropItUp.GUI
 
             if (replacement == null)
             {
-                _name.text = UIUtils.GenerateBeautifiedPrefabName(_tree);
+                _name.text = (_tree.m_isCustomContent) ? UIUtils.GenerateBeautifiedPrefabName(_tree) : "[v] " + UIUtils.GenerateBeautifiedPrefabName(_tree);
             }
             else
             {
                 TreeInfo replacementTree = PrefabCollection<TreeInfo>.FindLoaded(replacement.replacement_name);
-                _name.text = $"{UIUtils.GenerateBeautifiedPrefabName(_tree)}  [original: {UIUtils.GenerateBeautifiedPrefabName(replacementTree)}]";
+                //_name.text = $"{UIUtils.GenerateBeautifiedPrefabName(_tree)}  [original: {UIUtils.GenerateBeautifiedPrefabName(replacementTree)}]";
+                if (_tree.m_isCustomContent && replacementTree.m_isCustomContent)
+                {
+                    _name.text = $"{UIUtils.GenerateBeautifiedPrefabName(_tree)}  [original: {UIUtils.GenerateBeautifiedPrefabName(replacementTree)}]";
+                }
+                else if (!_tree.m_isCustomContent && replacementTree.m_isCustomContent)
+                {
+                    _name.text = $"[v] {UIUtils.GenerateBeautifiedPrefabName(_tree)}  [original: {UIUtils.GenerateBeautifiedPrefabName(replacementTree)}]";
+                }
+                else if (_tree.m_isCustomContent && !replacementTree.m_isCustomContent)
+                {
+                    _name.text = $"{UIUtils.GenerateBeautifiedPrefabName(_tree)}  [original: [v] {UIUtils.GenerateBeautifiedPrefabName(replacementTree)}]";
+                }
+                else
+                {
+                    _name.text = $"[v] {UIUtils.GenerateBeautifiedPrefabName(_tree)}  [original: [v] {UIUtils.GenerateBeautifiedPrefabName(replacementTree)}]";
+                }
             }
 
             backgroundSprite = null;

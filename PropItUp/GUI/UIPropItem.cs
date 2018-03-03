@@ -55,7 +55,7 @@ namespace PropItUp.GUI
             SetupControls();
 
             _prop = data as PropInfo;
-            _name.text = UIUtils.GenerateBeautifiedPrefabName(_prop);
+            _name.text = (_prop.m_isCustomContent) ? UIUtils.GenerateBeautifiedPrefabName(_prop) : "[v] " + UIUtils.GenerateBeautifiedPrefabName(_prop);
             backgroundSprite = null;
         }
 

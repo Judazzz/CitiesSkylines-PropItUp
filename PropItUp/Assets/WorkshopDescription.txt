@@ -23,18 +23,15 @@ However, you should keep in mind that any other mod that touches building or fre
 
 [h1]Most recent updates[/h1]
 [quote]
-[b]Februuary 24th, 2018 - v1.4.3[/b]
+[b]March 3rd, 2018 - v1.4.4[/b]
+- Vanilla items in lists now have "[v]" prefixed to the name, making it easier to distinguish between vanilla and Workshop items.
+
+[b]February 24th, 2018 - v1.4.3[/b]
 - Fixed a bug that caused an error pop-up when returning from the Asset Editor to the Main Menu.
 
 [b]December 16th, 2017 - v1.4.2[/b]
 - Fixed a bug that sometimes caused prop/tree items to be shown in lists multiple times;
 - Fixed a bug that caused issues when reloading a map when in-game.
-
-[b]December 4th, 2017 - v1.4.1[/b]
-- Added option to remove marker props like parking markers (remove-only);
-- Removing a prop or tree from an asset no longer requires selecting/highlighting that item in the top list first;
-- Minor UI tweaks;
-- Minor bug fixes.
 
 [b]Full update history[/b]
 - [url=http://steamcommunity.com/sharedfiles/filedetails/changelog/878991312]Change log[/url]
